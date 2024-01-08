@@ -1,0 +1,1 @@
+<PATH TO>\python-qgis.bat <FULL_PATH_TO_PYTHON_SCRIPT>

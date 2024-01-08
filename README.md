@@ -1,2 +1,25 @@
 # QGIS__ETL
- Using QGIS as an ETL tool 
+ 
+## Requirements ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
+##
+## This concept requires a QGIS installation on the computer
+## that executes the jobs.
+##
+## It requires the file python-qgis.bat, which normally can be
+## located in one of these folders :
+##
+## <OSGeo4W_ROOT>\bin
+## or 
+## <QGIS_ROOT>\bin
+##
+## If you are usig a dev- or ltr version, the filename is 
+## different eg: python-qgis-ltr.bat
+##
+## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
+
+
+# Boilerplates
+
+
+
+
