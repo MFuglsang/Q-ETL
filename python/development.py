@@ -12,9 +12,9 @@ qgs.initQgis()
 sys.path.append("python/transformers")
 sys.path.append("python/readers")
 sys.path.append("python/writers")
-from geometry import reproject, isGeometryValid
-from inputreaders import readShapefile, readGeojson
-from outputwriters import writeOutputfile
+from geometry import *
+from inputreaders import *
+from outputwriters import *
 
 print("QGIS ready from CMD")
 
