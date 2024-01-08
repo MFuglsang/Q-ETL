@@ -1,17 +1,23 @@
 import sys
 from qgis.core import QgsApplication
 
+sys.path.append("python/config")
+from configuration import *
+
+config = loadConfig()
 
 print('Kicking off... ')
 
-QgsApplication.setPrefixPath("C:/App/OSGeo4w/apps/qgis", True)
+QgsApplication.setPrefixPath(config["Qgs_PrefixPath"], True)
 qgs = QgsApplication([], False)
 qgs.initQgis()
 
 ## Loading stuff on the running QGIS...
+sys.path.append("python/config")
 sys.path.append("python/transformers")
 sys.path.append("python/readers")
 sys.path.append("python/writers")
+import config
 from geometry import *
 from inputreaders import *
 from outputwriters import *
