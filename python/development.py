@@ -33,7 +33,9 @@ if not layer.isValid():
 
 reprojectedLayer = reproject(layer, "EPSG:4326")
 
-valid = isGeometryValid(reprojectedLayer)
+centroidLayer = createCentroid(reprojectedLayer)
+
+valid = isGeometryValid(centroidLayer)
 
 if valid :
     print('Geometry contains errors')

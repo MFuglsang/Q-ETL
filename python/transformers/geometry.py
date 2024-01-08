@@ -1,4 +1,9 @@
-from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, QgsGeometryValidator
+from qgis.core import (QgsCoordinateReferenceSystem, 
+                       QgsCoordinateTransform, 
+                       QgsProject, 
+                       QgsGeometryValidator)
+from qgis.analysis import QgsNativeAlgorithms
+from qgis import processing
 
 print("Geometry imported")
 
@@ -14,6 +19,22 @@ def reproject(layer, targetEPSG):
         layer.updateFeature(feat)
     layer.setCrs(target_crs)
     print("Reprojector finished")
+    return layer
+
+def reprojectV2(layer, targetEPSG):
+    parameter = {
+        'INPUT': layer,
+        'TARGET_CRS': targetEPSG,
+        'OUTPUT': 'memory:Reprojected'
+    }
+    result = processing.run('native:reprojectlayer', parameter)['OUTPUT']
+    return result
+
+def createCentroid(layer):
+    for feat in layer.getFeatures():
+        geom = feat.geometry().centroid() 
+        feat.setGeometry(geom)
+        layer.updateFeature(feat)
     return layer
 
 def isGeometryValid(layer):
