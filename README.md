@@ -5,11 +5,9 @@ This concept requires a QGIS installation on the computer that executes the jobs
 It requires the file python-qgis.bat, which normally can be
 located in one of these folders :
 
-<OSGeo4W_ROOT>\bin
-or 
-<QGIS_ROOT>\bin
+**_<OSGeo4W_ROOT>\bin_** or **_<QGIS_ROOT>\bin_**
 
-If you are usig a dev- or ltr version, the filename is different eg: python-qgis-ltr.bat
+If you are usig a dev- or ltr version, the filename is different eg: _python-qgis-ltr.bat_
 
 ## Boilerplates
 
