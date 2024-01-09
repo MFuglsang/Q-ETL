@@ -17,7 +17,6 @@ def loadConfig():
                 "user" : "",
                 "password": ""
             }
-
         }
     }
 
