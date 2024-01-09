@@ -35,9 +35,9 @@ reprojectedLayer = reproject(layer, "EPSG:4326")
 
 centroidLayer = createCentroid(reprojectedLayer)
 
-valid = isGeometryValid(centroidLayer)
+invalid = isGeometryValid(centroidLayer)
 
-if valid :
+if invalid :
     print('Geometry contains errors')
 else:
     writeOutputfile(reprojectedLayer, "C:/temp/kommuner.geojson", "GeoJson")

@@ -9,6 +9,10 @@ located in one of these folders :
 
 If you are usig a dev- or ltr version, the filename is different eg: _python-qgis-ltr.bat_
 
+## Configuration
+in python/config/configuration.py, the different parameters for the jobs can be configured - database connections, QGIS locations etc.
+This config is shared between all jobs, but multiple name connections to database can exist at the same time.
+
 ## Boilerplates
 
 
