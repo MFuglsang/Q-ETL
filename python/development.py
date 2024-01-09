@@ -1,19 +1,24 @@
-import sys
+import sys, os
 from qgis.core import QgsApplication
 
 sys.path.append("python/config")
 from configuration import *
 
-config = loadConfig()
+sys.path.append("python/log")
+from filelog import *
 
-print('Kicking off... ')
+settings = loadConfig()
+settings['logfile'] = createLogFile(os.path.basename(__file__), settings['logdir'])
 
-QgsApplication.setPrefixPath(config["Qgs_PrefixPath"], True)
+
+
+infoWriter('Kicking off... ', 'INFO', settings)
+
+QgsApplication.setPrefixPath(settings["Qgs_PrefixPath"], True)
 qgs = QgsApplication([], False)
 qgs.initQgis()
 
 ## Loading stuff on the running QGIS...
-sys.path.append("python/config")
 sys.path.append("python/transformers")
 sys.path.append("python/readers")
 sys.path.append("python/writers")
@@ -22,11 +27,11 @@ from geometry import *
 from inputreaders import *
 from outputwriters import *
 
-print("QGIS ready from CMD")
+infoWriter("QGIS ready from CMD", 'INFO', settings)
 
 ## Read input geojson file
 
-layer = readGeojson("C:/Users/Administrator/Documents/GitHub/QGIS__ETL/testdata/kommuner.geojson")
+layer = readGeojson("C:/Users/Administrator/Documents/GitHub/QGIS__ETL/testdata/kommuner.geojson", settings)
 
 if not layer.isValid():
     raise Exception('Layer is not valid')
@@ -38,7 +43,7 @@ centroidLayer = createCentroid(reprojectedLayer)
 invalid = isGeometryValid(centroidLayer)
 
 if invalid :
-    print('Geometry contains errors')
+    infoWriter("Geometry contains errors", 'ERROR', logfile)
 else:
     writeOutputfile(reprojectedLayer, "C:/temp/kommuner.geojson", "GeoJson")
 
