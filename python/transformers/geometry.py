@@ -1,7 +1,9 @@
 from qgis.core import (QgsCoordinateReferenceSystem, 
                        QgsCoordinateTransform, 
                        QgsProject, 
-                       QgsGeometryValidator)
+                       QgsGeometryValidator,
+                       QgsVectorLayer,
+                       QgsFeature)
 from qgis.analysis import QgsNativeAlgorithms
 from qgis import processing
 
@@ -47,12 +49,20 @@ def reprojectV2(layer, targetEPSG):
 def createCentroid(layer, settings):
     infoWriter("Creating centroids", 'Info', settings)
     try:
-        newLayer = layer.clone()
+        newLayer = QgsVectorLayer(f'Point?crs={layer.crs().authid()}', 'newLayer', 'memory')
+        newLayer_data = newLayer.dataProvider()
+        newLayer_data.addAttributes(layer.fields())
+        newLayer.updateFields()
+
         newLayer.startEditing()
-        for feat in newLayer.getFeatures():
-            geom = feat.geometry().centroid() 
-            feat.setGeometry(geom)
-            newLayer.updateFeature(feat)
+        for f in layer.getFeatures():
+            geom = f.geometry()
+            centroid_geom = geom.centroid()
+            centroid_feature = QgsFeature()
+            centroid_feature.setGeometry(centroid_geom)
+            centroid_feature.setAttributes(f.attributes())
+            newLayer_data.addFeature(centroid_feature)
+        
         newLayer.commitChanges()
         infoWriter("Centroids finished", 'Info', settings)
         return newLayer
