@@ -1,3 +1,8 @@
+#####################################
+## BOILERPLATE PART
+## DO NOT CHANGE 
+#####################################
+
 import sys, os
 from qgis.core import QgsApplication
 
@@ -9,9 +14,6 @@ from filelog import *
 
 settings = loadConfig()
 settings['logfile'] = createLogFile(os.path.basename(__file__), settings['logdir'])
-
-
-
 infoWriter('Kicking off... ', 'INFO', settings)
 
 QgsApplication.setPrefixPath(settings["Qgs_PrefixPath"], True)
@@ -29,24 +31,23 @@ from outputwriters import *
 
 infoWriter("QGIS ready from CMD", 'INFO', settings)
 
-## Read input geojson file
+#####################################
+## SCRIPT PART (WRITE CODE HERE) 
+#####################################
 
 layer = readGeojson("C:/Users/Administrator/Documents/GitHub/QGIS__ETL/testdata/kommuner.geojson", settings)
 
-if not layer.isValid():
-    raise Exception('Layer is not valid')
+reprojectedLayer = reproject(layer, "EPSG:4326", settings)
 
-reprojectedLayer = reproject(layer, "EPSG:4326")
+centroidLayer = createCentroid(reprojectedLayer, settings)
 
-centroidLayer = createCentroid(reprojectedLayer)
-
-invalid = isGeometryValid(centroidLayer)
-
-if invalid :
-    infoWriter("Geometry contains errors", 'ERROR', logfile)
-else:
-    writeOutputfile(reprojectedLayer, "C:/temp/kommuner.geojson", "GeoJson")
+writeOutputfile(reprojectedLayer, "C:/temp/kommuner.geojson", "GeoJson", settings)
 
 
 
+#####################################
+## EXITING THE SCRIPT
+#####################################
+
+endScript(settings)
 qgs.exitQgis()

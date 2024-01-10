@@ -10,13 +10,26 @@ print("Inputreaders imported")
 def readShapefile(filepath, settings):
     infoWriter("Reading file: " + filepath , 'Info', settings)
     try: 
-        return QgsVectorLayer(filepath, 'QgsLayer_' + str(randrange(1000)), "ogr")
+        layer =  QgsVectorLayer(filepath, 'QgsLayer_' + str(randrange(1000)), "ogr")
+        infoWriter("Finished reading file", 'Info', settings)
+        return layer
     except:
         infoWriter("An error occured opening file " + filepath , 'ERROR', settings)
 
 def readGeojson(filepath, settings):
     infoWriter("Reading file: " + filepath , 'Info', settings)
-    try: 
-        return QgsVectorLayer(filepath, 'QgsLayer_' + str(randrange(1000)), "ogr")
+    try:
+        layer =  QgsVectorLayer(filepath, 'QgsLayer_' + str(randrange(1000)), "ogr")
+        infoWriter("Finished reading file", 'Info', settings)
+        return layer
     except:
         infoWriter("An error occured opening file " + filepath , 'ERROR', settings)
+
+def readWFS(uri, settings):
+    ## URI template : '<host>?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAME=<LAYERNAME>&SRSNAME=<EPSG:xxxx>'
+    try:
+        layer = QgsVectorLayer(uri, 'QgsLayer_' + str(randrange(1000)), "WFS")
+        return layer
+    except:
+        infoWriter("An error occured reading the WFS " + uri , 'ERROR', settings)
+        sys.exit("Program terminated")

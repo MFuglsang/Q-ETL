@@ -25,6 +25,16 @@ def infoWriter(message, level, settings):
         print(message)
         f.write(message + "\n")
 
+def endScript(settings):
+    now = datetime.now()
+    f = open(settings['logfile'], "a")
+    f.write("\n")
+    f.write("##################################################\n")
+    f.write("Job completed with succes!                        \n")
+    f.write("##################################################\n")
+    f.close()
+
+
 
 
 
