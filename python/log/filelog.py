@@ -24,6 +24,14 @@ def infoWriter(message, level, settings):
     else :
         print(message)
         f.write(message + "\n")
+    f.close()
+
+def terminateWriter(settings):
+    f = open(settings["logfile"], "a")
+    f.write("Program terminated" + "\n")
+    print("Program terminated")
+    f.close()
+
 
 def endScript(settings):
     now = datetime.now()

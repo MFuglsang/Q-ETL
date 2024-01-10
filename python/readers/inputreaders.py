@@ -1,5 +1,5 @@
 from random import randrange
-import sys
+import sys, os
 from qgis.core import QgsVectorLayer
 
 sys.path.append("python/log")
@@ -17,13 +17,18 @@ def readShapefile(filepath, settings):
         infoWriter("An error occured opening file " + filepath , 'ERROR', settings)
 
 def readGeojson(filepath, settings):
-    infoWriter("Reading file: " + filepath , 'Info', settings)
-    try:
-        layer =  QgsVectorLayer(filepath, 'QgsLayer_' + str(randrange(1000)), "ogr")
-        infoWriter("Finished reading file", 'Info', settings)
-        return layer
-    except:
-        infoWriter("An error occured opening file " + filepath , 'ERROR', settings)
+    if os.path.isfile(filepath):
+
+        infoWriter("Reading file: " + filepath , 'Info', settings)
+        try:
+            layer =  QgsVectorLayer(filepath, 'QgsLayer_' + str(randrange(1000)), "ogr")
+            infoWriter("Finished reading file", 'Info', settings)
+            return layer
+        except:
+            infoWriter("An error occured opening file " + filepath , 'ERROR', settings)
+            sys.exit("Program terminated")
+    else :
+        infoWriter("File not found exception: " + filepath , 'ERROR', settings)
 
 def readWFS(uri, settings):
     ## URI template : '<host>?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAME=<LAYERNAME>&SRSNAME=<EPSG:xxxx>'
