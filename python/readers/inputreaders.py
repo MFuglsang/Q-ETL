@@ -33,3 +33,13 @@ def readWFS(uri, settings):
     except:
         infoWriter("An error occured reading the WFS " + uri , 'ERROR', settings)
         sys.exit("Program terminated")
+
+def readGeopackage(filepath, layername, settings):
+    infoWriter("Reading file: " + filepath + "|layername=" + layername, 'Info', settings)
+    try:
+        layer = QgsVectorLayer(f'{filepath}|layername={layername}', f'QgsLayer_{str(randrange(1000))}', 'ogr')
+        infoWriter('Finished reading file', 'Info', settings)
+        return layer
+    except:
+        infoWriter(f'An error occured opening the file {filepath}', 'ERROR', settings)
+
