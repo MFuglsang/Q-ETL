@@ -25,7 +25,16 @@ sys.path.append(settings["QGIS_Plugin_Path"])
 import processing
 from processing.core.Processing import Processing
 from processing.script.ScriptUtils import *
+from qgis.analysis import QgsNativeAlgorithms
+
 Processing.initialize()
+QgsApplication.processingRegistry().addProvider(QgsNativeAlgorithms())
+from processing.script import ScriptUtils
+print("Folder for script algorithms:", ScriptUtils.scriptsFolders())
+print("[INFO] Script algorithms available:", 
+    [s.displayName() for s in QgsApplication.processingRegistry().providerById("script").algorithms()])
+
+
 
 ## Loading stuff on the running QGIS...
 sys.path.append("python/transformers")
@@ -44,11 +53,13 @@ infoWriter("QGIS ready from CMD", 'INFO', settings)
 
 layer = readGeojson("C:/Users/Administrator/Documents/GitHub/QGIS__ETL/testdata/kommuner.geojson", settings)
 
-reprojectedLayer = reprojectV2(layer, "EPSG:4326", settings)
+##reprojectedLayer = reprojectV2(layer, "EPSG:4326", settings)
+##centroidLayer = createCentroid(reprojectedLayer, settings)
 
-centroidLayer = createCentroid(reprojectedLayer, settings)
+bufferdeLayer = processing.run("model:BufferModel", {'bufferdist':100,'input':layer,'output':'TEMPORARY_OUTPUT'})
 
-writeOutputfile(reprojectedLayer, "C:/temp/kommuner.geojson", "GeoJson", settings)
+
+writeOutputfile(bufferdeLayer, "C:/temp/bufferLayer.geojson", "GeoJson", settings)
 
 
 
