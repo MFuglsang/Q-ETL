@@ -7,7 +7,7 @@ import sys, os
 from qgis.core import QgsApplication
 
 sys.path.append("python/config")
-from configuration import *
+from _local_configuration import *
 
 sys.path.append("python/log")
 from filelog import *

@@ -1,10 +1,9 @@
-
 def loadConfig():
     
     settings = {
-        "Qgs_PrefixPath" : "C:/App/OSGeo4w/apps/qgis",
-        "QGIS_Plugin_Path" : 'C:/App/OSGeo4W/apps/qgis/python/plugins',
-        "logdir" : "C:/Users/Administrator/Documents/GitHub/QGIS__ETL/logs/",
+        "Qgs_PrefixPath" : "",
+        "QGIS_Plugin_Path" : '',
+        "logdir" : "",
         "DatabaseConnections": {
             "MyPostGIS" : {
                 "host" : "",
@@ -23,4 +22,3 @@ def loadConfig():
     }
 
     return settings
-
