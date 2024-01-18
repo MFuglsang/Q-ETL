@@ -11,6 +11,8 @@ import sys
 sys.path.append("python/log")
 from filelog import *
 
+
+
 print("Geometry imported")
 
 def reproject(layer, targetEPSG, settings):
@@ -37,14 +39,21 @@ def reproject(layer, targetEPSG, settings):
         infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
-def reprojectV2(layer, targetEPSG):
-    parameter = {
-        'INPUT': layer,
-        'TARGET_CRS': targetEPSG,
-        'OUTPUT': 'memory:Reprojected'
-    }
-    result = processing.run('native:reprojectlayer', parameter)['OUTPUT']
-    return result
+def reprojectV2(layer, targetEPSG, settings):
+    try:
+        parameter = {
+            'INPUT': layer,
+            'TARGET_CRS': targetEPSG,
+            'OUTPUT': 'memory:Reprojected'
+        }
+        result = processing.run('native:reprojectlayer', parameter)['OUTPUT']
+        infoWriter("Reprojector V2 finished", 'Info', settings)
+        return result
+    except:
+        infoWriter("An error occured reprojectiong layer", 'ERROR', settings)
+        infoWriter("Program terminated" , 'ERROR', settings)
+        sys.exit()
+
 
 def createCentroid(layer, settings):
     infoWriter("Creating centroids", 'Info', settings)

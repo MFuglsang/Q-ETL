@@ -20,6 +20,13 @@ QgsApplication.setPrefixPath(settings["Qgs_PrefixPath"], True)
 qgs = QgsApplication([], False)
 qgs.initQgis()
 
+## Loading the Processing plugin...
+sys.path.append(settings["QGIS_Plugin_Path"])
+import processing
+from processing.core.Processing import Processing
+from processing.script.ScriptUtils import *
+Processing.initialize()
+
 ## Loading stuff on the running QGIS...
 sys.path.append("python/transformers")
 sys.path.append("python/readers")
@@ -37,7 +44,7 @@ infoWriter("QGIS ready from CMD", 'INFO', settings)
 
 layer = readGeojson("C:/Users/Administrator/Documents/GitHub/QGIS__ETL/testdata/kommuner.geojson", settings)
 
-reprojectedLayer = reproject(layer, "EPSG:4326", settings)
+reprojectedLayer = reprojectV2(layer, "EPSG:4326", settings)
 
 centroidLayer = createCentroid(reprojectedLayer, settings)
 
