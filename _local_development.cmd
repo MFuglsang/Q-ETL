@@ -1,1 +1,1 @@
-C:\App\OSGeo4W\bin\python-qgis.bat C:\Users\Administrator\Documents\GitHub\QGIS__ETL\python\development.py
+C:\App\OSGeo4W\bin\python-qgis.bat C:/Projects/QGIS_ETL_Python\python\development.py

@@ -42,6 +42,21 @@ def endScript(settings):
     f.write("##################################################\n")
     f.close()
 
+def describeEngine(scriptfolder, algorithms, settings):
+    f = open(settings['logfile'], "a")
+    f.write("\n")
+    f.write("##################################################\n")
+    f.write("Initializing engine:                              \n")
+    f.write("Script folder: " + str(scriptfolder) + "\n")
+    algs = []
+    for s in algorithms:
+        algs.append(s.displayName()) 
+    f.write("Available algorithems : " + str(algs) + "\n")
+    f.write("##################################################\n")
+    f.write("\n")
+    f.close()
+
+
 
 
 

@@ -14,7 +14,6 @@ from filelog import *
 
 settings = loadConfig()
 settings['logfile'] = createLogFile(os.path.basename(__file__), settings['logdir'])
-infoWriter('Kicking off... ', 'INFO', settings)
 
 QgsApplication.setPrefixPath(settings["Qgs_PrefixPath"], True)
 qgs = QgsApplication([], False)
@@ -30,11 +29,9 @@ from qgis.analysis import QgsNativeAlgorithms
 Processing.initialize()
 QgsApplication.processingRegistry().addProvider(QgsNativeAlgorithms())
 from processing.script import ScriptUtils
-print("Folder for script algorithms:", ScriptUtils.scriptsFolders())
-print("[INFO] Script algorithms available:", 
-    [s.displayName() for s in QgsApplication.processingRegistry().providerById("script").algorithms()])
 
-
+describeEngine(ScriptUtils.scriptsFolders(), QgsApplication.processingRegistry().providerById("script").algorithms(), settings)
+infoWriter('Kicking off... ', 'INFO', settings)
 
 ## Loading stuff on the running QGIS...
 sys.path.append("python/transformers")
@@ -51,15 +48,15 @@ infoWriter("QGIS ready from CMD", 'INFO', settings)
 ## SCRIPT PART (WRITE CODE HERE) 
 #####################################
 
-layer = readGeojson("C:/Users/Administrator/Documents/GitHub/QGIS__ETL/testdata/kommuner.geojson", settings)
+layer = readGeojson("C:/Projects/QGIS_ETL_Python/testdata/kommuner.geojson", settings)
 
-##reprojectedLayer = reprojectV2(layer, "EPSG:4326", settings)
-##centroidLayer = createCentroid(reprojectedLayer, settings)
+reprojectedLayer = reprojectV2(layer, "EPSG:4326", settings)
+centroidLayer = createCentroid(reprojectedLayer, settings)
 
-bufferdeLayer = processing.run("model:BufferModel", {'bufferdist':100,'input':layer,'output':'TEMPORARY_OUTPUT'})
+##bufferdeLayer = processing.run("model:BufferModel", {'bufferdist':100,'input':layer,'output':'TEMPORARY_OUTPUT'})
 
 
-writeOutputfile(bufferdeLayer, "C:/temp/bufferLayer.geojson", "GeoJson", settings)
+writeOutputfile(centroidLayer, "C:/temp/bufferLayer.geojson", "GeoJson", settings)
 
 
 
