@@ -91,3 +91,55 @@ def isGeometryValid(layer):
             summary.append(f"Feature id {feat.id()} Error {e}")
 
     return summary
+
+def forceRHR(layer, settings):
+    try:
+        parameter = {
+            'INPUT': layer,
+            'OUTPUT': 'memory:forced'
+        }
+        result = processing.run('native:forcerhr', parameter)['OUTPUT']
+        infoWriter("forceRHR finished", 'Info', settings)
+        return result
+    except:
+        infoWriter("An error occured in forceRHR", 'ERROR', settings)
+        infoWriter("Program terminated" , 'ERROR', settings)
+        sys.exit()
+
+def dissolveFeatures(layer, fieldList, settings):
+    try:
+        parameter = {
+            'INPUT': layer,
+            'FIELD' : fieldList,
+            'SEPARATE_DISJOINT' : False,
+            'OUTPUT': 'memory:dissolved'
+        }
+        result = processing.run('native:dissolve', parameter)['OUTPUT']
+        infoWriter("dissolveFeatures finished", 'Info', settings)
+        return result
+    except:
+        infoWriter("An error occured in dissolveFeatures", 'ERROR', settings)
+        infoWriter("Program terminated" , 'ERROR', settings)
+        sys.exit()
+
+def bufferLayer(layer, distance, segements, endcapStyle, joinStyle, miterLimit, dissolve, settings):
+    infoWriter("Creating buffer layer", 'Info', settings)
+    infoWriter("Parameters : " + str(distance) + 'm, ' + str(segements) + ' segments, ' + 'dissolve ' + str(dissolve)  , 'Info', settings)
+    try:
+        parameter = {
+            'INPUT': layer,
+            'DISTANCE': distance,
+            'SEGMENTS': segements,
+            'END_CAP_STYLE': endcapStyle,
+            'JOIN_STYLE': joinStyle,
+            'MITER_LIMIT': miterLimit,
+            'DISSOLVE': dissolve,
+                'OUTPUT': 'memory:dissolved'
+        }
+        result = processing.run('native:buffer', parameter)['OUTPUT']
+        infoWriter("BufferLayer finished", 'Info', settings)
+        return result
+    except:
+        infoWriter("An error occured in BufferLayer", 'ERROR', settings)
+        infoWriter("Program terminated" , 'ERROR', settings)
+        sys.exit()
