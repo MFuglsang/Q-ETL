@@ -38,6 +38,7 @@ sys.path.append("python/transformers")
 sys.path.append("python/readers")
 sys.path.append("python/writers")
 import config
+from general import *
 from geometry import *
 from inputreaders import *
 from outputwriters import *
@@ -48,16 +49,17 @@ infoWriter("QGIS ready from CMD", 'INFO', settings)
 ## SCRIPT PART (WRITE CODE HERE) 
 #####################################
 
-layer = readGeojson("C:/Projects/QGIS_ETL_Python/testdata/kommuner.geojson", settings)
+layer = readGeojson("C:/Users/Administrator/Documents/GitHub/QGIS__ETL/testdata/kommuner.geojson", settings)
 
-reprojectedLayer = reprojectV2(layer, "EPSG:4326", settings)
-centroidLayer = createCentroid(reprojectedLayer, settings)
+wfslayer = readWFS('https://midttrafik.admin.gc2.io/ows/midttrafik/rute_wfs/','midttrafik:rute_wfs.aktuelle_ruter', 'urn:ogc:def:crs:EPSG::25832', '1.1.0', settings)
+##reprojectedLayer = reprojectV2(layer, "EPSG:4326", settings)
+##centroidLayer = createCentroid(layer, settings)
 
-##bufferdeLayer = processing.run("model:BufferModel", {'bufferdist':100,'input':layer,'output':'TEMPORARY_OUTPUT'})
+##bufferLayer = bufferLayer(layer, 100, 5, 0, 0, 2, False, settings)
 
 
-writeOutputfile(centroidLayer, "C:/temp/bufferLayer.geojson", "GeoJson", settings)
-
+writeOutputfile(wfslayer, "C:/temp/wfs.geojson", "GeoJson", settings)
+#writeToTemp(bufferLayer, 'test', settings)
 
 
 #####################################
