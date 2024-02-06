@@ -54,15 +54,15 @@ infoWriter("QGIS ready from CMD", 'INFO', settings)
 
 ##layer = readGeojson("C:/Users/Administrator/Documents/GitHub/QGIS__ETL/testdata/kommuner.geojson", settings)
 
-wfslayer = readWFS('https://midttrafik.admin.gc2.io/ows/midttrafik/rute_wfs/','midttrafik:rute_wfs.aktuelle_ruter', 'urn:ogc:def:crs:EPSG::25832', '1.1.0', settings)
+wfslayer = readWFS2('https://geofyn.admin.gc2.io/wfs/geofyn/fynbus/25832?SERVICE=WFS&REQUEST=GetFeature&VERSION=1.1.0&TYPENAME=fynbus:routes_25832_v&SRSNAME=urn:ogc:def:crs:EPSG::25832', settings)
 ##reprojectedLayer = reprojectV2(layer, "EPSG:4326", settings)
 ##centroidLayer = createCentroid(layer, settings)
 
 ##bufferLayer = bufferLayer(layer, 100, 5, 0, 0, 2, False, settings)
 
 
-bufferLayer = processing.run('script:BufferModel',            
-{'bufferdist': 100, 'input': wfslayer, 'Output': 'memory:forced'})
+##bufferLayer = processing.run('script:BufferModel',            
+##{'bufferdist': 100, 'input': wfslayer, 'Output': 'memory:forced'})
 
 
 writeOutputfile(wfslayer, "C:/temp/wfs.geojson", "GeoJson", settings)

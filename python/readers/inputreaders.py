@@ -66,4 +66,15 @@ def readWFS(uri, typename, srsname, version, settings):
         infoWriter("An error occured reading the WFS " + uri , 'ERROR', settings)
         sys.exit("Program terminated")
 
+def readWFS2(uri, settings):
+    infoWriter("Reading WFS layer: " + uri, 'Info', settings)
+    
+    try:
+        layer = QgsVectorLayer(uri, "WFS_Layer" , 'WFS')
+        infoWriter("Finished reading the WFS service", 'Info', settings)
+        return layer
+    except:
+        infoWriter("An error occured reading the WFS " + uri , 'ERROR', settings)
+        sys.exit("Program terminated")
+
 
