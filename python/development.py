@@ -12,6 +12,9 @@ from _local_configuration import *
 sys.path.append("python/log")
 from filelog import *
 
+sys.path.append("python/misc")
+from housekeeping import *
+
 settings = loadConfig()
 settings['logfile'] = createLogFile(os.path.basename(__file__), settings['logdir'])
 
@@ -49,13 +52,17 @@ infoWriter("QGIS ready from CMD", 'INFO', settings)
 ## SCRIPT PART (WRITE CODE HERE) 
 #####################################
 
-layer = readGeojson("C:/Users/Administrator/Documents/GitHub/QGIS__ETL/testdata/kommuner.geojson", settings)
+##layer = readGeojson("C:/Users/Administrator/Documents/GitHub/QGIS__ETL/testdata/kommuner.geojson", settings)
 
 wfslayer = readWFS('https://midttrafik.admin.gc2.io/ows/midttrafik/rute_wfs/','midttrafik:rute_wfs.aktuelle_ruter', 'urn:ogc:def:crs:EPSG::25832', '1.1.0', settings)
 ##reprojectedLayer = reprojectV2(layer, "EPSG:4326", settings)
 ##centroidLayer = createCentroid(layer, settings)
 
 ##bufferLayer = bufferLayer(layer, 100, 5, 0, 0, 2, False, settings)
+
+
+bufferLayer = processing.run('script:BufferModel',            
+{'bufferdist': 100, 'input': wfslayer, 'Output': 'memory:forced'})
 
 
 writeOutputfile(wfslayer, "C:/temp/wfs.geojson", "GeoJson", settings)
@@ -66,5 +73,8 @@ writeOutputfile(wfslayer, "C:/temp/wfs.geojson", "GeoJson", settings)
 ## EXITING THE SCRIPT
 #####################################
 
-endScript(settings)
 qgs.exitQgis()
+
+endScript(settings)
+cleanUp(settings)
+

@@ -17,13 +17,13 @@ def writeOutputfile(layer, path, format, settings):
         sys.exit()
 
 def writeToTemp(layer, name,  settings):
-    infoWriter("Writing temp output to: " + settings['TempFolder'], 'Info', settings)
+    infoWriter("Writing temp output to: " + settings['TempFolder'] + '/persistent/', 'Info', settings)
  
-    if os.path.exists(settings['TempFolder'] + name + '.geojson'):
+    if os.path.exists(settings['TempFolder'] + '/persistent/' + name + '.geojson'):
         infoWriter("Temp file exists, deleting it", 'Info', settings)
-        os.remove(settings['TempFolder'] + name + '.geojson')
+        os.remove(settings['TempFolder'] + '/persistent/' + name + '.geojson')
     try:
-        QgsVectorFileWriter.writeAsVectorFormat(layer, settings['TempFolder'] + name + '.geojson' , "utf-8", layer.crs(), "GeoJson")
+        QgsVectorFileWriter.writeAsVectorFormat(layer, settings['TempFolder'] + '/persistent/' + name + '.geojson' , "utf-8", layer.crs(), "GeoJson")
         infoWriter("Export to temp completed", 'Info', settings)
     except:
         infoWriter("An error occured exporting layer to temp", 'ERROR', settings)

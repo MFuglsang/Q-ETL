@@ -46,7 +46,7 @@ def readGeopackage(filepath, layername, settings):
 def readWFS(uri, typename, srsname, version, settings):
     infoWriter("Reading WFS layer: " + uri, 'Info', settings)
     infoWriter("Typename: " + typename + ', srs: ' + srsname, 'Info', settings)
-    tempfile = settings['TempFolder'] + 'wfs_layer.gml'
+    tempfile = settings['TempFolder'] + '/transient/' + 'wfs_layer.gml'
     try:
         if os.path.exists(tempfile):
             infoWriter("Temp file exists, deleting it", 'Info', settings)
