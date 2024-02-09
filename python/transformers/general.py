@@ -118,4 +118,21 @@ def fieldCalculator (layer, fieldname, fieldtype, fieldlength, fieldprecision, f
         infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
     
+def renameTableField (layer, field, newname, settings):
+    infoWriter("Renaming field", 'Info', settings)
+    try:
+        parameter = {
+            'INPUT': layer,
+            'FIELD': field,
+            'NEW_NAME': newname,
+            'OUTPUT': 'memory:extracted'
+        }
+        result = processing.run('native:renametablefield', parameter)['OUTPUT']
+        infoWriter("Parameters: " + str(parameter), 'Info', settings)
+        infoWriter("renameTableField  finished", 'Info', settings)
+        return result
+    except:
+        infoWriter("An error occured in renameTableField", 'ERROR', settings)
+        infoWriter("Program terminated" , 'ERROR', settings)
+        sys.exit()
 
