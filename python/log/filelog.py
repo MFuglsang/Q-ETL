@@ -37,10 +37,12 @@ def endScript(settings):
     now = datetime.now()
     f = open(settings['logfile'], "a")
     f.write("\n")
+    f.write("ENDTIME: " + now.strftime("%d%m%Y, %H:%M") +  " \n")
     f.write("##################################################\n")
     f.write("Job completed with succes!                        \n")
     f.write("##################################################\n")
     f.close()
+    print("Job completed with succes!")
 
 def describeEngine(scriptfolder, algorithms, version, settings):
     f = open(settings['logfile'], "a")
