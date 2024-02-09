@@ -17,9 +17,10 @@ Parameters for transformer: \
 
 Example usage:\
 ```
-outputLayer = extractByExpression(inputLayer, '$area > 1000000', settings)\
+outputLayer = extractByExpression(layer=inputLayer, expression='$area > 1000000', settings=settings)
 
 ```
+Link to QGIS documentation:  https://docs.qgis.org/en/docs/user_manual/processing_algs/qgis/vectorselection.html#id29
 
 
 
