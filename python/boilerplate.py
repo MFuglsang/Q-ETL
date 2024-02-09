@@ -34,19 +34,19 @@ QgsApplication.processingRegistry().addProvider(QgsNativeAlgorithms())
 from processing.script import ScriptUtils
 
 describeEngine(ScriptUtils.scriptsFolders(), QgsApplication.processingRegistry().providerById("script").algorithms(), Qgis.QGIS_VERSION,  settings)
-infoWriter('Kicking off... ', 'INFO', settings)
+infoWriter('Loading ressources', 'INFO', settings)
 
-## Loading stuff on the running QGIS...s
-sys.path.append("python/transformers")
-sys.path.append("python/readers")
-sys.path.append("python/writers")
+## Loading stuff on the running QGIS...
+sys.path.append("python/workers")
+sys.path.append("python/inputters")
+sys.path.append("python/outputters")
 import config
 from general import *
 from geometry import *
 from inputreaders import *
 from outputwriters import *
 
-infoWriter("QGIS ready from CMD", 'INFO', settings)
+infoWriter("QGIS ETL engine ready", 'INFO', settings)
 
 
 #####################################
