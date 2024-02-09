@@ -33,7 +33,7 @@ A simple example model loading an input file, reprojection it to 4326, and writi
 ```
 layer = readGeojson("testdata/kommuner.geojson", settings)
 reprojectedLayer = reprojectV2(layer, "EPSG:4326", settings)
-writeOutputfile(wfslayer, "C:/temp/kommuner_4326.geojson", "GeoJson", settings)
+writeOutputfile(reprojectedLayer, "C:/temp/kommuner_4326.geojson", "GeoJson", settings)
 ```
 
 To run the job, simply call the <YourProject>.cmd file, and the job will execute. The translation log is placed in the log directory as specified in the configuration
