@@ -4,6 +4,8 @@ def loadConfig():
         "Qgs_PrefixPath" : "",
         "QGIS_Plugin_Path" : '',
         "logdir" : "",
+        "TempFolder" : "",
+        "logMaxage": 0, 
         "DatabaseConnections": {
             "MyPostGIS" : {
                 "host" : "",
