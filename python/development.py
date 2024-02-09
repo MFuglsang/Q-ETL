@@ -66,6 +66,7 @@ wfslayer = readWFS2('https://geofyn.admin.gc2.io/wfs/geofyn/fynbus/25832?SERVICE
 
 
 writeOutputfile(wfslayer, "C:/temp/wfs.geojson", "GeoJson", settings)
+
 #writeToTemp(bufferLayer, 'test', settings)
 
 
