@@ -3,3 +3,5 @@
 _local_*
 /temp/transient/*
 /temp/persistent/*
+/python/development.py
+development.cmd
