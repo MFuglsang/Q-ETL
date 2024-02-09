@@ -1,6 +1,6 @@
 /logs/*.txt
 *.pyc
-_local_*
+/python/config/_local_configuration.py
 /temp/transient/*
 /temp/persistent/*
 /python/development.py
