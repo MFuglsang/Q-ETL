@@ -9,7 +9,7 @@
 ## **addAutoIncrementalField**
 
 ## **extractByExpression**
-**QGIS processing algorithem : native:extractbyexpression**\
+**QGIS processing algorithem : native:extractbyexpression\ **
 
 Parameters for transformer: \
     1. Input layer,  Type:[vector: any] (reference to a Qgsvectorlayer. The layer must already be loaded into the script.)\
