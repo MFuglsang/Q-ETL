@@ -21,6 +21,27 @@ Link to QGIS documentation:  https://docs.qgis.org/3.28/en/docs/user_manual/proc
 
 ## **fieldCalculator**
 
+**QGIS processing algorithem : native:fieldcalculator **
+
+Opens the field calculator (see [Expressions](https://docs.qgis.org/3.28/en/docs/user_manual/expressions/expression.html#id5)). You can use all the supported expressions and functions.
+
+A new layer is created with the result of the field calculator.
+
+Parameters for worker: \
+    1. Input layer,  Type:[vector: any] (reference to a Qgsvectorlayer. The layer must already be loaded into the script.)\
+    2. fieldname, Type:[string]\
+    3. fieldtype, Type:[enumeration] (Default: 0) 0 — Float, 1 — Integer, 2 — String, 3 — Date \
+    4. fieldlength, Type:[number] (Default: 10)
+    5. fieldprecision, Type:[number] (Default: 3) 
+    6. formula, Type:[expression]
+
+Example usage:
+```
+outputLayer = (layer=inputlayer, fieldname='value', fieldtype=1 , fieldlength=10, fieldprecision=3, formula ='fid + 1', settings=settings)
+```
+Link to QGIS documentation: https://docs.qgis.org/3.28/en/docs/user_manual/processing_algs/qgis/vectortable.html#id46 
+
+
 ## **deleteColumns**
 
 **QGIS processing algorithem : native:deletecolumn **
