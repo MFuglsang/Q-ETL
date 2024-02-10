@@ -37,36 +37,13 @@ def readGeopackage(filepath, layername, settings):
     infoWriter("Reading file: " + filepath + "|layername=" + layername, 'Info', settings)
     try:
         layer = QgsVectorLayer(f'{filepath}|layername={layername}', f'QgsLayer_{str(randrange(1000))}', 'ogr')
-        infoWriter('Finished reading file', 'Info', settings)
+        infoWriter('Finished reading geopackage layer', 'Info', settings)
         return layer
     except:
         infoWriter(f'An error occured opening the file {filepath}', 'ERROR', settings)
-
-
-def readWFS(uri, typename, srsname, version, settings):
-    infoWriter("Reading WFS layer: " + uri, 'Info', settings)
-    infoWriter("Typename: " + typename + ', srs: ' + srsname, 'Info', settings)
-    tempfile = settings['TempFolder'] + '/transient/' + 'wfs_layer.gml'
-    try:
-        if os.path.exists(tempfile):
-            infoWriter("Temp file exists, deleting it", 'Info', settings)
-            os.remove(tempfile)
-
-        service = WebFeatureService(url=uri, version=version)
-
-        response = service.getfeature(typename=typename, srsname=srsname)
-        out = open(tempfile, 'wb')
-        out.write(bytes(response.read()))
-        out.close()
-
-        layer =  QgsVectorLayer(tempfile, 'QgsLayer_' + str(randrange(1000)), "ogr")
-        infoWriter("Finished reading the WFS service", 'Info', settings)
-        return layer
-    except:
-        infoWriter("An error occured reading the WFS " + uri , 'ERROR', settings)
         sys.exit("Program terminated")
 
-def readWFS2(uri, settings):
+def readWFS(uri, settings):
     infoWriter("Reading WFS layer: " + uri, 'Info', settings)
     
     try:
