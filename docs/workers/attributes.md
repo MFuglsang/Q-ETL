@@ -1,4 +1,4 @@
-# **GENERAL WORKERS** 
+# **ATTRIBUTE WORKERS** 
 
 ## **renameTableField**
 **QGIS processing algorithem : native:renametablefield **
