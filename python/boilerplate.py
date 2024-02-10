@@ -10,7 +10,7 @@ sys.path.append("python/config")
 from _local_configuration import *
 
 sys.path.append("python/log")
-from filelog import *
+import filelog 
 
 sys.path.append("python/misc")
 from misc import *
@@ -34,19 +34,16 @@ QgsApplication.processingRegistry().addProvider(QgsNativeAlgorithms())
 from processing.script import ScriptUtils
 
 describeEngine(ScriptUtils.scriptsFolders(), QgsApplication.processingRegistry().providerById("script").algorithms(), Qgis.QGIS_VERSION,  settings)
-infoWriter('Loading ressources', 'INFO', settings)
+filelog.infoWriter('Loading ressources', 'INFO', settings)
 
 ## Loading stuff on the running QGIS...
 sys.path.append("python/workers")
 sys.path.append("python/inputters")
 sys.path.append("python/outputters")
-import config
-from general import *
-from geometry import *
-from inputreaders import *
-from outputwriters import *
 
-infoWriter("QGIS ETL engine ready", 'INFO', settings)
+import config, general, geometry, inputreaders, outputwriters
+
+filelog.infoWriter("QGIS ETL engine ready", 'INFO', settings)
 
 
 #####################################

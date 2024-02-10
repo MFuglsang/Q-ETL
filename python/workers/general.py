@@ -9,7 +9,7 @@ from qgis import processing
 
 import sys
 sys.path.append("python/log")
-from filelog import *
+import filelog
 
 
 print("General imported")
@@ -18,47 +18,47 @@ print("General imported")
 def processingRunner(scritpCode, settings):
     try:
         result = ""
-        infoWriter("processingRunner finished", 'Info', settings)
+        filelog.infoWriter("processingRunner finished", 'Info', settings)
         return result
     except:
-        infoWriter("An error occured in processingRunner", 'ERROR', settings)
-        infoWriter("Program terminated" , 'ERROR', settings)
+        filelog.infoWriter("An error occured in processingRunner", 'ERROR', settings)
+        filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
 def scriptRunner(scritpName, params, settings):
-    infoWriter("scriptRunner running " + scritpName, 'Info', settings)
-    infoWriter("Parameters  " + str(params), 'Info', settings)
+    filelog.infoWriter("scriptRunner running " + scritpName, 'Info', settings)
+    filelog.infoWriter("Parameters  " + str(params), 'Info', settings)
     try:
 
         result = processing.run('script:'+scritpName,            
         params)
 
-        infoWriter("scriptRunner finished", 'Info', settings)
+        filelog.infoWriter("scriptRunner finished", 'Info', settings)
         return result
     except:
-        infoWriter("An error occured in processingRunner", 'ERROR', settings)
-        infoWriter("Program terminated" , 'ERROR', settings)
+        filelog.infoWriter("An error occured in processingRunner", 'ERROR', settings)
+        filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
 def extractByExpression(layer, expression, settings):
-    infoWriter("Extracting by expression", 'Info', settings)
+    filelog.infoWriter("Extracting by expression", 'Info', settings)
     try:
         parameter = {
             'INPUT': layer,
             'EXPRESSION': expression,
             'OUTPUT': 'memory:extracted'
         }
-        infoWriter("Parameters: " + str(parameter), 'Info', settings)
+        filelog.infoWriter("Parameters: " + str(parameter), 'Info', settings)
         result = processing.run('native:extractbyexpression', parameter)['OUTPUT']
-        infoWriter("Extractbyexpression  finished", 'Info', settings)
+        filelog.infoWriter("Extractbyexpression  finished", 'Info', settings)
         return result
     except:
-        infoWriter("An error occured in extractByExpression", 'ERROR', settings)
-        infoWriter("Program terminated" , 'ERROR', settings)
+        filelog.infoWriter("An error occured in extractByExpression", 'ERROR', settings)
+        filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
 def addAutoIncrementalField(layer, fieldname, start, settings):
-    infoWriter("Adding incremental field", 'Info', settings)
+    filelog.infoWriter("Adding incremental field", 'Info', settings)
     try:
         parameter = {
             'INPUT': layer,
@@ -72,16 +72,16 @@ def addAutoIncrementalField(layer, fieldname, start, settings):
             'OUTPUT': 'memory:extracted'
         }
         result = processing.run('native:addautoincrementalfield', parameter)['OUTPUT']
-        infoWriter("Parameters: " + str(parameter), 'Info', settings)
-        infoWriter("addAutoIncrementalField  finished", 'Info', settings)
+        filelog.infoWriter("Parameters: " + str(parameter), 'Info', settings)
+        filelog.infoWriter("addAutoIncrementalField  finished", 'Info', settings)
         return result
     except:
-        infoWriter("An error occured in addAutoIncrementalField", 'ERROR', settings)
-        infoWriter("Program terminated" , 'ERROR', settings)
+        filelog.infoWriter("An error occured in addAutoIncrementalField", 'ERROR', settings)
+        filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
 def deleteColumns (layer, columns, settings):
-    infoWriter("deleting fields", 'Info', settings)
+    filelog.infoWriter("deleting fields", 'Info', settings)
     try:
         parameter = {
             'INPUT': layer,
@@ -89,16 +89,16 @@ def deleteColumns (layer, columns, settings):
             'OUTPUT': 'memory:extracted'
         }
         result = processing.run('native:deletecolumn', parameter)['OUTPUT']
-        infoWriter("Parameters: " + str(parameter), 'Info', settings)
-        infoWriter("deleteColumns  finished", 'Info', settings)
+        filelog.infoWriter("Parameters: " + str(parameter), 'Info', settings)
+        filelog.infoWriter("deleteColumns  finished", 'Info', settings)
         return result
     except:
-        infoWriter("An error occured in deleteColumns", 'ERROR', settings)
-        infoWriter("Program terminated" , 'ERROR', settings)
+        filelog.infoWriter("An error occured in deleteColumns", 'ERROR', settings)
+        filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
 def fieldCalculator (layer, fieldname, fieldtype, fieldlength, fieldprecision, formula, settings):
-    infoWriter("Calculating field", 'Info', settings)
+    filelog.infoWriter("Calculating field", 'Info', settings)
     try:
         parameter = {
             'INPUT': layer,
@@ -110,16 +110,16 @@ def fieldCalculator (layer, fieldname, fieldtype, fieldlength, fieldprecision, f
             'OUTPUT': 'memory:extracted'
         }
         result = processing.run('native:fieldcalculator', parameter)['OUTPUT']
-        infoWriter("Parameters: " + str(parameter), 'Info', settings)
-        infoWriter("fieldCalculator  finished", 'Info', settings)
+        filelog.infoWriter("Parameters: " + str(parameter), 'Info', settings)
+        filelog.infoWriter("fieldCalculator  finished", 'Info', settings)
         return result
     except:
-        infoWriter("An error occured in fieldCalculator", 'ERROR', settings)
-        infoWriter("Program terminated" , 'ERROR', settings)
+        filelog.infoWriter("An error occured in fieldCalculator", 'ERROR', settings)
+        filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
     
 def renameTableField (layer, field, newname, settings):
-    infoWriter("Renaming field", 'Info', settings)
+    filelog.infoWriter("Renaming field", 'Info', settings)
     try:
         parameter = {
             'INPUT': layer,
@@ -128,11 +128,11 @@ def renameTableField (layer, field, newname, settings):
             'OUTPUT': 'memory:extracted'
         }
         result = processing.run('native:renametablefield', parameter)['OUTPUT']
-        infoWriter("Parameters: " + str(parameter), 'Info', settings)
-        infoWriter("renameTableField  finished", 'Info', settings)
+        filelog.infoWriter("Parameters: " + str(parameter), 'Info', settings)
+        filelog.infoWriter("renameTableField  finished", 'Info', settings)
         return result
     except:
-        infoWriter("An error occured in renameTableField", 'ERROR', settings)
-        infoWriter("Program terminated" , 'ERROR', settings)
+        filelog.infoWriter("An error occured in renameTableField", 'ERROR', settings)
+        filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 

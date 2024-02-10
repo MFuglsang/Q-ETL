@@ -14,7 +14,7 @@ Parameters for worker: \
 
 Example usage:
 ```
-outputLayer = addAutoIncrementalField(layer=inputLayer, field'fid', newname='ogc_fid' settings=settings)
+outputLayer = general.addAutoIncrementalField(layer=inputLayer, field'fid', newname='ogc_fid' settings=settings)
 ```
 Link to QGIS documentation:  https://docs.qgis.org/3.28/en/docs/user_manual/processing_algs/qgis/vectortable.html#id48
 
@@ -37,7 +37,7 @@ Parameters for worker: \
 
 Example usage:
 ```
-outputLayer = (layer=inputlayer, fieldname='value', fieldtype=1 , fieldlength=10, fieldprecision=3, formula ='fid + 1', settings=settings)
+outputLayer = general.fieldcalculator(layer=inputlayer, fieldname='value', fieldtype=1 , fieldlength=10, fieldprecision=3, formula ='fid + 1', settings=settings)
 ```
 Link to QGIS documentation: https://docs.qgis.org/3.28/en/docs/user_manual/processing_algs/qgis/vectortable.html#id46 
 
@@ -54,7 +54,7 @@ Parameters for worker: \
 
 Example usage:
 ```
-outputLayer = addAutoIncrementalField(layer=inputLayer, columns=['fid', 'ogc_fid'], settings=settings)
+outputLayer = general.addAutoIncrementalField(layer=inputLayer, columns=['fid', 'ogc_fid'], settings=settings)
 ```
 Link to QGIS documentation:  https://docs.qgis.org/3.28/en/docs/user_manual/processing_algs/qgis/vectortable.html#id43
 
@@ -74,7 +74,7 @@ Parameters for worker: \
 
 Example usage:
 ```
-outputLayer = addAutoIncrementalField(layer=inputLayer, fieldname='fid', start=1, settings=settings
+outputLayer = general.addAutoIncrementalField(layer=inputLayer, fieldname='fid', start=1, settings=settings
 ```
 Link to QGIS documentation:  https://docs.qgis.org/3.28/en/docs/user_manual/processing_algs/qgis/vectortable.html#id38
 
@@ -91,7 +91,7 @@ Parameters for worker: \
 
 Example usage:
 ```
-outputLayer = extractByExpression(layer=inputLayer, expression='$area > 1000000', settings=settings)
+outputLayer = general.extractByExpression(layer=inputLayer, expression='$area > 1000000', settings=settings)
 ```
 Link to QGIS documentation:  https://docs.qgis.org/en/docs/user_manual/processing_algs/qgis/vectorselection.html#id29
 
