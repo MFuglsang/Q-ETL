@@ -9,12 +9,12 @@ It is possible to use a negative distance for polygon input layers. In this case
 
 Parameters for worker: \
     1. Input layer, Type:[vector: any] (reference to a Qgsvectorlayer. The layer must already be loaded into the script.)\
-    2. distance, Type:[number], Default: 10.0
-    3. segements, Type: [number], Default: 5
-    4. endcapStyle, Type:[enumeration], Default: 0 (Controls how line endings are handled in the buffer. One of: 0 — Round, 1 — Flat, 2 — Square)
-    5. joinStyle, Type:[enumeration], Default: 0 (Specifies whether round, miter or beveled joins should be used when offsetting corners in a line. Options are: 0 — Round, 1 — Miter, 2 — Bevel)
-    6. miterLimit, Type:[number], Default: 2.0
-    7. dissolve, Type:[boolean], Default: False
+    2. distance, Type:[number], Default: 10.0\
+    3. segements, Type: [number], Default: 5\
+    4. endcapStyle, Type:[enumeration], Default: 0 (Controls how line endings are handled in the buffer. One of: 0 — Round, 1 — Flat, 2 — Square)\
+    5. joinStyle, Type:[enumeration], Default: 0 (Specifies whether round, miter or beveled joins should be used when offsetting corners in a line. Options are: 0 — Round, 1 — Miter, 2 — Bevel)\
+    6. miterLimit, Type:[number], Default: 2.0\
+    7. dissolve, Type:[boolean], Default: False\
 
 Example usage:
 ```
@@ -33,8 +33,8 @@ The resulting attribute table will have the same fields as the input layer. The 
 
 Parameters for worker: \
     1. Input layer,  Type:[vector: any] (reference to a Qgsvectorlayer. The layer must already be loaded into the script.)\
-    2. fieldList, Type:[tablefield: any] [list] -  Default: []
-    3. disjoined, Type: [boolean] Default: False (Keep disjoint features separate ? )
+    2. fieldList, Type:[tablefield: any] [list] -  Default: []\
+    3. disjoined, Type: [boolean] Default: False (Keep disjoint features separate ? )\
 
 Example usage:
 ```
