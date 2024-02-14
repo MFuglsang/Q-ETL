@@ -11,10 +11,7 @@ import sys
 sys.path.append("python/log")
 from filelog import *
 
-
-
 print("Geometry imported")
-
 
 def reproject(layer, targetEPSG, settings):
     infoWriter("Running reporjector V2", 'Info', settings)
@@ -49,7 +46,7 @@ def forceRHR(layer, settings):
         infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
-def dissolveFeatures(layer, fieldList, settings):
+def dissolveFeatures(layer, fieldList, disjoined, settings):
     infoWriter("Dissolving features", 'Info', settings)
     try:
         parameter = {
@@ -78,7 +75,7 @@ def bufferLayer(layer, distance, segements, endcapStyle, joinStyle, miterLimit, 
             'JOIN_STYLE': joinStyle,
             'MITER_LIMIT': miterLimit,
             'DISSOLVE': dissolve,
-                'OUTPUT': 'memory:dissolved'
+                'OUTPUT': 'memory:buffer'
         }
         infoWriter("Parameters: " + str(parameter), 'Info', settings)
         result = processing.run('native:buffer', parameter)['OUTPUT']
