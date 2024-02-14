@@ -1,13 +1,17 @@
 # **INPUTTERS** 
 
-## **wfs**
+## **WFS**
 
 **QGIS function : QgsVectorLayer **
 
 Add a WFS layer to the project, using a WFS connection -  this connection is defined with a URI and using the WFS provider:
 ```
 uri = "https://demo.mapserver.org/cgi-bin/wfs?service=WFS&version=2.0.0&request=GetFeature&typename=ms:cities"
-vlayer = QgsVectorLayer(uri, "my wfs layer", "WFS")
+
+## or
+
+uri = XxxX
+
 ```
 The correct formatting of the URI string can be obtained by loading the WFS in QGIS, and acessing the 'Source' propperties of the layer once it is loaded.
 
