@@ -10,7 +10,8 @@ uri = "https://demo.mapserver.org/cgi-bin/wfs?service=WFS&version=2.0.0&request=
 
 ## or
 
-uri = XxxX
+```
+uri = "srsname='EPSG:25832' typename='fkg:fkg.t_5800_fac_pkt' url='https://geofa.geodanmark.dk/ows/fkg/fkg' "
 
 ```
 The correct formatting of the URI string can be obtained by loading the WFS in QGIS, and acessing the 'Source' propperties of the layer once it is loaded.
