@@ -31,9 +31,9 @@ Now, open the <YourProject>.py file. Most of this is boilerplate, that should be
 
 A simple example model loading an input file, reprojection it to 4326, and writing the output looks like :
 ```
-layer = readGeojson("testdata/kommuner.geojson", settings)
-reprojectedLayer = reprojectV2(layer, "EPSG:4326", settings)
-writeOutputfile(reprojectedLayer, "C:/temp/kommuner_4326.geojson", "GeoJson", settings)
+layer = inputters.geojson("testdata/kommuner.geojson", settings)
+reprojectedLayer = geometry.reprojectV2(layer, "EPSG:4326", settings)
+outputters.file(reprojectedLayer, "C:/temp/kommuner_4326.geojson", "GeoJson", settings)
 ```
 
 To run the job, simply call the <YourProject>.cmd file, and the job will execute. The translation log is placed in the log directory as specified in the configuration
@@ -41,6 +41,23 @@ To run the job, simply call the <YourProject>.cmd file, and the job will execute
 
 ## Boilerplates
 
+Most of the code is static, and needs no modifucations. In your <YourProject>.py file, the only part that needs to be modified are from:
 
+#####################################
+ SCRIPT PART (WRITE CODE HERE) 
+#####################################
+
+to:
+
+#####################################
+ EXITING THE SCRIPT
+#####################################
+
+Here all ETL logic is placed for the job to run.
+
+## Running jobs
+
+When the ETL job is ready, all that is required is to run the <YourProject>.cmd file.
+While the job runs, a log file is created for the job run - in the log folder specified in the configuration.py file.
 
 
