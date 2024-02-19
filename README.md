@@ -43,14 +43,14 @@ To run the job, simply call the <YourProject>.cmd file, and the job will execute
 
 Most of the code is static, and needs no modifucations. In your <YourProject>.py file, the only part that needs to be modified are from:
 
-#####################################
- SCRIPT PART (WRITE CODE HERE) 
+#####################################\
+ SCRIPT PART (WRITE CODE HERE) \
 #####################################
 
 to:
 
-#####################################
- EXITING THE SCRIPT
+#####################################\
+ EXITING THE SCRIPT\
 #####################################
 
 Here all ETL logic is placed for the job to run.
