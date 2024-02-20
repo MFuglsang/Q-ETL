@@ -75,7 +75,7 @@ def bufferLayer(layer, distance, segements, endcapStyle, joinStyle, miterLimit, 
             'JOIN_STYLE': joinStyle,
             'MITER_LIMIT': miterLimit,
             'DISSOLVE': dissolve,
-                'OUTPUT': 'memory:buffer'
+            'OUTPUT': 'memory:buffer'
         }
         infoWriter("Parameters: " + str(parameter), 'Info', settings)
         result = processing.run('native:buffer', parameter)['OUTPUT']
@@ -83,5 +83,21 @@ def bufferLayer(layer, distance, segements, endcapStyle, joinStyle, miterLimit, 
         return result
     except:
         infoWriter("An error occured in BufferLayer", 'ERROR', settings)
+        infoWriter("Program terminated" , 'ERROR', settings)
+        sys.exit()
+
+def fixGeometry(layer, settings):
+    infoWriter("Fixing geometries", 'Info', settings)
+    try:
+        parameter = {
+            'INPUT': layer,
+            'OUTPUT': 'memory:buffer'
+        }
+        infoWriter("Parameters: " + str(parameter), 'Info', settings)
+        result = processing.run('native:fixgeometries', parameter)['OUTPUT']
+        infoWriter("FixGeometry finished", 'Info', settings)
+        return result
+    except:
+        infoWriter("An error occured in FixGeometry", 'ERROR', settings)
         infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()

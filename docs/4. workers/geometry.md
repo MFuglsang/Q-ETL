@@ -70,3 +70,17 @@ Example usage:
 outputLayer = geometry.reproject(layer=inputLayer, targetEPSG='EPSG:25832', settings=settings)
 ```
 Link to QGIS documentation:  https://docs.qgis.org/3.28/en/docs/user_manual/processing_algs/qgis/vectorgeneral.html#id121
+
+## **Fix Geometry**
+**QGIS processing algorithem : native:fixgeometries **
+
+Attempts to create a valid representation of a given invalid geometry without losing any of the input vertices. Already valid geometries are returned without further intervention. Always outputs multi-geometry layer.
+
+Parameters for worker: \
+    1. Input layer,  Type:[vector: any] (reference to a Qgsvectorlayer. The layer must already be loaded into the script.)\
+
+Example usage:
+```
+outputLayer = geometry.fixGeometry(layer=inputLayer, settings=settings)
+```
+Link to QGIS documentation: https://docs.qgis.org/3.28/en/docs/user_manual/processing_algs/qgis/vectorgeometry.html#id338

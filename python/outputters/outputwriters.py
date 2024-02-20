@@ -16,7 +16,7 @@ def file(layer, path, format, settings):
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
-def Temp(layer, name,  settings):
+def temp(layer, name,  settings):
     filelog.infoWriter("Writing temp output to: " + settings['TempFolder'] + '/persistent/', 'Info', settings)
  
     if os.path.exists(settings['TempFolder'] + '/persistent/' + name + '.geojson'):
@@ -27,5 +27,20 @@ def Temp(layer, name,  settings):
         filelog.infoWriter("Export to temp completed", 'Info', settings)
     except:
         filelog.infoWriter("An error occured exporting layer to temp", 'ERROR', settings)
+        filelog.infoWriter("Program terminated" , 'ERROR', settings)
+        sys.exit()
+
+def geopackage(layer, geopackage, layername, overwrite, settings):
+    filelog.infoWriter("Writing output to geopackage : " + geopackage+ ', with layername: ' + layername  , 'Info', settings)
+
+    try:
+        if os.path.exists(geopackage):
+            filelog.infoWriter("Geopackage exists, adding layer to it", 'Info', settings)
+            ## Missing logic
+        else:
+            filelog.infoWriter("Geopackage does not exists, creating it", 'Info', settings)
+            ## Missing logic
+    except:
+        filelog.infoWriter("An error occured exporting layer to geopackage", 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
