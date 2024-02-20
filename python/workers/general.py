@@ -42,6 +42,7 @@ def scriptRunner(scritpName, params, settings):
 
 def extractByExpression(layer, expression, settings):
     filelog.infoWriter("Extracting by expression", 'Info', settings)
+    filelog.infoWriter("Processing " + str(layer.featureCount()) +" features", 'Info', settings)
     try:
         parameter = {
             'INPUT': layer,
@@ -51,6 +52,7 @@ def extractByExpression(layer, expression, settings):
         filelog.infoWriter("Parameters: " + str(parameter), 'Info', settings)
         result = processing.run('native:extractbyexpression', parameter)['OUTPUT']
         filelog.infoWriter("Extractbyexpression  finished", 'Info', settings)
+        filelog.infoWriter("Returning  " + str(result.featureCount()) +" features", 'Info', settings)
         return result
     except:
         filelog.infoWriter("An error occured in extractByExpression", 'ERROR', settings)

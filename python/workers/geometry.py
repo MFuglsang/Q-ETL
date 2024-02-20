@@ -9,45 +9,48 @@ from qgis import processing
 
 import sys
 sys.path.append("python/log")
-from filelog import *
+import filelog
 
 print("Geometry imported")
 
 def reproject(layer, targetEPSG, settings):
-    infoWriter("Running reporjector V2", 'Info', settings)
+    filelog.infoWriter("Running reporjector V2", 'Info', settings)
+    filelog.infoWriter("Processing " + str(layer.featureCount()) +" features", 'Info', settings)
     try:
         parameter = {
             'INPUT': layer,
             'TARGET_CRS': targetEPSG,
             'OUTPUT': 'memory:Reprojected'
         }
-        infoWriter("Parameters: " + str(parameter), 'Info', settings)
+        filelog.infoWriter("Parameters: " + str(parameter), 'Info', settings)
         result = processing.run('native:reprojectlayer', parameter)['OUTPUT']
-        infoWriter("Reprojector V2 finished", 'Info', settings)
+        filelog.infoWriter("Reprojector V2 finished", 'Info', settings)
         return result
     except:
-        infoWriter("An error occured reprojectiong layer", 'ERROR', settings)
-        infoWriter("Program terminated" , 'ERROR', settings)
+        filelog.infoWriter("An error occured reprojectiong layer", 'ERROR', settings)
+        filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
 
 def forceRHR(layer, settings):
-    infoWriter("Running force right-hand rule", 'Info', settings)
+    filelog.infoWriter("Running force right-hand rule", 'Info', settings)
+    filelog.infoWriter("Processing " + str(layer.featureCount()) +" features", 'Info', settings)
     try:
         parameter = {
             'INPUT': layer,
             'OUTPUT': 'memory:forced'
         }
         result = processing.run('native:forcerhr', parameter)['OUTPUT']
-        infoWriter("forceRHR finished", 'Info', settings)
+        filelog.infoWriter("forceRHR finished", 'Info', settings)
         return result
     except:
-        infoWriter("An error occured in forceRHR", 'ERROR', settings)
-        infoWriter("Program terminated" , 'ERROR', settings)
+        filelog.infoWriter("An error occured in forceRHR", 'ERROR', settings)
+        filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
 def dissolveFeatures(layer, fieldList, disjoined, settings):
-    infoWriter("Dissolving features", 'Info', settings)
+    filelog.infoWriter("Dissolving features", 'Info', settings)
+    filelog.infoWriter("Processing " + str(layer.featureCount()) +" features", 'Info', settings)
     try:
         parameter = {
             'INPUT': layer,
@@ -55,17 +58,19 @@ def dissolveFeatures(layer, fieldList, disjoined, settings):
             'SEPARATE_DISJOINT' : False,
             'OUTPUT': 'memory:dissolved'
         }
-        infoWriter("Parameters: " + str(parameter), 'Info', settings)
+        filelog.infoWriter("Parameters: " + str(parameter), 'Info', settings)
         result = processing.run('native:dissolve', parameter)['OUTPUT']
-        infoWriter("dissolveFeatures finished", 'Info', settings)
+        filelog.infoWriter("DissolveFeatures finished", 'Info', settings)
+        filelog.infoWriter("Returning " + str(result.featureCount()) +" features", 'Info', settings)
         return result
     except:
-        infoWriter("An error occured in dissolveFeatures", 'ERROR', settings)
-        infoWriter("Program terminated" , 'ERROR', settings)
+        filelog.infoWriter("An error occured in dissolveFeatures", 'ERROR', settings)
+        filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
 def bufferLayer(layer, distance, segements, endcapStyle, joinStyle, miterLimit, dissolve, settings):
-    infoWriter("Creating buffer layer", 'Info', settings)
+    filelog.infoWriter("Creating buffer layer", 'Info', settings)
+    filelog.infoWriter("Processing " + str(layer.featureCount()) +" features", 'Info', settings)
     try:
         parameter = {
             'INPUT': layer,
@@ -77,27 +82,28 @@ def bufferLayer(layer, distance, segements, endcapStyle, joinStyle, miterLimit, 
             'DISSOLVE': dissolve,
             'OUTPUT': 'memory:buffer'
         }
-        infoWriter("Parameters: " + str(parameter), 'Info', settings)
+        filelog.infoWriter("Parameters: " + str(parameter), 'Info', settings)
         result = processing.run('native:buffer', parameter)['OUTPUT']
-        infoWriter("BufferLayer finished", 'Info', settings)
+        filelog.infoWriter("BufferLayer finished", 'Info', settings)
         return result
     except:
-        infoWriter("An error occured in BufferLayer", 'ERROR', settings)
-        infoWriter("Program terminated" , 'ERROR', settings)
+        filelog.infoWriter("An error occured in BufferLayer", 'ERROR', settings)
+        filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
 def fixGeometry(layer, settings):
-    infoWriter("Fixing geometries", 'Info', settings)
+    filelog.infoWriter("Fixing geometries", 'Info', settings)
+    filelog.infoWriter("Processing " + str(layer.featureCount()) +" features", 'Info', settings)
     try:
         parameter = {
             'INPUT': layer,
             'OUTPUT': 'memory:buffer'
         }
-        infoWriter("Parameters: " + str(parameter), 'Info', settings)
+        filelog.infoWriter("Parameters: " + str(parameter), 'Info', settings)
         result = processing.run('native:fixgeometries', parameter)['OUTPUT']
-        infoWriter("FixGeometry finished", 'Info', settings)
+        filelog.infoWriter("FixGeometry finished", 'Info', settings)
         return result
     except:
-        infoWriter("An error occured in FixGeometry", 'ERROR', settings)
-        infoWriter("Program terminated" , 'ERROR', settings)
+        filelog.infoWriter("An error occured in FixGeometry", 'ERROR', settings)
+        filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()

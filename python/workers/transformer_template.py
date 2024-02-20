@@ -1,9 +1,11 @@
 def WORKERNAME(layer, settings): ## Layer and settings are mandatory
     filelog.infoWriter("Running WORKERNAME", 'Info', settings)
+    filelog.infoWriter("Processing " + str(layer.featureCount()) +" features", 'Info', settings)
     try:
 
         ## Transformer-code go's here
-
+        
+        filelog.infoWriter("Parameters: " + str(parameter), 'Info', settings)
         filelog.infoWriter("WORKERNAME finished", 'Info', settings)
         return result ## Transformer must return something 
     except:

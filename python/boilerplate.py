@@ -41,9 +41,10 @@ sys.path.append("python/workers")
 sys.path.append("python/inputters")
 sys.path.append("python/outputters")
 
-import config, general, geometry, inputreaders, outputwriters
+import config, general, attributes, geometry, analysis, inputreaders, outputwriters
 
 filelog.infoWriter("QGIS ETL engine ready", 'INFO', settings)
+filelog.infoWriter("----- Starting Script -----", 'INFO', settings)
 
 
 #####################################
