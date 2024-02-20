@@ -1,5 +1,15 @@
 import os
 from qgis.core import QgsVectorFileWriter
+
+from qgis.core import (QgsCoordinateReferenceSystem, 
+                       QgsCoordinateTransform, 
+                       QgsProject, 
+                       QgsGeometryValidator,
+                       QgsVectorLayer,
+                       QgsFeature)
+from qgis.analysis import QgsNativeAlgorithms
+from qgis import processing
+
 print("Outputwriters imported")
 
 import sys
@@ -7,7 +17,7 @@ sys.path.append("python/log")
 import filelog 
 
 def file(layer, path, format, settings):
-    filelog.infoWriter("Writing output to: " + path, 'Info', settings)
+    filelog.infoWriter("Writing " + str(layer.featureCount()) + " features to: " + path, 'Info', settings)
     try:
         QgsVectorFileWriter.writeAsVectorFormat(layer, path, "utf-8", layer.crs(), format)
         filelog.infoWriter("Export completed", 'Info', settings)
@@ -30,16 +40,18 @@ def temp(layer, name,  settings):
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
-def geopackage(layer, geopackage, layername, overwrite, settings):
-    filelog.infoWriter("Writing output to geopackage : " + geopackage+ ', with layername: ' + layername  , 'Info', settings)
-
+def geopackage(layer, geopackage, overwrite, settings):
+    filelog.infoWriter("Writing "+ str(layer.featureCount()) + " features to geopackage : " + geopackage  , 'Info', settings)
     try:
-        if os.path.exists(geopackage):
-            filelog.infoWriter("Geopackage exists, adding layer to it", 'Info', settings)
-            ## Missing logic
-        else:
-            filelog.infoWriter("Geopackage does not exists, creating it", 'Info', settings)
-            ## Missing logic
+        parameter = {'LAYERS': [layer],
+                'OUTPUT': geopackage,
+                'OVERWRITE': overwrite,
+                'SAVE_STYLES': False,
+                'SAVE_METADATA': False,
+                'SELECTED_FEATURES_ONLY': False}
+        processing.run("native:package", parameter)
+        filelog.infoWriter("Parameters: " + str(parameter), 'Info', settings)
+        filelog.infoWriter("Export to Geopackage completed", 'Info', settings)
     except:
         filelog.infoWriter("An error occured exporting layer to geopackage", 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
