@@ -40,9 +40,10 @@ def temp(layer, name,  settings):
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
-def geopackage(layer, geopackage, overwrite, settings):
+def geopackage(layer, layername, geopackage, overwrite, settings):
     filelog.infoWriter("Writing "+ str(layer.featureCount()) + " features to geopackage : " + geopackage  , 'Info', settings)
     try:
+        layer.setName(layername)
         parameter = {'LAYERS': [layer],
                 'OUTPUT': geopackage,
                 'OVERWRITE': overwrite,
