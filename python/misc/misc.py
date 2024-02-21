@@ -3,8 +3,11 @@ import glob
 import time 
 import sys
 
+import smtplib
+from email.mime.text import MIMEText
+
 sys.path.append("python/log")
-from filelog import *
+import filelog
 
 def cleanUp(settings):
 
@@ -31,51 +34,74 @@ def validateEnvironment(settings):
     ## validating QGIS ressources
     isExist = os.path.exists(settings['Qgs_PrefixPath'])
     if not isExist:
-        infoWriter("Qgs_PrefixPath not found" , 'ERROR', settings)
-        infoWriter("Program terminated" , 'ERROR', settings)
+        filelog.infoWriter("Qgs_PrefixPath not found" , 'ERROR', settings)
+        filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
     else:
-        infoWriter("Qgs_PrefixPath found" , 'INFO', settings)
+        filelog.infoWriter("Qgs_PrefixPath found" , 'INFO', settings)
     
     isExist = os.path.exists(settings['QGIS_Plugin_Path'])
     if not isExist:
-        infoWriter("QGIS_Plugin_Path not found" , 'ERROR', settings)
-        infoWriter("Program terminated" , 'ERROR', settings)
+        filelog.infoWriter("QGIS_Plugin_Path not found" , 'ERROR', settings)
+        filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
     else:
-        infoWriter("QGIS_Plugin_Path found" , 'INFO', settings)
+        filelog.infoWriter("QGIS_Plugin_Path found" , 'INFO', settings)
 
     ## Locating the temp folder
     isExist = os.path.exists(settings['TempFolder'])
     if not isExist:
-        infoWriter("Tempfolder does not exist" , 'ERROR', settings)
-        infoWriter("Program terminated" , 'ERROR', settings)
+        filelog.infoWriter("Tempfolder does not exist" , 'ERROR', settings)
+        filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
     else:
-        infoWriter("Temp folder found : " + settings['TempFolder'], 'Info', settings)
+        filelog.infoWriter("Temp folder found : " + settings['TempFolder'], 'Info', settings)
         ## Locating or creating the folders inside temp
         isExist = os.path.exists(settings['TempFolder'] + '/transient')
         if not isExist:
             os.mkdir(settings['TempFolder'] + '/transient')
-            infoWriter("Transient folder not found in tempdir, it was created", 'Info', settings)
+            filelog.infoWriter("Transient folder not found in tempdir, it was created", 'Info', settings)
         else:
-            infoWriter("Transient folder found in tempdir", 'Info', settings)
+            filelog.infoWriter("Transient folder found in tempdir", 'Info', settings)
 
         isExist = os.path.exists(settings['TempFolder'] + '/persistent')
         if not isExist:
-            infoWriter("persistent folder not found in tempdir, it was created", 'Info', settings)
+            filelog.infoWriter("persistent folder not found in tempdir, it was created", 'Info', settings)
             os.mkdir(settings['TempFolder'] + '/persistent')
         else:
-            infoWriter("Persistent folder found in tempdir", 'Info', settings)
+            filelog.infoWriter("Persistent folder found in tempdir", 'Info', settings)
    
     ## Locating the logdir
     isExist = os.path.exists(settings['logdir'])
     if not isExist:
-        infoWriter("Logdir does not exist" , 'ERROR', settings)
-        infoWriter("Program terminated" , 'ERROR', settings)
+        filelog.infoWriter("Logdir does not exist" , 'ERROR', settings)
+        filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
         
-    infoWriter("", 'Info', settings)   
-    infoWriter("Environement and settings OK !", 'Info', settings)     
+    filelog.infoWriter("", 'Info', settings)   
+    filelog.infoWriter("Environement and settings OK !", 'Info', settings)    
+
+
+def abortRun(settings):
+        filelog.infoWriter("Program terminated" , 'ERROR', settings)
+        sys.exit()
+
     
+
+def send_email(subject, body, sender, recipients, password, host, port):
+    msg = MIMEText(body)
+    msg['Subject'] = subject
+    msg['From'] = sender
+    msg['To'] = ', '.join(recipients)
+    with smtplib.SMTP_SSL(host, port) as smtp_server:
+       smtp_server.login(sender, password)
+       smtp_server.sendmail(sender, recipients, msg.as_string())
+    print("Message sent!")
+
+
+def initCompleted(settings):
+    filelog.infoWriter("QGIS ETL engine ready", 'INFO', settings)
+    filelog.infoWriter("", 'INFO', settings)
+    filelog.infoWriter("----- Starting Script -----", 'INFO', settings)
+    filelog.infoWriter("", 'INFO', settings)

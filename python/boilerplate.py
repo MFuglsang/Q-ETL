@@ -13,10 +13,11 @@ sys.path.append("python/log")
 import filelog 
 
 sys.path.append("python/misc")
-from misc import *
+import misc
 
 settings = loadConfig()
-settings['logfile'] = createLogFile(os.path.basename(__file__), settings['logdir'])
+settings['logfile'] = filelog.createLogFile(os.path.basename(__file__), settings['logdir'])
+misc.validateEnvironment(settings)
 
 QgsApplication.setPrefixPath(settings["Qgs_PrefixPath"], True)
 qgs = QgsApplication([], False)
@@ -33,19 +34,18 @@ Processing.initialize()
 QgsApplication.processingRegistry().addProvider(QgsNativeAlgorithms())
 from processing.script import ScriptUtils
 
-describeEngine(ScriptUtils.scriptsFolders(), QgsApplication.processingRegistry().providerById("script").algorithms(), Qgis.QGIS_VERSION,  settings)
-filelog.infoWriter('Loading ressources', 'INFO', settings)
+filelog.describeEngine(ScriptUtils.scriptsFolders(), QgsApplication.processingRegistry().providerById("script").algorithms(), Qgis.QGIS_VERSION,  settings)
+filelog.infoWriter('Loading python ressources', 'INFO', settings)
 
 ## Loading stuff on the running QGIS...
 sys.path.append("python/workers")
 sys.path.append("python/inputters")
 sys.path.append("python/outputters")
+sys.path.append("python/constructors")
 
-import config, general, attributes, geometry, analysis, inputreaders, outputwriters
+import config, general, attributes, geometry, analysis, inputreaders, outputwriters, construct
 
-filelog.infoWriter("QGIS ETL engine ready", 'INFO', settings)
-filelog.infoWriter("----- Starting Script -----", 'INFO', settings)
-
+misc.initCompleted(settings)
 
 #####################################
 ## SCRIPT PART (WRITE CODE HERE) 
