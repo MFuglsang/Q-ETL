@@ -10,6 +10,22 @@ from log import filelog
 print("Inputreaders imported")
 
 def shapefile(filepath, settings):
+    """
+    A function that reads a shapefile
+
+    Parameters
+    ----------
+    filepath : str
+        The path to the shapefile to read
+
+    settings
+        The configuration object defined in your config file (config_boilerplate.py)
+    
+    Returns
+    -------
+    layer
+        A QgsVectorLayer containing data from the shapefile.
+    """
     infoWriter("Reading file: " + filepath , 'Info', settings)
     try: 
         layer =  QgsVectorLayer(filepath, 'QgsLayer_' + str(randrange(1000)), "ogr")
@@ -19,6 +35,23 @@ def shapefile(filepath, settings):
         filelog.infoWriter("An error occured opening file " + filepath , 'ERROR', settings)
 
 def geojson(filepath, settings):
+    """
+    A function that reads a GeoJson file.
+
+    Parameters
+    ----------
+    filepath : str
+        The path to the GeoJson file to read
+        
+    settings
+        The configuration object defined in your config file (config_boilerplate.py)
+    
+    Returns
+    -------
+    layer
+        A QgsVectorLayer object containing data from the GeoJson file.
+    """
+
     if os.path.isfile(filepath):
 
         filelog.infoWriter("Reading file: " + filepath , 'Info', settings)
@@ -33,9 +66,27 @@ def geojson(filepath, settings):
     else :
         filelog.infoWriter("File not found exception: " + filepath , 'ERROR', settings)
 
-
-
 def geopackage(filepath, layername, settings):
+    """
+    A function that reads a GeoPackage file.
+
+    Parameters
+    ----------
+    filepath : str
+        The path to the GeoPackage file to read
+
+    layername : str
+        Name of the layer to read from the GeoPackage
+        
+    settings
+        The configuration object defined in your config file (config_boilerplate.py)
+    
+    Returns
+    -------
+    layer
+        A QgsVectorLayer object containing data from the GeoPackage layer.
+    """
+    
     filelog.infoWriter("Reading file: " + filepath + "|layername=" + layername, 'Info', settings)
     try:
         layer = QgsVectorLayer(f'{filepath}|layername={layername}', f'QgsLayer_{str(randrange(1000))}', 'ogr')
