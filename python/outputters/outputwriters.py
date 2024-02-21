@@ -23,7 +23,7 @@ def file(layer, path, format, settings):
         filelog.infoWriter("Export completed", 'Info', settings)
     except Exception as error:
         filelog.infoWriter("An error occured exporting layer", 'ERROR', settings)
-        filelog.infoWriter("Errormessage " + type(error).__name__ + "–" + str(error) , 'ERROR', settings)
+        filelog.infoWriter(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
@@ -36,8 +36,9 @@ def temp(layer, name,  settings):
     try:
         QgsVectorFileWriter.writeAsVectorFormat(layer, settings['TempFolder'] + '/persistent/' + name + '.geojson' , "utf-8", layer.crs(), "GeoJson")
         filelog.infoWriter("Export to temp completed", 'Info', settings)
-    except:
+    except Exception as error:
         filelog.infoWriter("An error occured exporting layer to temp", 'ERROR', settings)
+        filelog.infoWriter(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
@@ -56,6 +57,6 @@ def geopackage(layer, layername, geopackage, overwrite, settings):
         filelog.infoWriter("Export to Geopackage completed", 'Info', settings)
     except Exception as error:
         filelog.infoWriter("An error occured exporting layer to geopackage", 'ERROR', settings)
-        filelog.infoWriter("Errormessage " + type(error).__name__ + "–" + str(error) , 'ERROR', settings)
+        filelog.infoWriter(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()

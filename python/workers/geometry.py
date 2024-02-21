@@ -24,10 +24,11 @@ def reproject(layer, targetEPSG, settings):
         }
         filelog.infoWriter("Parameters: " + str(parameter), 'Info', settings)
         result = processing.run('native:reprojectlayer', parameter)['OUTPUT']
-        filelog.infoWriter("Reprojector V2 finished", 'Info', settings)
+        filelog.infoWriter("Reproject finished", 'Info', settings)
         return result
-    except:
+    except Exception as error:
         filelog.infoWriter("An error occured reprojectiong layer", 'ERROR', settings)
+        filelog.infoWriter(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
@@ -43,8 +44,9 @@ def forceRHR(layer, settings):
         result = processing.run('native:forcerhr', parameter)['OUTPUT']
         filelog.infoWriter("forceRHR finished", 'Info', settings)
         return result
-    except:
+    except Exception as error:
         filelog.infoWriter("An error occured in forceRHR", 'ERROR', settings)
+        filelog.infoWriter(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
@@ -63,8 +65,9 @@ def dissolveFeatures(layer, fieldList, disjoined, settings):
         filelog.infoWriter("DissolveFeatures finished", 'Info', settings)
         filelog.infoWriter("Returning " + str(result.featureCount()) +" features", 'Info', settings)
         return result
-    except:
+    except Exception as error:
         filelog.infoWriter("An error occured in dissolveFeatures", 'ERROR', settings)
+        filelog.infoWriter(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
@@ -86,8 +89,9 @@ def bufferLayer(layer, distance, segements, endcapStyle, joinStyle, miterLimit, 
         result = processing.run('native:buffer', parameter)['OUTPUT']
         filelog.infoWriter("BufferLayer finished", 'Info', settings)
         return result
-    except:
+    except Exception as error:
         filelog.infoWriter("An error occured in BufferLayer", 'ERROR', settings)
+        filelog.infoWriter(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
@@ -103,7 +107,8 @@ def fixGeometry(layer, settings):
         result = processing.run('native:fixgeometries', parameter)['OUTPUT']
         filelog.infoWriter("FixGeometry finished", 'Info', settings)
         return result
-    except:
+    except Exception as error:
         filelog.infoWriter("An error occured in FixGeometry", 'ERROR', settings)
+        filelog.infoWriter(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
