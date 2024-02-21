@@ -5,9 +5,7 @@ import sys
 
 import smtplib
 from email.mime.text import MIMEText
-
-sys.path.append("python/log")
-import filelog
+from log import filelog
 
 def cleanUp(settings):
 

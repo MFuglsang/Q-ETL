@@ -13,8 +13,7 @@ from qgis import processing
 print("Outputwriters imported")
 
 import sys
-sys.path.append("python/log")
-import filelog 
+from log import filelog
 
 def file(layer, path, format, settings):
     filelog.infoWriter("Writing " + str(layer.featureCount()) + " features to: " + path, 'Info', settings)

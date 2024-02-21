@@ -2,9 +2,7 @@ from qgis.analysis import QgsNativeAlgorithms
 from qgis import processing
 
 import sys
-sys.path.append("python/log")
-import filelog
-
+from log import filelog
 
 def clip(layer, overlay, settings):
     filelog.infoWriter("Clipping layers", 'Info', settings)

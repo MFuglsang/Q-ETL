@@ -5,17 +5,11 @@
 
 import sys, os
 from qgis.core import QgsApplication, Qgis
+from config import _local_configuration
+from log import filelog
+from misc import misc
 
-sys.path.append("python/config")
-from _local_configuration import *
-
-sys.path.append("python/log")
-import filelog 
-
-sys.path.append("python/misc")
-import misc
-
-settings = loadConfig()
+settings = _local_configuration.loadConfig()
 settings['logfile'] = filelog.createLogFile(os.path.basename(__file__), settings['logdir'])
 misc.validateEnvironment(settings)
 
@@ -37,13 +31,10 @@ from processing.script import ScriptUtils
 filelog.describeEngine(ScriptUtils.scriptsFolders(), QgsApplication.processingRegistry().providerById("script").algorithms(), Qgis.QGIS_VERSION,  settings)
 filelog.infoWriter('Loading python ressources', 'INFO', settings)
 
-## Loading stuff on the running QGIS...
-sys.path.append("python/workers")
-sys.path.append("python/inputters")
-sys.path.append("python/outputters")
-sys.path.append("python/constructors")
-
-import config, general, attributes, geometry, analysis, inputreaders, outputwriters, construct
+from workers import analysis, attributes, general, geometry
+from inputters import inputreaders
+from outputters import outputwriters
+from constructors import construct
 
 misc.initCompleted(settings)
 

@@ -8,8 +8,7 @@ from qgis.analysis import QgsNativeAlgorithms
 from qgis import processing
 
 import sys
-sys.path.append("python/log")
-import filelog
+from log import filelog
 
 print("Geometry imported")
 

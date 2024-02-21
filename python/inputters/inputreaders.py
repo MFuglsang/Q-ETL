@@ -5,9 +5,7 @@ from random import randrange
 from owslib.wfs import WebFeatureService
 import sys, os
 from qgis.core import QgsVectorLayer
-
-sys.path.append("python/log")
-import filelog
+from log import filelog
 
 print("Inputreaders imported")
 

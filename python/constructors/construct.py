@@ -9,9 +9,7 @@ from qgis.core import (QgsCoordinateReferenceSystem,
 from qgis.analysis import QgsNativeAlgorithms
 from qgis import processing
 
-import sys
-sys.path.append("python/log")
-import filelog
+from log import filelog
 
 def layerFromWKT(type, wktList, epsg, settings):
     filelog.infoWriter("Creating layer from WKT" , 'Info', settings)
