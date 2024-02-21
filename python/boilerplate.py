@@ -60,5 +60,5 @@ filelog.infoWriter("----- Starting Script -----", 'INFO', settings)
 
 qgs.exitQgis()
 
-endScript(settings)
-cleanUp(settings)
+filelog.endScript(settings)
+filelog.cleanUp(settings)
