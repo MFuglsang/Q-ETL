@@ -21,8 +21,9 @@ def file(layer, path, format, settings):
     try:
         QgsVectorFileWriter.writeAsVectorFormat(layer, path, "utf-8", layer.crs(), format)
         filelog.infoWriter("Export completed", 'Info', settings)
-    except:
+    except Exception as error:
         filelog.infoWriter("An error occured exporting layer", 'ERROR', settings)
+        filelog.infoWriter("Errormessage " + type(error).__name__ + "–" + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
@@ -53,7 +54,8 @@ def geopackage(layer, layername, geopackage, overwrite, settings):
         processing.run("native:package", parameter)
         filelog.infoWriter("Parameters: " + str(parameter), 'Info', settings)
         filelog.infoWriter("Export to Geopackage completed", 'Info', settings)
-    except:
+    except Exception as error:
         filelog.infoWriter("An error occured exporting layer to geopackage", 'ERROR', settings)
+        filelog.infoWriter("Errormessage " + type(error).__name__ + "–" + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
