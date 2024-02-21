@@ -28,8 +28,9 @@ def extractByExpression(layer, expression, settings):
         result = processing.run('native:extractbyexpression', parameter)['OUTPUT']
         filelog.infoWriter("Extractbyexpression  finished", 'Info', settings)
         return result
-    except:
+    except Exception as error:
         filelog.infoWriter("An error occured in extractByExpression", 'ERROR', settings)
+        filelog.infoWriter(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
@@ -51,8 +52,9 @@ def addAutoIncrementalField(layer, fieldname, start, settings):
         filelog.infoWriter("Parameters: " + str(parameter), 'Info', settings)
         filelog.infoWriter("addAutoIncrementalField  finished", 'Info', settings)
         return result
-    except:
+    except Exception as error:
         filelog.infoWriter("An error occured in addAutoIncrementalField", 'ERROR', settings)
+        filelog.infoWriter(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
@@ -68,8 +70,9 @@ def deleteColumns (layer, columns, settings):
         filelog.infoWriter("Parameters: " + str(parameter), 'Info', settings)
         filelog.infoWriter("deleteColumns  finished", 'Info', settings)
         return result
-    except:
+    except Exception as error:
         filelog.infoWriter("An error occured in deleteColumns", 'ERROR', settings)
+        filelog.infoWriter(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
@@ -89,8 +92,9 @@ def fieldCalculator (layer, fieldname, fieldtype, fieldlength, fieldprecision, f
         filelog.infoWriter("Parameters: " + str(parameter), 'Info', settings)
         filelog.infoWriter("fieldCalculator  finished", 'Info', settings)
         return result
-    except:
+    except Exception as error:
         filelog.infoWriter("An error occured in fieldCalculator", 'ERROR', settings)
+        filelog.infoWriter(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
     
@@ -107,7 +111,8 @@ def renameTableField (layer, field, newname, settings):
         filelog.infoWriter("Parameters: " + str(parameter), 'Info', settings)
         filelog.infoWriter("renameTableField  finished", 'Info', settings)
         return result
-    except:
+    except Exception as error:
         filelog.infoWriter("An error occured in renameTableField", 'ERROR', settings)
+        filelog.infoWriter(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()

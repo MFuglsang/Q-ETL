@@ -18,8 +18,9 @@ def clip(layer, overlay, settings):
         result = processing.run('native:clip', parameter)['OUTPUT']
         filelog.infoWriter("Clip  finished", 'Info', settings)
         return result
-    except:
+    except Exception as error:
         filelog.infoWriter("An error occured in Clip", 'ERROR', settings)
+        filelog.infoWriter(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
@@ -40,8 +41,9 @@ def joinByLocation(layer, predicate, join, join_fields, method, discard_nomatchi
         result = processing.run('native:joinattributesbylocation', parameter)['OUTPUT']
         filelog.infoWriter("joinByLocation finished", 'Info', settings)
         return result
-    except:
+    except Exception as error:
         filelog.infoWriter("An error occured in joinByLocation", 'ERROR', settings)
+        filelog.infoWriter(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
@@ -58,8 +60,9 @@ def extractByLocation(layer, predicate, intersect, settings):
         result = processing.run('native:extractbylocation', parameter)['OUTPUT']
         filelog.infoWriter("extractByLocation finished", 'Info', settings)
         return result
-    except:
+    except Exception as error:
         filelog.infoWriter("An error occured in extractByLocation", 'ERROR', settings)
+        filelog.infoWriter(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
@@ -76,8 +79,9 @@ def randomExtract(layer, method, number, settings):
         result = processing.run('native:randomextract', parameter)['OUTPUT']
         filelog.infoWriter("randomExtract finished", 'Info', settings)
         return result
-    except:
+    except Exception as error:
         filelog.infoWriter("An error occured in randomExtract", 'ERROR', settings)
+        filelog.infoWriter(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
 
@@ -93,7 +97,8 @@ def difference(layer, overlay, settings):
         result = processing.run('native:difference', parameter)['OUTPUT']
         filelog.infoWriter("Difference  finished", 'Info', settings)
         return result
-    except:
+    except Exception as error:
         filelog.infoWriter("An error occured in Difference", 'ERROR', settings)
+        filelog.infoWriter(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
         filelog.infoWriter("Program terminated" , 'ERROR', settings)
         sys.exit()
