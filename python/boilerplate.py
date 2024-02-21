@@ -60,5 +60,5 @@ misc.initCompleted(settings)
 
 qgs.exitQgis()
 
-endScript(settings)
-cleanUp(settings)
+filelog.endScript(settings)
+misc.cleanUp(settings)
