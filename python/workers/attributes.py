@@ -15,6 +15,22 @@ print("Attributes imported")
 
 
 def extractByExpression(layer, expression, settings):
+    """_summary_
+
+    Parameters
+    ----------
+    layer : _type_
+        _description_
+    expression : _type_
+        _description_
+    settings : _type_
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     filelog.infoWriter("Extracting by expression", 'Info', settings)
     try:
         parameter = {
@@ -33,6 +49,24 @@ def extractByExpression(layer, expression, settings):
         sys.exit()
 
 def addAutoIncrementalField(layer, fieldname, start, settings):
+    """_summary_
+
+    Parameters
+    ----------
+    layer : _type_
+        _description_
+    fieldname : _type_
+        _description_
+    start : _type_
+        _description_
+    settings : _type_
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     filelog.infoWriter("Adding incremental field", 'Info', settings)
     try:
         parameter = {
@@ -57,6 +91,22 @@ def addAutoIncrementalField(layer, fieldname, start, settings):
         sys.exit()
 
 def deleteColumns (layer, columns, settings):
+    """_summary_
+
+    Parameters
+    ----------
+    layer : _type_
+        _description_
+    columns : _type_
+        _description_
+    settings : _type_
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     filelog.infoWriter("deleting fields", 'Info', settings)
     try:
         parameter = {
@@ -75,6 +125,30 @@ def deleteColumns (layer, columns, settings):
         sys.exit()
 
 def fieldCalculator (layer, fieldname, fieldtype, fieldlength, fieldprecision, formula, settings):
+    """_summary_
+
+    Parameters
+    ----------
+    layer : _type_
+        _description_
+    fieldname : _type_
+        _description_
+    fieldtype : _type_
+        _description_
+    fieldlength : _type_
+        _description_
+    fieldprecision : _type_
+        _description_
+    formula : _type_
+        _description_
+    settings : _type_
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     filelog.infoWriter("Calculating field", 'Info', settings)
     try:
         parameter = {
@@ -97,6 +171,24 @@ def fieldCalculator (layer, fieldname, fieldtype, fieldlength, fieldprecision, f
         sys.exit()
     
 def renameTableField (layer, field, newname, settings):
+    """_summary_
+
+    Parameters
+    ----------
+    layer : _type_
+        _description_
+    field : _type_
+        _description_
+    newname : _type_
+        _description_
+    settings : _type_
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     filelog.infoWriter("Renaming field", 'Info', settings)
     try:
         parameter = {
