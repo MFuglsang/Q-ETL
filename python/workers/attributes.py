@@ -125,29 +125,39 @@ def deleteColumns (layer, columns, settings):
         sys.exit()
 
 def fieldCalculator (layer, fieldname, fieldtype, fieldlength, fieldprecision, formula, settings):
-    """_summary_
+    """
+    Scripting the field calcualtor
+    You can use all the supported expressions and functions.
+    The original layer is not modified. A new layer is generated where the attribute table contains the calucalted field
+    QGIS processing algorithem: native:fieldcalculator
 
     Parameters
     ----------
-    layer : _type_
-        _description_
-    fieldname : _type_
-        _description_
-    fieldtype : _type_
-        _description_
-    fieldlength : _type_
-        _description_
-    fieldprecision : _type_
-        _description_
-    formula : _type_
-        _description_
-    settings : _type_
-        _description_
+    layer : Qgsvectorlayer [vector: any]
+        The Qgsvectorlayer input for the algorithem
+
+    fieldname : String
+        The name of the new calcualted field
+
+    fieldtype : Enumeration
+        Type of the field,  Default: 0  (0 — Float, 1 — Integer, 2 — String, 3 — Date)
+
+    fieldlength : Integer
+        Lenght of the field, Default: 10.
+
+    fieldprecision : Integer
+        Precision of the field, Default: 3.
+
+    formula : Expression
+        The expression that populates the values of the field.
+
+    settings : dict
+        The configuration object defined in your config file (config_boilerplate.py)
 
     Returns
     -------
-    _type_
-        _description_
+    Qgsvectorlayer [vector: any]
+        The result output from the algorithem
     """
     filelog.infoWriter("Calculating field", 'Info', settings)
     try:
@@ -171,23 +181,29 @@ def fieldCalculator (layer, fieldname, fieldtype, fieldlength, fieldprecision, f
         sys.exit()
     
 def renameTableField (layer, field, newname, settings):
-    """_summary_
+    """
+    Renames an existing field from a vector layer.  
+    The original layer is not modified. A new layer is generated where the attribute table contains the renamed field.
+    QGIS processing algorithem: native:renametablefield
 
     Parameters
     ----------
-    layer : _type_
-        _description_
-    field : _type_
-        _description_
-    newname : _type_
-        _description_
-    settings : _type_
-        _description_
+    layer : Qgsvectorlayer [vector: any]
+        The Qgsvectorlayer input for the algorithem
+
+    field : Tablefield
+        The field that is to be renamed
+
+    newname : String
+        New name for the field
+
+    settings : dict
+        The configuration object defined in your config file (config_boilerplate.py)
 
     Returns
     -------
-    _type_
-        _description_
+    Qgsvectorlayer [vector: any]
+        The result output from the algorithem
     """
     filelog.infoWriter("Renaming field", 'Info', settings)
     try:

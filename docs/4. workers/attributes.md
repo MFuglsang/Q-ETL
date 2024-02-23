@@ -23,7 +23,7 @@ Link to QGIS documentation:  https://docs.qgis.org/3.28/en/docs/user_manual/proc
 
 **QGIS processing algorithem : native:fieldcalculator **
 
-Opens the field calculator (see [Expressions](https://docs.qgis.org/3.28/en/docs/user_manual/expressions/expression.html#id5)). You can use all the supported expressions and functions.
+Scripting the field calcualtor (see [Expressions](https://docs.qgis.org/3.28/en/docs/user_manual/expressions/expression.html#id5)). You can use all the supported expressions and functions.
 
 A new layer is created with the result of the field calculator.
 
