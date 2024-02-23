@@ -13,6 +13,28 @@ from log import filelog
 print("Geometry imported")
 
 def reproject(layer, targetEPSG, settings):
+    """
+    Reprojects a vector layer in a different CRS.
+    The reprojected layer will have the same features and attributes of the input layer.
+    QGIS processing algorithem: native:reprojectlayer.
+
+    Parameters
+    ----------
+    layer : Qgsvectorlayer [vector: polygon]
+        The Qgsvectorlayer input for the algorithem
+
+    targetEPSG : Integer
+        The EPSG code og the target coordinate system.
+
+    settings : dict
+        The configuration object defined in your config file (config_boilerplate.py)
+
+    Returns
+    -------
+    Qgsvectorlayer [vector: polygon]
+        The result output from the algorithem
+    """
+
     filelog.infoWriter("Running reporjector V2", 'Info', settings)
     filelog.infoWriter("Processing " + str(layer.featureCount()) +" features", 'Info', settings)
     try:
@@ -33,6 +55,27 @@ def reproject(layer, targetEPSG, settings):
 
 
 def forceRHR(layer, settings):
+    """
+    Forces polygon geometries to respect the Right-Hand-Rule, in which the area that is bounded
+    by a polygon is to the right of the boundary. 
+    In particular, the exterior ring is oriented in a clockwise direction and any interior
+    rings in a counter-clockwise direction.
+    QGIS processing algorithem: native:forcerhr
+
+    Parameters
+    ----------
+    layer : Qgsvectorlayer [vector: polygon]
+        The Qgsvectorlayer input for the algorithem
+
+    settings : dict
+        The configuration object defined in your config file (config_boilerplate.py)
+
+    Returns
+    -------
+    Qgsvectorlayer [vector: polygon]
+        The result output from the algorithem
+    """
+
     filelog.infoWriter("Running force right-hand rule", 'Info', settings)
     filelog.infoWriter("Processing " + str(layer.featureCount()) +" features", 'Info', settings)
     try:
@@ -50,6 +93,33 @@ def forceRHR(layer, settings):
         sys.exit()
 
 def dissolveFeatures(layer, fieldList, disjoined, settings):
+    """
+    Takes a vector layer and combines its features into new features. 
+    One or more attributes can be specified to dissolve features belonging to the same class 
+    (having the same value for the specified attributes), alternatively all features can be dissolved to a single feature.
+    All output geometries will be converted to multi geometries. 
+    QGIS processing algorithem: native:dissolve.
+
+    Parameters
+    ----------
+    layer : Qgsvectorlayer [vector: any]
+        The Qgsvectorlayer input for the algorithem
+
+    fieldList : List
+        List of fields to dissolve on. Default []
+
+    disjoined : Boolean
+        Keep disjoint features separate ? Default: False
+
+    settings : dict
+        The configuration object defined in your config file (config_boilerplate.py)
+
+    Returns
+    -------
+    Qgsvectorlayer [vector: polygon]
+        The result output from the algorithem
+
+    """
     filelog.infoWriter("Dissolving features", 'Info', settings)
     filelog.infoWriter("Processing " + str(layer.featureCount()) +" features", 'Info', settings)
     try:
