@@ -2,10 +2,14 @@ from core.logger import *
 import sys
 import platform,socket,re,uuid,json
 import pip._internal as pip
+from sys import argv
+import os.path as path
+import json
 
-logger = get_logger()
+
 
 def validateEnvironment(settings):
+    logger = get_logger()
     logger.info('Validating Environment and settings')
     ## validating QGIS ressources
     isExist = os.path.exists(settings['Qgs_PrefixPath'])
@@ -39,7 +43,7 @@ def validateEnvironment(settings):
     logger.info('Environement and settings OK !')     
 
 def describeEngine(scriptfolder, algorithms, version):
-
+    logger = get_logger()
     try:
         import psutil
     except ImportError:
@@ -84,3 +88,10 @@ def describeEngine(scriptfolder, algorithms, version):
     logger.info("----- Starting Script -----")
     logger.info("")
 
+def get_config():
+    settings_file =  path.abspath(path.join(argv[0] ,"../..")) + '\\settings.json'
+
+    with open(settings_file, 'r') as file:
+        settings = json.load(file)
+
+    return settings

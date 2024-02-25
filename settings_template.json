@@ -1,0 +1,21 @@
+{
+    "Qgs_PrefixPath" : "",
+    "QGIS_Plugin_Path" : "",
+    "logdir" : "",
+    "TempFolder" : "",
+    "DatabaseConnections": {
+        "MyPostGIS" : {
+            "host" : "",
+            "port" : "",
+            "user" : "",
+            "password": ""
+        },
+        "MyMSSQL" : {
+            "host" : "",
+            "port" : "",
+            "databasename":"",
+            "user" : "",
+            "password": ""
+        }
+    }
+}

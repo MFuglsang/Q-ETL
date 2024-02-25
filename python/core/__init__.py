@@ -1,11 +1,10 @@
 import sys, os
 from qgis.core import QgsApplication, Qgis
-from config import _local_configuration
-
-
 from core.logger import *
+from core.misc import get_config
 
-settings = _local_configuration.loadConfig()
+#settings = _local_configuration.loadConfig()
+settings = get_config()
 logger = initialize_logger(settings)
 start_logfile()
 
