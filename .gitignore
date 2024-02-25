@@ -5,3 +5,4 @@
 /temp/persistent/*
 /python/development.py
 development.cmd
+settings.json
