@@ -12,9 +12,9 @@ class Constructor:
 
     logger = get_logger()
 
-    def layerFromWKT(type, wktList, epsg, settings):
-        logger.info("Creating layer from WKT" , 'Info', settings)
-        logger.info("Number of features " + str(len(wktList)) + ', type: ' + type, 'Info', settings)
+    def layerFromWKT(type, wktList, epsg):
+        logger.info("Creating layer from WKT")
+        logger.info("Number of features " + str(len(wktList)) + ', type: ' + type)
 
         if type in ['Point', 'Line','Polygon','MultiPoint', 'MultiLine', 'MultiPolygon']:
 
@@ -31,24 +31,24 @@ class Constructor:
                 wkt_layer.updateFields()
                 wkt_layer.commitChanges()
 
-                logger.info("layerFromWKT finished", 'Info', settings)
-                logger.info("Returning  " + str(wkt_layer.featureCount()) +" features", 'Info', settings)
+                logger.info("layerFromWKT finished")
+                logger.info("Returning  " + str(wkt_layer.featureCount()) +" features")
                 return wkt_layer
 
             except Exception as error:
-                logger.error("An error occured in crating WKT layer", 'ERROR', settings)
-                logger.error(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
-                logger.critical("Program terminated" , 'ERROR', settings)
+                logger.error("An error occured in crating WKT layer")
+                logger.error(type(error).__name__ + " – " + str(error) )
+                logger.critical("Program terminated" )
                 sys.exit()
         else:
-                logger.error("An error occured in crating WKT layer", 'ERROR', settings)
-                logger.error('Unsupported type, use Point/Line/Polygon/multiPoint/MultiLine/Multipolygon' , 'ERROR', settings)
-                logger.critical("Program terminated" , 'ERROR', settings)
+                logger.error("An error occured in crating WKT layer")
+                logger.error('Unsupported type, use Point/Line/Polygon/multiPoint/MultiLine/Multipolygon' )
+                logger.critical("Program terminated" )
                 sys.exit()
 
-    def bboxFromLayer(layer, settings):
-        logger.info("Extracting bbox from layer" , 'Info', settings)
-        logger.info("Processing " + str(layer.featureCount()) +" features", 'Info', settings)
+    def bboxFromLayer(layer):
+        logger.info("Extracting bbox from layer" )
+        logger.info("Processing " + str(layer.featureCount()) +" features")
         try:
             ext = layer.extent()
             xmin = ext.xMinimum()
@@ -57,10 +57,10 @@ class Constructor:
             ymax = ext.yMaximum()
             epsg = layer.crs().authid()
             data = [xmin, ymin, xmax, ymax, epsg]
-            logger.info("Extract bbox finished", 'Info', settings)
+            logger.info("Extract bbox finished")
             return data
         except Exception as error:
-            logger.error("An error occured extracting bbox", 'ERROR', settings)
-            logger.error(type(error).__name__ + " – " + str(error) , 'ERROR', settings)
-            logger.critical("Program terminated" , 'ERROR', settings)
+            logger.error("An error occured extracting bbox")
+            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.critical("Program terminated" )
             sys.exit()
