@@ -1,11 +1,7 @@
 from core.logger import *
 import sys
 from qgis.core import QgsVectorLayer
-# import processing
-# from processing.core.Processing import Processing
-# from processing.script.ScriptUtils import *
-# from qgis.analysis import QgsNativeAlgorithms
-# Processing.initialize()
+from random import randrange
 
 class Input_Reader:
     logger = get_logger()
