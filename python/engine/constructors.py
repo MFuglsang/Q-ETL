@@ -10,7 +10,7 @@ from qgis import processing
 
 class Constructor:
 
-    logger =  logger = get_logger()
+    logger = get_logger()
 
     def layerFromWKT(type, wktList, epsg, settings):
         logger.info("Creating layer from WKT" , 'Info', settings)

@@ -8,7 +8,7 @@ from qgis.core import QgsVectorLayer
 # Processing.initialize()
 
 class Input_Reader:
-    logger =  logger = get_logger()
+    logger = get_logger()
 
     def wfs(uri):
         """

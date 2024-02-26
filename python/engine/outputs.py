@@ -9,6 +9,9 @@ from qgis.analysis import QgsNativeAlgorithms
 Processing.initialize()
 
 class Output_Writer:
+
+    logger = get_logger()
+
     def geopackage(layer, layername, geopackage, overwrite):
         """
         A function that writes a QgsVectorLayer to a Geopackage file. 

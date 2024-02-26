@@ -5,7 +5,7 @@ from qgis import processing
 
 
 class Worker:
-    logger =  logger = get_logger() 
+    logger = get_logger() 
 
     ## ##################################
     ## ATTRIBUTE WORKERS
