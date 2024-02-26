@@ -40,9 +40,6 @@ class Input_Reader:
         ----------
         filepath : str
             The path to the shapefile to read
-
-        settings
-            The configuration object defined in your config file (config_boilerplate.py)
         
         Returns
         -------
@@ -70,9 +67,6 @@ class Input_Reader:
         filepath : str
             The path to the GeoJson file to read
             
-        settings
-            The configuration object defined in your config file (config_boilerplate.py)
-        
         Returns
         -------
         layer

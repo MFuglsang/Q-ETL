@@ -21,8 +21,6 @@ class Worker:
             _description_
         expression : _type_
             _description_
-        settings : _type_
-            _description_
 
         Returns
         -------
@@ -56,8 +54,6 @@ class Worker:
         fieldname : _type_
             _description_
         start : _type_
-            _description_
-        settings : _type_
             _description_
 
         Returns
@@ -96,8 +92,6 @@ class Worker:
         layer : _type_
             _description_
         columns : _type_
-            _description_
-        settings : _type_
             _description_
 
         Returns
@@ -149,8 +143,6 @@ class Worker:
         formula : Expression
             The expression that populates the values of the field.
 
-        settings : dict
-            The configuration object defined in your config file (config_boilerplate.py)
 
         Returns
         -------
@@ -195,8 +187,6 @@ class Worker:
         newname : String
             New name for the field
 
-        settings : dict
-            The configuration object defined in your config file (config_boilerplate.py)
 
         Returns
         -------
@@ -233,8 +223,6 @@ class Worker:
         layer : _type_
             _description_
         overlay : _type_
-            _description_
-        settings : _type_
             _description_
 
         Returns
@@ -278,8 +266,6 @@ class Worker:
             _description_
         prefix : _type_
             _description_
-        settings : _type_
-            _description_
 
         Returns
         -------
@@ -319,8 +305,6 @@ class Worker:
             _description_
         intersect : _type_
             _description_
-        settings : _type_
-            _description_
 
         Returns
         -------
@@ -356,8 +340,6 @@ class Worker:
             _description_
         number : _type_
             _description_
-        settings : _type_
-            _description_
 
         Returns
         -------
@@ -390,8 +372,6 @@ class Worker:
         layer : _type_
             _description_
         overlay : _type_
-            _description_
-        settings : _type_
             _description_
 
         Returns
@@ -435,8 +415,6 @@ class Worker:
         targetEPSG : Integer
             The EPSG code og the target coordinate system.
 
-        settings : dict
-            The configuration object defined in your config file (config_boilerplate.py)
 
         Returns
         -------
@@ -476,8 +454,6 @@ class Worker:
         layer : Qgsvectorlayer [vector: polygon]
             The Qgsvectorlayer input for the algorithem
 
-        settings : dict
-            The configuration object defined in your config file (config_boilerplate.py)
 
         Returns
         -------
@@ -520,8 +496,6 @@ class Worker:
         disjoined : Boolean
             Keep disjoint features separate ? Default: False
 
-        settings : dict
-            The configuration object defined in your config file (config_boilerplate.py)
 
         Returns
         -------
@@ -582,8 +556,6 @@ class Worker:
         dissolve : Boolean
             Dissolve the final buffer. Default: false.
 
-        settings : dict
-            The configuration object defined in your config file (config_boilerplate.py)
 
         Returns
         -------
@@ -625,8 +597,6 @@ class Worker:
         layer : Qgsvectorlayer [vector: any]
             The Qgsvectorlayer input for the algorithem
 
-        settings : dict
-            The configuration object defined in your config file (config_boilerplate.py)
 
         Returns
         -------

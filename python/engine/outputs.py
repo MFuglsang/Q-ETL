@@ -64,9 +64,6 @@ class Output_Writer:
 
         format : _type_
             The driver type used to write the data to the file. 
-
-        settings
-            The configuration object defined in your config file (config_boilerplate.py)
         """
 
         logger.info("Writing " + str(layer.featureCount()) + " features to: " + path)
