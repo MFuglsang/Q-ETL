@@ -1,6 +1,7 @@
 from core.logger import *
 import sys
 from qgis.analysis import QgsNativeAlgorithms
+from qgis.core import QgsCoordinateReferenceSystem
 from qgis import processing
 
 
@@ -448,7 +449,7 @@ class Worker:
         try:
             parameter = {
                 'INPUT': layer,
-                'TARGET_CRS': targetEPSG,
+                'TARGET_CRS': QgsCoordinateReferenceSystem(targetEPSG),
                 'OUTPUT': 'memory:Reprojected'
             }
             logger.info("Parameters: " + str(parameter))
