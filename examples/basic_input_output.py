@@ -1,14 +1,10 @@
-#####################################
-## SCRIPT PART (WRITE CODE HERE) 
-#####################################
+from engine import *
+from core import *
 
 ## Reading from WFS into a QGIS layer
-wfslayer = inputreaders.wfs('https://geofyn.admin.gc2.io/wfs/geofyn/fynbus/25832?SERVICE=WFS&REQUEST=GetFeature&VERSION=1.1.0&TYPENAME=fynbus:routes_25832_v&SRSNAME=urn:ogc:def:crs:EPSG::25832', settings)
+input_reader = Input_Reader
+wfslayer = input_reader.wfs('https://geofyn.admin.gc2.io/wfs/geofyn/fynbus/25832?SERVICE=WFS&REQUEST=GetFeature&VERSION=1.1.0&TYPENAME=fynbus:routes_25832_v&SRSNAME=urn:ogc:def:crs:EPSG::25832')
 
 ## Writing the QGIS layer to a Geojson file
-outputwriters.file(wfslayer, "C:/temp/wfs.geojson", "GeoJson", settings)
-
-
-#####################################
-## EXITING THE SCRIPT
-#####################################
+output_writer = Output_Writer
+output_writer.file(wfslayer, 'c:/temp/wfs.geojson', 'GeoJson')
