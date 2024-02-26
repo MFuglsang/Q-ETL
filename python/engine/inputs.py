@@ -36,7 +36,7 @@ class Input_Reader:
             logger.critical("Program terminated")
             sys.exit()
 
-    def shapefile(filepath, settings):
+    def shapefile(filepath):
         """
         A function that reads a shapefile
 
@@ -65,7 +65,7 @@ class Input_Reader:
             sys.exit()
             
 
-    def geojson(filepath, settings):
+    def geojson(filepath):
         """
         A function that reads a GeoJson file.
 

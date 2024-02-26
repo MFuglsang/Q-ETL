@@ -1,6 +1,6 @@
 from core.logger import *
 import sys
-from qgis.core import QgsVectorLayer
+from qgis.core import QgsVectorLayer, QgsVectorFileWriter
 
 import processing
 from processing.core.Processing import Processing
@@ -51,7 +51,7 @@ class Output_Writer:
             logger.critical("Program terminated")
             sys.exit()
 
-    def file(layer, path, format, settings):
+    def file(layer, path, format):
         """_summary_
 
         Parameters
