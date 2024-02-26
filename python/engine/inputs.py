@@ -32,5 +32,64 @@ class Input_Reader:
             return layer
         except Exception as error:
             logger.error("An error occured reading the WFS " + uri )
-            logger.critical(type(error).__name__ + " – " + str(error))
-            sys.exit("Program terminated")
+            logger.error(type(error).__name__ + " – " + str(error))
+            logger.critical("Program terminated")
+            sys.exit()
+
+    def shapefile(filepath, settings):
+        """
+        A function that reads a shapefile
+
+        Parameters
+        ----------
+        filepath : str
+            The path to the shapefile to read
+
+        settings
+            The configuration object defined in your config file (config_boilerplate.py)
+        
+        Returns
+        -------
+        layer
+            A QgsVectorLayer containing data from the shapefile.
+        """
+        logger.info("Reading file: " + filepath)
+        try: 
+            layer =  QgsVectorLayer(filepath, 'QgsLayer_' + str(randrange(1000)), "ogr")
+            logger.info("Finished reading file")
+            return layer
+        except Exception as error:
+            logger.error("An error occured opening file " + filepath)
+            logger.error(type(error).__name__ + " – " + str(error))
+            logger.critical("Program terminated")
+            sys.exit()
+            
+
+    def geojson(filepath, settings):
+        """
+        A function that reads a GeoJson file.
+
+        Parameters
+        ----------
+        filepath : str
+            The path to the GeoJson file to read
+            
+        settings
+            The configuration object defined in your config file (config_boilerplate.py)
+        
+        Returns
+        -------
+        layer
+            A QgsVectorLayer object containing data from the GeoJson file.
+        """
+
+        logger.info("Reading file: " + filepath)
+        try:
+            layer =  QgsVectorLayer(filepath, 'QgsLayer_' + str(randrange(1000)), "ogr")
+            logger.info("Finished reading file")
+            return layer
+        except Exception as error:
+            logger.info("An error occured opening file " + filepath)
+            logger.error(type(error).__name__ + " – " + str(error))
+            logger.critical("Program terminated")
+            sys.exit()

@@ -47,3 +47,31 @@ class Output_Writer:
             logger.error(type(error).__name__ + " – " + str(error))
             logger.critical("Program terminated")
             sys.exit()
+
+    def file(layer, path, format, settings):
+        """_summary_
+
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            The QgsVectorLayer that is to be written to a file
+
+        path : _type_
+            The full path for the file to be created
+
+        format : _type_
+            The driver type used to write the data to the file. 
+
+        settings
+            The configuration object defined in your config file (config_boilerplate.py)
+        """
+
+        logger.info("Writing " + str(layer.featureCount()) + " features to: " + path)
+        try:
+            QgsVectorFileWriter.writeAsVectorFormat(layer, path, "utf-8", layer.crs(), format)
+            logger.info("Export completed")
+        except Exception as error:
+            logger.error("An error occured exporting layer")
+            logger.error(type(error).__name__ + " – " + str(error))
+            logger.critical("Program terminated")
+            sys.exit()
