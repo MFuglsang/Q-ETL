@@ -21,7 +21,8 @@ Parameters for inputreader: \
 
 Example usage:
 ```
-outputLayer = inputreaders.wfs(uri="https://demo.mapserver.org/cgi-bin/wfs?service=WFS&version=2.0.0&request=GetFeature&typename=ms:cities", settings=settings)
+reader = Input_Reader
+outputLayer = reader.wfs(uri="https://demo.mapserver.org/cgi-bin/wfs?service=WFS&version=2.0.0&request=GetFeature&typename=ms:cities")
 ```
 Link to QGIS documentation: https://docs.qgis.org/3.28/en/docs/pyqgis_developer_cookbook/loadlayer.html
 
@@ -36,7 +37,8 @@ Parameters for inputreader: \
 
 Example usage:
 ```
-outputLayer = inputreaders.geojson(filepath="c:\input\data.geojson", settings=settings)
+reader = Input_Reader
+outputLayer = reader.geojson(filepath="c:\input\data.geojson")
 ```
 Link to QGIS documentation: https://docs.qgis.org/3.28/en/docs/pyqgis_developer_cookbook/loadlayer.html
 
@@ -52,7 +54,8 @@ Parameters for inputreader: \
 
 Example usage:
 ```
-outputLayer = inputreaders.geopackage(filepath="c:\input\data.gpk", layername="observations" settings=settings)
+reader = Input_Reader
+outputLayer = reader.geopackage(filepath="c:\input\data.gpk", layername="observations")
 ```
 Link to QGIS documentation: https://docs.qgis.org/3.28/en/docs/pyqgis_developer_cookbook/loadlayer.html
 
@@ -67,6 +70,7 @@ Parameters for inputreader: \
 
 Example usage:
 ```
-outputLayer = inputreaders.shapefile(filepath="c:\input\data.shp", settings=settings)
+reader = Input_Reader
+outputLayer = reader.shapefile(filepath="c:\input\data.shp")
 ```
 Link to QGIS documentation: https://docs.qgis.org/3.28/en/docs/pyqgis_developer_cookbook/loadlayer.html

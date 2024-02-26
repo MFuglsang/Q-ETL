@@ -1,5 +1,3 @@
 # **OUTPUTTERS** 
 
 ## **writeOutputfile**
-
-## **writeToTemp**

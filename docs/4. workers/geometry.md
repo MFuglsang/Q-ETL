@@ -18,7 +18,8 @@ Parameters for worker: \
 
 Example usage:
 ```
-outputLayer = geometry.dissolveFeatures(layer=inputLayer, distance=10, segements=5, endcapStyle=0, joinStyle=0, miterLimit=2, dissolve=False, settings=settings)
+worker = Worker
+outputLayer = worker.dissolveFeatures(layer=inputLayer, distance=10, segements=5, endcapStyle=0, joinStyle=0, miterLimit=2, dissolve=False)
 ```
 Link to QGIS documentation:  https://docs.qgis.org/3.28/en/docs/user_manual/processing_algs/qgis/vectorgeometry.html#id310
 
@@ -38,7 +39,8 @@ Parameters for worker: \
 
 Example usage:
 ```
-outputLayer = geometry.dissolveFeatures(layer=inputLayer, fieldList=['Name'], disjoined=False, settings=settings)
+worker = Worker
+outputLayer = worker.dissolveFeatures(layer=inputLayer, fieldList=['Name'], disjoined=False)
 ```
 Link to QGIS documentation:  https://docs.qgis.org/3.28/en/docs/user_manual/processing_algs/qgis/vectorgeometry.html#id326
 
@@ -52,7 +54,8 @@ Parameters for worker: \
 
 Example usage:
 ```
-outputLayer = geometry.forceRHR(layer=inputLayer, settings=settings)
+worker = Worker
+outputLayer = worker.forceRHR(layer=inputLayer)
 ```
 Link to QGIS documentation:  https://docs.qgis.org/3.28/en/docs/user_manual/processing_algs/qgis/vectorgeometry.html#id339
 
@@ -67,7 +70,8 @@ Parameters for worker: \
 
 Example usage:
 ```
-outputLayer = geometry.reproject(layer=inputLayer, targetEPSG='EPSG:25832', settings=settings)
+worker = Worker
+outputLayer = worker.reproject(layer=inputLayer, targetEPSG='EPSG:25832')
 ```
 Link to QGIS documentation:  https://docs.qgis.org/3.28/en/docs/user_manual/processing_algs/qgis/vectorgeneral.html#id121
 
@@ -81,6 +85,7 @@ Parameters for worker: \
 
 Example usage:
 ```
-outputLayer = geometry.fixGeometry(layer=inputLayer, settings=settings)
+worker = Worker
+outputLayer = worker.fixGeometry(layer=inputLayer)
 ```
 Link to QGIS documentation: https://docs.qgis.org/3.28/en/docs/user_manual/processing_algs/qgis/vectorgeometry.html#id338
