@@ -8,10 +8,12 @@ settings = get_config()
 logger = initialize_logger(settings)
 start_logfile()
 
-from core.misc import validateEnvironment, describeEngine, get_postgres_connections
+from core.misc import validateEnvironment, describeEngine, get_postgres_connections, get_bin_folder
 validateEnvironment(settings)
+settings['bin_path'] = get_bin_folder(settings)
 
 settings['Postgres_Ponnections'] = get_postgres_connections(settings)
+print(settings)
 
 QgsApplication.setPrefixPath(settings["Qgs_PrefixPath"], True)
 qgs = QgsApplication([], False)

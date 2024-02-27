@@ -110,3 +110,18 @@ def get_postgres_connections(settings):
                 connections.append(connection)
 
     return connections
+
+def get_bin_folder(settings):
+    logger = get_logger()
+    if 'OSGeo4W' in settings['Qgs_PrefixPath']:
+        logger.info("QGIS installed in OSGeo4W bundle")
+        bin = path.abspath(path.join(settings['Qgs_PrefixPath'] ,"../..")) + '\\bin\\'
+
+    else:
+        logger.info("QGIS installed standalone")
+        bin = settings['Qgs_PrefixPath'] + '\\bin\\'
+
+    return bin
+
+
+
