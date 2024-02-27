@@ -1,6 +1,7 @@
 from core.logger import *
+from core.misc import get_config
 import sys
-from qgis.core import QgsVectorLayer, QgsVectorFileWriter
+from qgis.core import QgsVectorLayer, QgsVectorFileWriter, QgsVectorLayerExporter
 
 import processing
 from processing.core.Processing import Processing
@@ -11,6 +12,35 @@ Processing.initialize()
 class Output_Writer:
 
     logger = get_logger()
+
+    def postgis(layer, dbname, schema, tablename):
+        """
+        A function that exports a QgsVectorLayer into a Postgis database.
+
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            The QgsVectorLayer to be exported into Postgis
+        dbname : str
+            The database name
+        schema : str
+            Schema name
+        tablename : str
+            The name of the table that will be imported
+        """
+
+        logger.info(f'Exporting {str(layer.featureCount())} features to Postgis')
+        try:
+            settings = get_config()
+            db_con = settings['DatabaseConnections']['MyPostGIS']
+            uri = f'dbname=\'{dbname}\' host=\'{db_con["host"]}\' port=\'{db_con["port"]}\' user=\'{db_con["user"]}\' password=\'{db_con["password"]}\' table="{schema}"."{tablename}" (geom) key=\'id\'' 
+            QgsVectorLayerExporter.exportLayer(layer, uri, 'postgres', layer.crs())
+            logger.info('Export to Postgis completed')
+        except Exception as error:
+            logger.error('An error occured exporting layer to Postgis')
+            logger.error(f'{type(error).__name__} - {str(error)}')
+            logger.critical('Program terminated')
+            sys.exit()
 
     def geopackage(layer, layername, geopackage, overwrite):
         """
