@@ -83,3 +83,33 @@ class Input_Reader:
             logger.error(type(error).__name__ + " – " + str(error))
             logger.critical("Program terminated")
             sys.exit()
+
+    def geopackage(file, layername):
+        """
+        A function that reads alayer from a Geopackage file.
+
+        Parameters
+        ----------
+        File : str
+            The path to the geopackage file to read
+
+        Layername : str
+            The layer to load from the Geopackage
+            
+        Returns
+        -------
+        layer
+            A QgsVectorLayer object containing data from the geopackage.
+        """
+
+        logger.info("Reading geopackage: " + file)
+        try:
+            uri = file + "|layername=" + layername
+            layer =  QgsVectorLayer(uri, 'QgsLayer_' + str(randrange(1000)), "ogr")
+            logger.info("Finished reading geopackage")
+            return layer
+        except Exception as error:
+            logger.info("An error occured opening geopackage " + file)
+            logger.error(type(error).__name__ + " – " + str(error))
+            logger.critical("Program terminated")
+            sys.exit()
