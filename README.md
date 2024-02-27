@@ -28,7 +28,7 @@ After the configuration is set up, the first job can be created.
 Here, two boilerplate files are required : 
 
     * boilerplate.cmd in the root folder
-    * biolerplate.py in the python folder.
+    * boilerplate.py in the python folder.
 
 Make a copy of these two files, and rename them to <YourProject> .cmd/.py
 
@@ -44,7 +44,7 @@ reader = Input_Reader
 layer = reader.geojson("testdata/kommuner.geojson")
 
 worker = Worker
-reprojectedLayer = wworker.reproject(layer, "EPSG:4326")
+reprojectedLayer = worker.reproject(layer, "EPSG:4326")
 
 writer = Output_writer
 writer.file(reprojectedLayer, "C:/temp/kommuner_4326.geojson", "GeoJson")
