@@ -5,6 +5,7 @@ import pip._internal as pip
 from sys import argv
 import os.path as path
 import json
+from PyQt5.QtCore import QSettings
 
 
 
@@ -95,3 +96,17 @@ def get_config():
         settings = json.load(file)
 
     return settings
+
+def get_postgres_connections(settings):
+    ini = QSettings(settings['QGIS_ini_Path'], QSettings.IniFormat)
+    connections = []
+
+    keys = ini.allKeys()
+    for elm in keys:
+        if 'PostgreSQL' in elm:
+            if 'port' in elm :
+                            
+                connection = elm.split('PostgreSQL/connections/')[1].split('/')[0]
+                connections.append(connection)
+
+    return connections

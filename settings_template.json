@@ -1,6 +1,7 @@
 {
     "Qgs_PrefixPath" : "",
     "QGIS_Plugin_Path" : "",
+    "QGIS_ini_Path" : "",
     "logdir" : "",
     "TempFolder" : "",
     "DatabaseConnections": {
