@@ -40,6 +40,15 @@ def validateEnvironment(settings):
     else:
         logger.info('Logdir found')
 
+    ## Locating the temp folder
+    isExist = os.path.exists(settings['TempFolder'])
+    if not isExist:
+        logger.error('TempFolder does not exist')
+        logger.critical('Program terminated')
+        sys.exit()
+    else:
+        logger.info('TempFolder found')
+
     logger.info('')  
     logger.info('Environement and settings OK !')     
 
