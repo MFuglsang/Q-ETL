@@ -130,7 +130,7 @@ class Output_Writer:
                         f.write(line + '\\n')
                     else:
                         f.write(line)
-            logger.info("File created.")
+            logger.info("File created")
         except Exception as error:
             logger.error("An error occured creating file")
             logger.error(type(error).__name__ + " – " + str(error))
