@@ -2,13 +2,14 @@ import sys, os
 from qgis.core import QgsApplication, Qgis
 from core.logger import *
 from core.misc import get_config
+import atexit
 
 #settings = _local_configuration.loadConfig()
 settings = get_config()
 logger = initialize_logger(settings)
 start_logfile()
 
-from core.misc import validateEnvironment, describeEngine, get_postgres_connections, get_bin_folder
+from core.misc import validateEnvironment, describeEngine, get_postgres_connections, get_bin_folder, script_finished
 settings['bin_path'] = get_bin_folder(settings)
 validateEnvironment(settings)
 
@@ -39,3 +40,5 @@ except Exception as e :
     sys.exit()
 
 describeEngine(ScriptUtils.scriptsFolders(), QgsApplication.processingRegistry().providerById("script").algorithms(), Qgis.QGIS_VERSION)
+
+atexit.register(script_finished)

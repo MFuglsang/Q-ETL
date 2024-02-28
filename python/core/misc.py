@@ -9,6 +9,7 @@ from PyQt5.QtCore import QSettings
 
 
 
+
 def validateEnvironment(settings):
     logger = get_logger()
     logger.info('Validating Environment and settings')
@@ -40,6 +41,9 @@ def validateEnvironment(settings):
     else:
         logger.info('Logdir found')
 
+    if settings['logdir'][-1] != '/':
+        settings['logdir'] = settings['logdir'] + '/'
+
     ## Locating the temp folder
     isExist = os.path.exists(settings['TempFolder'])
     if not isExist:
@@ -48,6 +52,8 @@ def validateEnvironment(settings):
         sys.exit()
     else:
         logger.info('TempFolder found')
+    if settings['TempFolder'][-1] != '/':
+        settings['TempFolder'] = settings['TempFolder'] + '/'
 
     logger.info('')  
     logger.info('Environement and settings OK !')     
@@ -131,6 +137,18 @@ def get_bin_folder(settings):
         bin = settings['Qgs_PrefixPath'] + '\\bin\\'
 
     return bin
+
+def script_finished():
+    logger = get_logger()
+    now = datetime.now()
+    logger.info('')
+    logger.info('')
+    logger.info('')
+    logger.info('##################################################')
+    logger.info('JOB: ' + argv[0] + ' finished')
+    logger.info('ENDTIME: ' + now.strftime("%d/%m/%Y, %H:%M"))
+    logger.info('##################################################')
+    
 
 
 

@@ -31,7 +31,7 @@ def start_logfile():
     logger.info('##################################################')
     logger.info('QGIS ETL JOB LOG')
     logger.info('JOB: ' + argv[0])
-    logger.info('STARTTIME: " + now.strftime("%d/%m/%Y, %H:%M")')
+    logger.info('STARTTIME: ' + now.strftime("%d/%m/%Y, %H:%M"))
     logger.info('##################################################')
     logger.info('')
 
