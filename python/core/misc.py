@@ -7,9 +7,6 @@ import os.path as path
 import json
 from PyQt5.QtCore import QSettings
 
-
-
-
 def validateEnvironment(settings):
     logger = get_logger()
     logger.info('Validating Environment and settings')
@@ -98,11 +95,10 @@ def describeEngine(scriptfolder, algorithms, version):
         algs.append(s.displayName()) 
     logger.info("Available custom Scripts : " + str(algs) + "")
     logger.info("##################################################")
-    logger.info("")
     logger.info("QGIS ETL engine ready")
     logger.info("")
     logger.info("----- Starting Script -----")
-    logger.info("")
+
 
 def get_config():
     settings_file =  path.abspath(path.join(argv[0] ,"../..")) + '\\settings.json'
@@ -142,12 +138,19 @@ def script_finished():
     logger = get_logger()
     now = datetime.now()
     logger.info('')
-    logger.info('')
-    logger.info('')
     logger.info('##################################################')
-    logger.info('JOB: ' + argv[0] + ' finished')
+    logger.info('JOB: ' + argv[0] + ' FINISHED')
     logger.info('ENDTIME: ' + now.strftime("%d/%m/%Y, %H:%M"))
     logger.info('##################################################')
+
+def script_failed():
+    now = datetime.now()
+    logger.info('')
+    logger.info('##################################################')
+    logger.info('JOB: ' + argv[0] + ' FAILED')
+    logger.info('ENDTIME: ' + now.strftime("%d/%m/%Y, %H:%M"))
+    logger.info('##################################################')
+    sys.exit()
     
 
 

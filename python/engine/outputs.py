@@ -2,6 +2,7 @@ from core.logger import *
 from core.misc import get_config
 import sys
 from qgis.core import QgsVectorLayer, QgsVectorFileWriter, QgsVectorLayerExporter
+from core.misc import script_failed
 
 import processing
 from processing.core.Processing import Processing
@@ -40,7 +41,7 @@ class Output_Writer:
             logger.error('An error occured exporting layer to Postgis')
             logger.error(f'{type(error).__name__} - {str(error)}')
             logger.critical('Program terminated')
-            sys.exit()
+            script_failed()
 
     def geopackage(layer, layername, geopackage, overwrite):
         """
@@ -79,7 +80,7 @@ class Output_Writer:
             logger.error("An error occured exporting layer to geopackage")
             logger.error(type(error).__name__ + " – " + str(error))
             logger.critical("Program terminated")
-            sys.exit()
+            script_failed()
 
     def file(layer, path, format):
         """_summary_
@@ -104,4 +105,4 @@ class Output_Writer:
             logger.error("An error occured exporting layer")
             logger.error(type(error).__name__ + " – " + str(error))
             logger.critical("Program terminated")
-            sys.exit()
+            script_failed()

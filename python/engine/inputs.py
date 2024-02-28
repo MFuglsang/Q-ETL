@@ -2,6 +2,8 @@ from core.logger import *
 import sys
 from qgis.core import QgsVectorLayer
 from random import randrange
+from core.misc import script_failed
+
 
 class Input_Reader:
     logger = get_logger()
@@ -30,7 +32,7 @@ class Input_Reader:
             logger.error("An error occured reading the WFS " + uri )
             logger.error(type(error).__name__ + " – " + str(error))
             logger.critical("Program terminated")
-            sys.exit()
+            script_failed()
 
     def shapefile(filepath):
         """
@@ -55,7 +57,7 @@ class Input_Reader:
             logger.error("An error occured opening file " + filepath)
             logger.error(type(error).__name__ + " – " + str(error))
             logger.critical("Program terminated")
-            sys.exit()
+            script_failed()
             
 
     def geojson(filepath):
@@ -82,7 +84,7 @@ class Input_Reader:
             logger.info("An error occured opening file " + filepath)
             logger.error(type(error).__name__ + " – " + str(error))
             logger.critical("Program terminated")
-            sys.exit()
+            script_failed()
 
     def geopackage(file, layername):
         """
@@ -112,4 +114,4 @@ class Input_Reader:
             logger.info("An error occured opening geopackage " + file)
             logger.error(type(error).__name__ + " – " + str(error))
             logger.critical("Program terminated")
-            sys.exit()
+            script_failed()
