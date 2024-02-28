@@ -106,3 +106,35 @@ class Output_Writer:
             logger.error(type(error).__name__ + " – " + str(error))
             logger.critical("Program terminated")
             script_failed()
+
+    def textfile(file, list,  newline):
+        """
+        Create an output file from a list of lines. 
+
+        Parameters
+        ----------
+        file : Path and filename
+            The file to be created.
+            
+        list : List
+            List of lines to be written to the file.
+
+        newline : Boolean
+            If true, a newline character will be added to the end of each line.
+        """
+        logger.info("Creating text file: " + file)
+        try:
+            with open(file, 'w', encoding="utf-8") as f:
+                for line in list:
+                    if newline == True:
+                        f.write(line + '\\n')
+                    else:
+                        f.write(line)
+            logger.info("File created.")
+        except Exception as error:
+            logger.error("An error occured creating file")
+            logger.error(type(error).__name__ + " – " + str(error))
+            logger.critical("Program terminated")
+            script_failed()
+
+
