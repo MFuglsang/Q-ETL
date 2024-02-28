@@ -1,4 +1,5 @@
-# QGIS as ETL tool using Python
+# QGIS ETL 
+# - ETL build on the QGIS Engine, using python.
  
 ## Requirements 
 This concept requires a QGIS installation on the computer that executes the jobs.
