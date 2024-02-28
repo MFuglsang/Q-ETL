@@ -440,6 +440,48 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
+    def simplify(layer, method, tolerance):
+            """
+            Simplifies the geometries in a line or polygon layer. 
+            It creates a new layer with the same features as the ones in the input layer, but with geometries containing a lower number of vertices.
+            QGIS processing algorithem: native:simplifygeometries.
+
+            Parameters
+            ----------
+            layer : Qgsvectorlayer [vector: polygon]
+                The Qgsvectorlayer input for the algorithem
+
+            method : Integer
+                Simplification method. One of: 0 — Distance (Douglas-Peucker), 1 — Snap to grid, 2 — Area (Visvalingam)
+
+            tolerance : Integer
+                Threshold tolerance (in units of the layer): if the distance between two nodes is smaller than the tolerance value,
+                the segment will be simplified and vertices will be removed.
+
+
+            Returns
+            -------
+            Qgsvectorlayer [vector: polygon/line]
+                The result output from the algorithem
+            """
+
+            logger.info("Running reporjector V2")
+            logger.info("Processing " + str(layer.featureCount()) +" features")
+            try:
+                parameter = {
+                    'METHOD':method,
+                    'TOLERANCE':tolerance,
+                    'OUTPUT': 'memory:Reprojected'
+                }
+                logger.info("Parameters: " + str(parameter))
+                result = processing.run('native:simplifygeometries', parameter)['OUTPUT']
+                logger.info("Simplifygeometries finished")
+                return result
+            except Exception as error:
+                logger.error("An error occured in simplifygeometries")
+                logger.error(type(error).__name__ + " – " + str(error) )
+                logger.critical("Program terminated" )
+                sys.exit()
 
     def forceRHR(layer):
         """
@@ -473,6 +515,73 @@ class Worker:
             return result
         except Exception as error:
             logger.error("An error occured in forceRHR")
+            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.critical("Program terminated" )
+            sys.exit()
+
+    def join_by_attribute(layer1, layer1_field, layer2, layer2_field, fields_to_copy, method, discard, prefix):
+        """
+        Takes an input vector layer and creates a new vector layer that is an extended version of the input one, 
+        with additional attributes in its attribute table.
+        The additional attributes and their values are taken from a second vector layer. An attribute is selected in each of them 
+        to define the join criteria.
+        QGIS processing algorithem: native:joinattributestable.
+
+        Parameters
+        ----------
+        layer1 : Qgsvectorlayer [vector: any]
+            The 1. Qgsvectorlayer input for the algorithem
+
+        layer1_field : String
+            Field of the source layer to use for the join
+
+        layer2 : Qgsvectorlayer [vector: any]
+            The 2. Qgsvectorlayer input for the algorithem
+
+        layer2_field : String
+            Field of the source layer to use for the join
+
+        fields_to_copy : List
+            Select the specific fields you want to add. By default all the fields are added. Default []
+
+        method : Integer
+            The type of the final joined layer. One of: 
+            0 — Create separate feature for each matching feature (one-to-many)
+            1 — Take attributes of the first matching feature only (one-to-one)
+
+        discard : Boolean
+            Check if you don’t want to keep the features that could not be joined
+
+        prefix : String
+            Add a prefix to joined fields in order to easily identify them and avoid field name collision
+
+        Returns
+        -------
+        Qgsvectorlayer [vector: polygon]
+            The result output from the algorithem
+
+        """
+        logger.info("Joining features features")
+        logger.info("Processing " + str(layer1.featureCount()) +" features")
+        try:
+            parameter = {
+                'INPUT':layer1,
+                'FIELD':layer1_field,
+                'INPUT_2':layer2,
+                'FIELD_2':layer2_field,
+                'FIELDS_TO_COPY':fields_to_copy,
+                'METHOD':method,
+                'DISCARD_NONMATCHING':discard,
+                'PREFIX':prefix,
+                'OUTPUT': 'memory:joined'
+            }
+            logger.info("Parameters: " + str(parameter))
+            result = processing.run('native:joinattributestable', parameter)['OUTPUT']
+            logger.info("Joinattributestable finished")
+            logger.info("Returning " + str(result.featureCount()) +" features")
+            return result
+        except Exception as error:
+            logger.error("An error occured in joinattributestable")
             logger.error(type(error).__name__ + " – " + str(error) )
             logger.critical("Program terminated" )
             sys.exit()
