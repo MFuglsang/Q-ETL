@@ -1,4 +1,4 @@
-![Demo Animation](../ressources/images/logo.png?raw=true)
+<img src="../ressources/images/logo.png" width="300" height="150">
 ## - ETL build on the QGIS Engine, using python.
  
 ## Requirements 
