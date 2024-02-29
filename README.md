@@ -1,4 +1,4 @@
-# QGIS ETL 
+![Demo Animation](../ressources/images/logo.png?raw=true)
 ## - ETL build on the QGIS Engine, using python.
  
 ## Requirements 
