@@ -1,4 +1,4 @@
-<img src="../ressources/images/logo.png" width="400" height="100"> 
+<img src="../ressources/images/logo.png" width="400" height="85"> 
 - ETL build on the QGIS Engine, using python.
  
 ## Requirements 
