@@ -1,5 +1,5 @@
-<img src="../ressources/images/logo.png" width="400" height="100">
-## - ETL build on the QGIS Engine, using python.
+<img src="../ressources/images/logo.png" width="400" height="100"> 
+- ETL build on the QGIS Engine, using python.
  
 ## Requirements 
 This concept requires a QGIS installation on the computer that executes the jobs.
