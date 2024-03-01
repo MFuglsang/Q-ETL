@@ -144,6 +144,7 @@ def script_finished():
     logger.info('##################################################')
 
 def script_failed():
+    logger = get_logger()
     now = datetime.now()
     logger.info('')
     logger.info('##################################################')
