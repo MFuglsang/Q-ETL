@@ -106,8 +106,8 @@ class Input_Reader:
 
         logger.info("Reading geopackage: " + file)
         try:
-            uri = file + "|layername=" + layername
-            layer =  QgsVectorLayer(uri, 'QgsLayer_' + str(randrange(1000)), "ogr")
+            uri = f'{file}|layername={layername}'
+            layer = QgsVectorLayer(uri, f'QgsLayer_{str(randrange(1000))}', 'ogr')
             logger.info("Finished reading geopackage")
             return layer
         except Exception as error:
