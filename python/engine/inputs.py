@@ -115,3 +115,27 @@ class Input_Reader:
             logger.error(type(error).__name__ + " – " + str(error))
             logger.critical("Program terminated")
             script_failed()
+
+    def filegdb(file, layername):
+        """
+        A function that read a layer from an ESRI File Geodatabase using the OpenFileGDB driver.
+
+        Parameters
+        ----------
+        file : str
+            The path to the file geodatabase to read.
+        layername : str
+            The layer to load from the database.
+        """
+
+        logger.info(f'Reading file geodatabase: {file}')
+        try:
+            uri = f'{file}|layername={layername}'
+            layer = QgsVectorLayer(uri, f'QgsLayer_{str(randrange(1000))}', 'ogr')
+            logger.info('Finished reading File geodatabase')
+            return layer
+        except Exception as error:
+            logger.info("An error occured opening File geodatabase " + file)
+            logger.error(type(error).__name__ + " – " + str(error))
+            logger.critical("Program terminated")
+            script_failed()
