@@ -24,10 +24,13 @@ class Output_Writer:
         ----------
         layer : QgsVectorLayer
             The QgsVectorLayer to be exported into Postgis
+
         dbname : str
             The database name
+
         schema : str
             Schema name
+            
         tablename : str
             The name of the table that will be imported
         """
