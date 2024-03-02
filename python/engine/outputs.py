@@ -139,26 +139,37 @@ class Output_Writer:
             logger.critical("Program terminated")
             script_failed()
 
-    def mssql(layer, connection, schema, table, overwrite, geom_type, geom_name):
-        """_summary_
+    def mssql(layer, connection, schema, table, overwrite, geom_type, geom_name, ogr2ogr_params):
+        """
+        A function that exports a QgsVectorLayer into a MSSQL database using ogr2ogr.
 
         Parameters
         ----------
-        layer : _type_
-            _description_
-        connection : _type_
-            _description_
-        schema : _type_
-            _description_
-        table : _type_
-            _description_
-        overwrite : _type_
-            _description_
-        geom_type : _type_
-            _description_
-        geom_name : _type_
-            _description_
+        layer : QgsVectorLayer
+            The QgsVectorLayer that is to be written to a file.
+
+        connection : String
+            The name of a connection from the settings.json file.
+        
+        schema : String
+            The target schema.
+
+        table : String
+            The target table.
+
+        overwrite : Boolean
+            Overwrite or append.
+
+        geom_type : String
+            Geometry type. One of geometry/geography.
+
+        geom_name : String
+            Name of the geometry coloumn.
+
+        ogr2ogr_params : String
+            Extra parameters for ogr2ogr besides the default.
         """
+
         try:
             config = get_config()
             logger.info(f'Exporting {layer} to MSSQL Server')
@@ -180,8 +191,13 @@ class Output_Writer:
                 ow = '-overwrite'
             else:
                 ow = ''
+
+            if ogr2ogr_params != '':
+                ep = ' ' + ogr2ogr_params
+            else:
+                ep = ''
             
-            ogr2ogrstring = config['QGIS_bin_folder'] + '/ogr2ogr.exe --config MSSQLSPATIAL_USE_BCP FALSE -f "MSSQLSpatial" "' +  ogrconnection +'" "' + tmp_path + '" ' + geometry + ' ' + table +  ' -lco UPLOAD_GEOM_FORMAT=wkt ' + ow
+            ogr2ogrstring = config['QGIS_bin_folder'] + '/ogr2ogr.exe --config MSSQLSPATIAL_USE_BCP FALSE -f "MSSQLSpatial" "' +  ogrconnection +'" "' + tmp_path + '" ' + geometry + ' ' + table +  ' -lco UPLOAD_GEOM_FORMAT=wkt ' + ep + ow
             logger.info(f'Writing to MSSQL database {dbconnection["databasename"]}, {table}')
             run = subprocess.run(ogr2ogrstring, capture_output=True)
             logger.info(run.stdout)
