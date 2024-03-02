@@ -1,6 +1,8 @@
 from core.logger import *
 from core.misc import get_config
-import sys
+import sys, copy
+import subprocess
+from random import randrange
 from qgis.core import QgsVectorLayer, QgsVectorFileWriter, QgsVectorLayerExporter
 from core.misc import script_failed
 
@@ -137,4 +139,55 @@ class Output_Writer:
             logger.critical("Program terminated")
             script_failed()
 
+    def mssql(layer, connection, schema, table, overwrite, geom_type, geom_name):
+        """_summary_
 
+        Parameters
+        ----------
+        layer : _type_
+            _description_
+        connection : _type_
+            _description_
+        schema : _type_
+            _description_
+        table : _type_
+            _description_
+        overwrite : _type_
+            _description_
+        geom_type : _type_
+            _description_
+        geom_name : _type_
+            _description_
+        """
+        try:
+            config = get_config()
+            logger.info(f'Exporting {layer} to MSSQL Server')
+            dbconnection = config['DatabaseConnections'][connection]
+            conn = copy.copy(dbconnection)
+            conn['password'] = 'xxxxxxx'
+            logger.info(f'Connection: {str(conn)}')
+            logger.info(f'Creating temporary layer in Temp folder')
+            tmp_path = config['TempFolder'] + 'mssql_layer_'+str(randrange(1000))+'.geojson'
+            QgsVectorFileWriter.writeAsVectorFormat(layer, tmp_path, "utf-8", layer.crs(), 'geojson')
+            logger.info(f'Teporary layer in Temp folder done')
+
+            ## ogr2ogr parameters
+            table = f'-nln "{schema}.{table}"'
+            geometry = f'-lco "GEOM_TYPE={geom_type}" -lco "GEOM_NAME={geom_name}"'
+            ogrconnection = f"MSSQL:server={dbconnection['host']};driver=SQL Server;database={dbconnection['databasename']};uid={dbconnection['user']};pwd={dbconnection['password']}"
+
+            if overwrite == True:
+                ow = '-overwrite'
+            else:
+                ow = ''
+            
+            ogr2ogrstring = config['QGIS_bin_folder'] + '/ogr2ogr.exe --config MSSQLSPATIAL_USE_BCP FALSE -f "MSSQLSpatial" "' +  ogrconnection +'" "' + tmp_path + '" ' + geometry + ' ' + table +  ' -lco UPLOAD_GEOM_FORMAT=wkt ' + ow
+            logger.info(f'Writing to MSSQL database {dbconnection["databasename"]}, {table}')
+            run = subprocess.run(ogr2ogrstring, capture_output=True)
+            logger.info(run.stdout)
+            logger.info(f'Exort to MSSQL completed')
+        except Exception as error:
+            logger.error("An error occured exporting to MSSQL")
+            logger.error(type(error).__name__ + " – " + str(error))
+            logger.critical("Program terminated")
+            script_failed()

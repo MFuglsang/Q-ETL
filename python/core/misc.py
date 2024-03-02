@@ -29,6 +29,15 @@ def validateEnvironment(settings):
     else:
         logger.info('QGIS_Plugin_Path found')
 
+    isExist = os.path.exists(settings['QGIS_bin_folder'])
+    if not isExist:
+        
+        logger.error('QGIS_Bin_Folder not found')
+        logger.critical('Program terminated')
+        sys.exit()
+    else:
+        logger.info('QGIS_Bin_Folder found')
+
     ## Locating the logdir
     isExist = os.path.exists(settings['logdir'])
     if not isExist:
