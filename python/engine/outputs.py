@@ -1,6 +1,6 @@
 from core.logger import *
 from core.misc import get_config
-import sys, copy
+import sys, copy, os
 import subprocess
 from random import randrange
 from qgis.core import QgsVectorLayer, QgsVectorFileWriter, QgsVectorLayerExporter
@@ -30,7 +30,7 @@ class Output_Writer:
 
         schema : str
             Schema name
-            
+
         tablename : str
             The name of the table that will be imported
         """
@@ -188,7 +188,11 @@ class Output_Writer:
             ## ogr2ogr parameters
             table = f'-nln "{schema}.{table}"'
             geometry = f'-lco "GEOM_TYPE={geom_type}" -lco "GEOM_NAME={geom_name}"'
-            ogrconnection = f"MSSQL:server={dbconnection['host']};driver=SQL Server;database={dbconnection['databasename']};uid={dbconnection['user']};pwd={dbconnection['password']}"
+
+            if dbconnection['user'] == '' and dbconnection['password'] == '':
+                ogrconnection = f"MSSQL:server={dbconnection['host']};driver=SQL Server;database={dbconnection['databasename']};trusted_connection=yes;"
+            else:
+                ogrconnection = f"MSSQL:server={dbconnection['host']};driver=SQL Server;database={dbconnection['databasename']};uid={dbconnection['user']};pwd={dbconnection['password']}"
 
             if overwrite == True:
                 ow = '-overwrite'
@@ -204,8 +208,14 @@ class Output_Writer:
             logger.info(f'Writing to MSSQL database {dbconnection["databasename"]}, {table}')
             run = subprocess.run(ogr2ogrstring, capture_output=True)
             logger.info(run.stdout)
+            os.remove(tmp_path)
             logger.info(f'Exort to MSSQL completed')
         except Exception as error:
+            try:
+                os.remove(tmp_path)
+            except:
+                pass
+
             logger.error("An error occured exporting to MSSQL")
             logger.error(type(error).__name__ + " – " + str(error))
             logger.critical("Program terminated")
