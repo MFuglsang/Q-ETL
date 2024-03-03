@@ -145,7 +145,8 @@ class Output_Writer:
     def mssql(layer, connection, schema, table, overwrite, geom_type, geom_name, ogr2ogr_params):
         """
         A function that exports a QgsVectorLayer into a MSSQL database using ogr2ogr.
-
+        The function writes the data to a temporary geojson file, that is then importet to the database with ogr2ogr.
+        
         Parameters
         ----------
         layer : QgsVectorLayer
