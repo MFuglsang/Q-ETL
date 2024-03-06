@@ -208,9 +208,9 @@ class Output_Writer:
             ogr2ogrstring = config['QGIS_bin_folder'] + '/ogr2ogr.exe --config MSSQLSPATIAL_USE_BCP FALSE -f "MSSQLSpatial" "' +  ogrconnection +'" "' + tmp_path + '" ' + geometry + ' ' + table +  ' -lco UPLOAD_GEOM_FORMAT=wkt ' + ep + ow
             logger.info(f'Writing to MSSQL database {dbconnection["databasename"]}, {table}')
             run = subprocess.run(ogr2ogrstring, capture_output=True)
-            logger.info(run.stdout)
+            #logger.info(run.stdout)
             os.remove(tmp_path)
-            logger.info(f'Exort to MSSQL completed')
+            logger.info(f'Export to MSSQL completed')
         except Exception as error:
             try:
                 os.remove(tmp_path)
