@@ -86,13 +86,26 @@ class Input_Reader:
             logger.critical("Program terminated")
             script_failed()
 
+    def fileBasedDB(file, layername, format):
+        logger.info(f'Reading {format}: {file}')
+        try:
+            uri = f'{file}|layername={layername}'
+            layer = QgsVectorLayer(uri, f'QgsLayer_{str(randrange(1000))}', 'ogr')
+            logger.info(f'Finished reading {format}')
+            return layer
+        except Exception as error:
+            logger.info(f'An error occured opening {format}: {file}')
+            logger.error(type(error).__name__ + " – " + str(error))
+            logger.critical("Program terminated")
+            script_failed()
+
     def geopackage(file, layername):
         """
         A function that reads alayer from a Geopackage file.
 
         Parameters
         ----------
-        File : str
+        file : str
             The path to the geopackage file to read
 
         Layername : str
@@ -104,17 +117,8 @@ class Input_Reader:
             A QgsVectorLayer object containing data from the geopackage.
         """
 
-        logger.info("Reading geopackage: " + file)
-        try:
-            uri = f'{file}|layername={layername}'
-            layer = QgsVectorLayer(uri, f'QgsLayer_{str(randrange(1000))}', 'ogr')
-            logger.info("Finished reading geopackage")
-            return layer
-        except Exception as error:
-            logger.info("An error occured opening geopackage " + file)
-            logger.error(type(error).__name__ + " – " + str(error))
-            logger.critical("Program terminated")
-            script_failed()
+        layer = Input_Reader.fileBasedDB(file, layername, 'Geopackage')
+        return layer
 
     def filegdb(file, layername):
         """
@@ -128,14 +132,5 @@ class Input_Reader:
             The layer to load from the database.
         """
 
-        logger.info(f'Reading file geodatabase: {file}')
-        try:
-            uri = f'{file}|layername={layername}'
-            layer = QgsVectorLayer(uri, f'QgsLayer_{str(randrange(1000))}', 'ogr')
-            logger.info('Finished reading File geodatabase')
-            return layer
-        except Exception as error:
-            logger.info("An error occured opening File geodatabase " + file)
-            logger.error(type(error).__name__ + " – " + str(error))
-            logger.critical("Program terminated")
-            script_failed()
+        layer = Input_Reader.fileBasedDB(file, layername, 'ESRI File Geodatabase')
+        return layer
