@@ -3,7 +3,7 @@ from core.misc import get_config
 import sys, copy, os
 import subprocess
 from random import randrange
-from qgis.core import QgsVectorLayer, QgsVectorFileWriter, QgsVectorLayerExporter
+from qgis.core import QgsVectorFileWriter, QgsVectorLayerExporter, QgsProject
 from core.misc import script_failed
 
 import processing
@@ -218,6 +218,32 @@ class Output_Writer:
                 pass
 
             logger.error("An error occured exporting to MSSQL")
+            logger.error(type(error).__name__ + " – " + str(error))
+            logger.critical("Program terminated")
+            script_failed()
+
+    def filegdb(layer, layername, path):
+        """
+        A function that export a QgsVectorLayer into an ESRI File
+
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            The layer that is to be written to an ESRI File GeoDatabase
+        path : str
+            The full path for the ESRI File Geodatabase to be created
+        layername : str
+            The name of the resulting layer in the ESRI File Geodatabase
+        """
+
+        logger.info(f'Writing {str(layer.featureCount())} features to: {path}')
+        try:
+            options = QgsVectorFileWriter.SaveVectorOptions()
+            options.driverName = 'OpenFileGDB'
+            options.layerName = layername
+            QgsVectorFileWriter.writeAsVectorFormatV3(layer, path, QgsProject.instance().transformContext(), options)
+        except Exception as error:
+            logger.error("An error occured exporting layer to ESRI File Geodatabase")
             logger.error(type(error).__name__ + " – " + str(error))
             logger.critical("Program terminated")
             script_failed()
