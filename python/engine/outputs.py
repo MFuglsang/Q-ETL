@@ -16,7 +16,7 @@ class Output_Writer:
 
     logger = get_logger()
 
-    def postgis(layer, dbname, schema, tablename):
+    def postgis(layer, connection, dbname, schema, tablename, overwrite=True):
         """
         A function that exports a QgsVectorLayer into a Postgis database.
 
@@ -24,6 +24,9 @@ class Output_Writer:
         ----------
         layer : QgsVectorLayer
             The QgsVectorLayer to be exported into Postgis
+
+        connection : str
+            The name of the connection object in the settings file
 
         dbname : str
             The database name
@@ -33,19 +36,39 @@ class Output_Writer:
 
         tablename : str
             The name of the table that will be imported
+        
+        overwrite : str
+            Defaults to True. Should the resulting table in Postgis be overwritten if it exists. If set to False, then it will append the data.
         """
 
         logger.info(f'Exporting {str(layer.featureCount())} features to Postgis')
+
         try:
-            settings = get_config()
-            db_con = settings['DatabaseConnections']['MyPostGIS']
-            uri = f'dbname=\'{dbname}\' host=\'{db_con["host"]}\' port=\'{db_con["port"]}\' user=\'{db_con["user"]}\' password=\'{db_con["password"]}\' table="{schema}"."{tablename}" (geom) key=\'id\'' 
-            QgsVectorLayerExporter.exportLayer(layer, uri, 'postgres', layer.crs())
-            logger.info('Export to Postgis completed')
+            config = get_config()
+            dbConnection = config['DatabaseConnections'][connection]
+            logger.info('Creating temporary folder in Temp folder')
+            tmp_path = f'{config["TempFolder"]}postgis_layer_{str(randrange(1000))}.geojson'
+            options = QgsVectorFileWriter.SaveVectorOptions()
+            options.driverName = 'GeoJSON'
+            QgsVectorFileWriter.writeAsVectorFormatV3(layer, tmp_path, QgsProject.instance().transformContext(), options)
+            logger.info('Temporary layer created')
+
+            # ogr2ogr parameters
+            table = f'-nln "{schema}.{tablename}"'
+            ogrconnection = f'PG:"host={dbConnection["host"]} port={dbConnection["port"]} dbname={dbname} schemas={schema} user={dbConnection["user"]} password={dbConnection["password"]}"'
+            ogr2ogrstring = f'{config["QGIS_bin_folder"]}/ogr2ogr.exe -f "PostgreSQL" {ogrconnection} {tmp_path} {table}'
+            if overwrite:
+                ogr2ogrstring = f'{ogr2ogrstring} -overwrite'
+            logger.info(f'Writing to PostGIS database {dbname}')
+            run = subprocess.run(ogr2ogrstring, capture_output=True)
+            os.remove(tmp_path)
+            logger.info('Temporary layer removed')
+            logger.info('Export to PostGIS completed')
+            
         except Exception as error:
-            logger.error('An error occured exporting layer to Postgis')
-            logger.error(f'{type(error).__name__} - {str(error)}')
-            logger.critical('Program terminated')
+            logger.error("An error occured exporting to Postgis")
+            logger.error(type(error).__name__ + " – " + str(error))
+            logger.critical("Program terminated")
             script_failed()
 
     def geopackage(layer, layername, geopackage, overwrite):
