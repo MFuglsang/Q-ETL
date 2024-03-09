@@ -165,7 +165,7 @@ class Output_Writer:
             logger.critical("Program terminated")
             script_failed()
 
-    def mssql(layer, connection, schema, table, overwrite, geom_type, geom_name, ogr2ogr_params):
+    def mssql(layer, connection, driver, schema, table, overwrite, geom_type, geom_name, ogr2ogr_params):
         """
         A function that exports a QgsVectorLayer into a MSSQL database using ogr2ogr.
         The function writes the data to a temporary geojson file, that is then importet to the database with ogr2ogr.
@@ -178,6 +178,10 @@ class Output_Writer:
         connection : String
             The name of a connection from the settings.json file.
         
+        driver : String (Optional)
+            The driver used for writing to the database.
+            Default value is : 'SQL Server'.
+            
         schema : String
             The target schema.
 
@@ -205,9 +209,11 @@ class Output_Writer:
             conn['password'] = 'xxxxxxx'
             logger.info(f'Connection: {str(conn)}')
             logger.info(f'Creating temporary layer in Temp folder')
-            tmp_path = config['TempFolder'] + 'mssql_layer_'+str(randrange(1000))+'.geojson'
-            QgsVectorFileWriter.writeAsVectorFormat(layer, tmp_path, "utf-8", layer.crs(), 'geojson')
-            logger.info(f'Teporary layer in Temp folder done')
+            tmp_path = f'{config["TempFolder"]}mssql_layer_{str(randrange(1000))}.geojson'
+            options = QgsVectorFileWriter.SaveVectorOptions()
+            options.driverName = 'GeoJSON'
+            QgsVectorFileWriter.writeAsVectorFormatV3(layer, tmp_path, QgsProject.instance().transformContext(), options)
+            logger.info('Temporary layer created')
 
             ## ogr2ogr parameters
             table = f'-nln "{schema}.{table}"'
@@ -228,12 +234,15 @@ class Output_Writer:
             else:
                 ep = ''
             
-            ogr2ogrstring = config['QGIS_bin_folder'] + '/ogr2ogr.exe --config MSSQLSPATIAL_USE_BCP FALSE -f "MSSQLSpatial" "' +  ogrconnection +'" "' + tmp_path + '" ' + geometry + ' ' + table +  ' -lco UPLOAD_GEOM_FORMAT=wkt ' + ep + ow
+            ogr2ogrstring = f'{config["QGIS_bin_folder"]}/ogr2ogr.exe --config MSSQLSPATIAL_USE_BCP FALSE -f "MSSQLSpatial" "{ogrconnection}" "{tmp_path}" {geometry} {table} -lco UPLOAD_GEOM_FORMAT=wkt {ep}  {ow}'
             logger.info(f'Writing to MSSQL database {dbconnection["databasename"]}, {table}')
-            run = subprocess.run(ogr2ogrstring, capture_output=True)
-            #logger.info(run.stdout)
+            ogr2ogrstring.join(' -progress')
+            run = subprocess.run(ogr2ogrstring, stderr=subprocess.STDOUT)
+            if run.stdout:
+                logger.info(run.stdout)
             os.remove(tmp_path)
             logger.info(f'Export to MSSQL completed')
+        
         except Exception as error:
             try:
                 os.remove(tmp_path)
