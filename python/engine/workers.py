@@ -169,6 +169,27 @@ class Worker:
             logger.error(type(error).__name__ + " – " + str(error) )
             logger.critical("Program terminated" )
             sys.exit()
+
+    def timeStamper(layer, ts_fieldname):
+        """
+            Create an attribute woth current timestamp on features.
+
+        Parameters
+        ----------
+        layer : Qgsvectorlayer [vector: any]
+            The Qgsvectorlayer input for the algorithem
+
+        ts_fieldname : String
+            The name of the new timestamp field
+
+        Returns
+        -------
+        Qgsvectorlayer [vector: any]
+            The result output from the algorithem
+        """
+        logger.info(f'Creating timestamp {ts_fieldname} using fieldCalculator')
+        newLayer = Worker.fieldCalculator(layer, ts_fieldname, 5, 0, 0, ' now() ')
+        return newLayer
         
     def renameTableField (layer, field, newname):
         """

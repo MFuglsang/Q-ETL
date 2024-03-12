@@ -24,13 +24,13 @@ class Input_Reader:
         """
               
         try:
-            logger.info("Reading WFS layer: " + uri)
+            logger.info(f'Reading WFS layer: {uri}')
             layer = QgsVectorLayer(uri, "WFS_Layer" , 'WFS')
             logger.info("Finished reading the WFS service")
             return layer
         except Exception as error:
-            logger.error("An error occured reading the WFS " + uri )
-            logger.error(type(error).__name__ + " – " + str(error))
+            logger.error(f'An error occured reading the WFS {uri}')
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated")
             script_failed()
 
@@ -48,14 +48,14 @@ class Input_Reader:
         layer
             A QgsVectorLayer containing data from the shapefile.
         """
-        logger.info("Reading file: " + filepath)
+        logger.info(f'Reading file: {filepath}')
         try: 
-            layer =  QgsVectorLayer(filepath, 'QgsLayer_' + str(randrange(1000)), "ogr")
+            layer =  QgsVectorLayer(filepath, f'QgsLayer_ {str(randrange(1000))}', "ogr")
             logger.info("Finished reading file")
             return layer
         except Exception as error:
-            logger.error("An error occured opening file " + filepath)
-            logger.error(type(error).__name__ + " – " + str(error))
+            logger.error(f'An error occured opening file {filepath}')
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated")
             script_failed()
             
@@ -75,14 +75,14 @@ class Input_Reader:
             A QgsVectorLayer object containing data from the GeoJson file.
         """
 
-        logger.info("Reading file: " + filepath)
+        logger.info(f'Reading file: {filepath}')
         try:
-            layer =  QgsVectorLayer(filepath, 'QgsLayer_' + str(randrange(1000)), "ogr")
+            layer =  QgsVectorLayer(filepath, f'QgsLayer_ {str(randrange(1000))}', "ogr")
             logger.info("Finished reading file")
             return layer
         except Exception as error:
-            logger.info("An error occured opening file " + filepath)
-            logger.error(type(error).__name__ + " – " + str(error))
+            logger.info(f'An error occured opening file {filepath}')
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated")
             script_failed()
 
@@ -120,6 +120,7 @@ class Input_Reader:
         layer = Input_Reader.fileBasedDB(file, layername, 'Geopackage')
         return layer
 
+
     def filegdb(file, layername):
         """
         A function that read a layer from an ESRI File Geodatabase using the OpenFileGDB driver.
@@ -131,6 +132,5 @@ class Input_Reader:
         layername : str
             The layer to load from the database.
         """
-
         layer = Input_Reader.fileBasedDB(file, layername, 'ESRI File Geodatabase')
         return layer

@@ -67,7 +67,7 @@ class Output_Writer:
             
         except Exception as error:
             logger.error("An error occured exporting to Postgis")
-            logger.error(type(error).__name__ + " – " + str(error))
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated")
             script_failed()
 
@@ -92,7 +92,7 @@ class Output_Writer:
 
         """
 
-        logger.info("Writing "+ str(layer.featureCount()) + " features to geopackage : " + geopackage)
+        logger.info(f'Writing {str(layer.featureCount())} features to geopackage : {geopackage}')
         try:
             layer.setName(layername)
             parameter = {'LAYERS': [layer],
@@ -102,11 +102,11 @@ class Output_Writer:
                     'SAVE_METADATA': False,
                     'SELECTED_FEATURES_ONLY': False}
             processing.run("native:package", parameter)
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             logger.info("Export to Geopackage completed")
         except Exception as error:
             logger.error("An error occured exporting layer to geopackage")
-            logger.error(type(error).__name__ + " – " + str(error))
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated")
             script_failed()
 
@@ -125,13 +125,13 @@ class Output_Writer:
             The driver type used to write the data to the file. 
         """
 
-        logger.info("Writing " + str(layer.featureCount()) + " features to: " + path)
+        logger.info(f'Writing {str(layer.featureCount())} features to: {path}')
         try:
             QgsVectorFileWriter.writeAsVectorFormat(layer, path, "utf-8", layer.crs(), format)
             logger.info("Export completed")
         except Exception as error:
             logger.error("An error occured exporting layer")
-            logger.error(type(error).__name__ + " – " + str(error))
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated")
             script_failed()
 
@@ -161,7 +161,7 @@ class Output_Writer:
             logger.info("File created")
         except Exception as error:
             logger.error("An error occured creating file")
-            logger.error(type(error).__name__ + " – " + str(error))
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated")
             script_failed()
 
@@ -218,9 +218,14 @@ class Output_Writer:
             ## ogr2ogr parameters
             table = f'-nln "{schema}.{table}"'
             geometry = f'-lco "GEOM_TYPE={geom_type}" -lco "GEOM_NAME={geom_name}"'
+            
+            if driver != '':
+                mssql_driver = driver
+            else:
+                 mssql_driver = 'SQL Server'
 
             if dbconnection['user'] == '' and dbconnection['password'] == '':
-                ogrconnection = f"MSSQL:server={dbconnection['host']};driver=SQL Server;database={dbconnection['databasename']};trusted_connection=yes;"
+                ogrconnection = f"MSSQL:server={dbconnection['host']};driver={mssql_driver};database={dbconnection['databasename']};trusted_connection=yes;"
             else:
                 ogrconnection = f"MSSQL:server={dbconnection['host']};driver=SQL Server;database={dbconnection['databasename']};uid={dbconnection['user']};pwd={dbconnection['password']}"
 
@@ -250,7 +255,7 @@ class Output_Writer:
                 pass
 
             logger.error("An error occured exporting to MSSQL")
-            logger.error(type(error).__name__ + " – " + str(error))
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated")
             script_failed()
 
@@ -276,6 +281,6 @@ class Output_Writer:
             QgsVectorFileWriter.writeAsVectorFormatV3(layer, path, QgsProject.instance().transformContext(), options)
         except Exception as error:
             logger.error("An error occured exporting layer to ESRI File Geodatabase")
-            logger.error(type(error).__name__ + " – " + str(error))
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated")
             script_failed()
