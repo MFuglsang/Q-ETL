@@ -13,19 +13,22 @@ class Worker:
     ## ##################################
 
     def extractByExpression(layer, expression):
-        """_summary_
+        """
+        Creates a vector layer from an input layer, containing only matching features.
+        The criteria for adding features to the resulting layer is based on a QGIS expression.
 
         Parameters
         ----------
-        layer : _type_
-            _description_
-        expression : _type_
-            _description_
+        layer : QgsVectorLayer
+            The QgsVectorLayer that is used as input.
+
+        expression : String
+            Expression to filter the vector layer
 
         Returns
         -------
-        _type_
-            _description_
+        QgsVectorLayer
+            The QgsVectorLayer output layer.
         """
         logger.info("Extracting by expression")
         try:
@@ -34,32 +37,38 @@ class Worker:
                 'EXPRESSION': expression,
                 'OUTPUT': 'memory:extracted'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:extractbyexpression', parameter)['OUTPUT']
             logger.info("Extractbyexpression  finished")
             return result
         except Exception as error:
             logger.error("An error occured in extractByExpression")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
     def addAutoIncrementalField(layer, fieldname, start):
-        """_summary_
+        """
+        Adds a new integer field to a vector layer, with a sequential value for each feature.
+        This field can be used as a unique ID for features in the layer. The new attribute is not added to the input layer but a new layer is generated instead.
+        The initial starting value for the incremental series can be specified. Optionally, the incremental series can be based on grouping 
+        fields and a sort order for features can also be specified.
 
         Parameters
         ----------
-        layer : _type_
-            _description_
-        fieldname : _type_
-            _description_
-        start : _type_
-            _description_
+        layer : QgsVectorLayer
+            The QgsVectorLayer that is used as input.
+
+        fieldname : String
+            Name of the field with autoincremental values.
+
+        start : Integer
+            Choose the initial number of the incremental count, Default: 0.
 
         Returns
         -------
-        _type_
-            _description_
+        QgsVectorLayer
+            The QgsVectorLayer output layer.
         """
         logger.info("Adding incremental field")
         try:
@@ -75,29 +84,31 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             result = processing.run('native:addautoincrementalfield', parameter)['OUTPUT']
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             logger.info("addAutoIncrementalField  finished")
             return result
         except Exception as error:
             logger.error("An error occured in addAutoIncrementalField")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
     def deleteColumns (layer, columns):
-        """_summary_
+        """
+        Takes a vector layer and generates a new one that has the same features but without the selected columns.
 
         Parameters
         ----------
-        layer : _type_
-            _description_
-        columns : _type_
-            _description_
+        layer : QgsVectorLayer
+            Input vector layer to drop field(s) from
+
+        columns : List of tablefields
+            The field(s) to drop
 
         Returns
         -------
-        _type_
-            _description_
+        QgsVectorLayer
+            The QgsVectorLayer output layer.
         """
         logger.info("deleting fields")
         try:
@@ -107,12 +118,12 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             result = processing.run('native:deletecolumn', parameter)['OUTPUT']
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             logger.info("deleteColumns  finished")
             return result
         except Exception as error:
             logger.error("An error occured in deleteColumns")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -161,12 +172,12 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             result = processing.run('native:fieldcalculator', parameter)['OUTPUT']
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             logger.info("fieldCalculator  finished")
             return result
         except Exception as error:
             logger.error("An error occured in fieldCalculator")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -223,12 +234,12 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             result = processing.run('native:renametablefield', parameter)['OUTPUT']
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             logger.info("renameTableField  finished")
             return result
         except Exception as error:
             logger.error("An error occured in renameTableField")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -258,12 +269,12 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             result = processing.run('native:createattributeindex', parameter)['OUTPUT']
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             logger.info("createattributeindex  finished")
             return result
         except Exception as error:
             logger.error("An error occured in createattributeindex")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -291,12 +302,12 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             result = processing.run('native:createspatialindex', parameter)['OUTPUT']
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             logger.info("createspatialindex  finished")
             return result
         except Exception as error:
             logger.error("An error occured in createspatialindex")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -326,13 +337,13 @@ class Worker:
                 'OVERLAY': overlay,
                 'OUTPUT': 'memory:extracted'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:clip', parameter)['OUTPUT']
             logger.info("Clip  finished")
             return result
         except Exception as error:
             logger.error("An error occured in Clip")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -373,13 +384,13 @@ class Worker:
                 'PREFIX':prefix,
                 'OUTPUT': 'memory:extracted'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:joinattributesbylocation', parameter)['OUTPUT']
             logger.info("joinByLocation finished")
             return result
         except Exception as error:
             logger.error("An error occured in joinByLocation")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -408,13 +419,13 @@ class Worker:
                 'INTERSECT':intersect,
                 'OUTPUT': 'memory:extracted'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:extractbylocation', parameter)['OUTPUT']
             logger.info("extractByLocation finished")
             return result
         except Exception as error:
             logger.error("An error occured in extractByLocation")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -443,13 +454,13 @@ class Worker:
                 'NUMBER':number,
                 'OUTPUT': 'memory:extracted'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:randomextract', parameter)['OUTPUT']
             logger.info("randomExtract finished")
             return result
         except Exception as error:
             logger.error("An error occured in randomExtract")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -475,13 +486,13 @@ class Worker:
                 'OVERLAY': overlay,
                 'OUTPUT': 'memory:extracted'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:difference', parameter)['OUTPUT']
             logger.info("Difference  finished")
             return result
         except Exception as error:
             logger.error("An error occured in Difference")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -519,13 +530,13 @@ class Worker:
                 'TARGET_CRS': QgsCoordinateReferenceSystem(targetEPSG),
                 'OUTPUT': 'memory:Reprojected'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:reprojectlayer', parameter)['OUTPUT']
             logger.info("Reproject finished")
             return result
         except Exception as error:
             logger.error("An error occured reprojectiong layer")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -562,13 +573,13 @@ class Worker:
                     'TOLERANCE':tolerance,
                     'OUTPUT': 'memory:Reprojected'
                 }
-                logger.info("Parameters: " + str(parameter))
+                logger.info(f'Parameters: {str(parameter)}')
                 result = processing.run('native:simplifygeometries', parameter)['OUTPUT']
                 logger.info("Simplifygeometries finished")
                 return result
             except Exception as error:
                 logger.error("An error occured in simplifygeometries")
-                logger.error(type(error).__name__ + " – " + str(error) )
+                logger.error(f'{type(error).__name__}  –  {str(error)}')
                 logger.critical("Program terminated" )
                 sys.exit()
 
@@ -604,7 +615,7 @@ class Worker:
             return result
         except Exception as error:
             logger.error("An error occured in forceRHR")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -664,14 +675,14 @@ class Worker:
                 'PREFIX':prefix,
                 'OUTPUT': 'memory:joined'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:joinattributestable', parameter)['OUTPUT']
             logger.info("Joinattributestable finished")
             logger.info("Returning " + str(result.featureCount()) +" features")
             return result
         except Exception as error:
             logger.error("An error occured in joinattributestable")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -710,14 +721,14 @@ class Worker:
                 'SEPARATE_DISJOINT' : False,
                 'OUTPUT': 'memory:dissolved'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:dissolve', parameter)['OUTPUT']
             logger.info("DissolveFeatures finished")
             logger.info("Returning " + str(result.featureCount()) +" features")
             return result
         except Exception as error:
             logger.error("An error occured in dissolveFeatures")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -774,13 +785,13 @@ class Worker:
                 'DISSOLVE': dissolve,
                 'OUTPUT': 'memory:buffer'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:buffer', parameter)['OUTPUT']
             logger.info("BufferLayer finished")
             return result
         except Exception as error:
             logger.error("An error occured in BufferLayer")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -809,13 +820,13 @@ class Worker:
                 'INPUT': layer,
                 'OUTPUT': 'memory:buffer'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:fixgeometries', parameter)['OUTPUT']
             logger.info("FixGeometry finished")
             return result
         except Exception as error:
             logger.error("An error occured in FixGeometry")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -850,14 +861,14 @@ class Worker:
                 'NUMBER':number,
                 'OUTPUT': 'memory:buffer'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:randomextract', parameter)['OUTPUT']
             logger.info("Returning " + str(result.featureCount()) +" features")
             logger.info("randomextract finished")
             return result
         except Exception as error:
             logger.error("An error occured in FixGeometry")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
