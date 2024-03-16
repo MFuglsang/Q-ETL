@@ -316,19 +316,23 @@ class Worker:
     ## ##################################
             
     def clip(layer, overlay):
-        """_summary_
+        """
+        Clips a vector layer using the features of an additional polygon layer.
+        Only the parts of the features in the input layer that fall within the polygons of 
+        the overlay layer will be added to the resulting layer.
 
         Parameters
         ----------
-        layer : _type_
-            _description_
-        overlay : _type_
-            _description_
+        layer : Qgsvectorlayer [vector: any]
+            Layer containing the features to be clipped
+
+        overlay : [vector: polygon]
+            Layer containing the clipping features
 
         Returns
         -------
-        _type_
-            _description_
+        Qgsvectorlayer [vector: any]
+            Layer to contain the features from the input layer that are inside the overlay (clipping) layer
         """
         logger.info("Clipping layers")
         try:
@@ -348,29 +352,49 @@ class Worker:
             sys.exit()
 
     def joinByLocation(layer, predicate, join, join_fields, method, discard_nomatching, prefix):
-        """_summary_
-
+        """
+        Takes an input vector layer and creates a new vector layer that is an extended version of
+        the input one, with additional attributes in its attribute table.
+        The additional attributes and their values are taken from a second vector layer.
+        A spatial criteria is applied to select the values from the second layer that are added to each 
+        feature from the first layer.
+        
         Parameters
         ----------
-        layer : _type_
-            _description_
-        predicate : _type_
-            _description_
-        join : _type_
-            _description_
-        join_fields : _type_
-            _description_
-        method : _type_
-            _description_
-        discard_nomatching : _type_
-            _description_
-        prefix : _type_
-            _description_
+        layer : Qgsvectorlayer [vector: any]
+            Input vector layer. 
+            The output layer will consist of the features of this layer with attributes from 
+            matching features in the second layer.
+
+        predicate : [enumeration] [list] Default: [0]
+            Type of spatial relation the source feature should have with the target feature so that they could be joined. One or more of:
+            0 — intersect, 1 — contain, 2 — equal, 3 — touch, 4 — overlap, 5 — are within 6 — cross.
+
+        join : [vector: any]
+            The join layer. 
+            Features of this vector layer will add their attributes to the source layer attribute table if 
+            they satisfy the spatial relationship.
+
+        join_fields : [tablefield: any] [list]
+            Select the specific fields you want to add from the join layer. 
+            By default all the fields are added.
+
+        method : [enumeration]           	
+            The type of the final joined layer. One of: 
+            0 — Create separate feature for each matching feature (one-to-many)
+            1 — Take attributes of the first matching feature only (one-to-one)
+            2 — Take attributes of the feature with largest overlap only (one-to-one)
+
+        discard_nomatching : [boolean] Default: False
+            Remove from the output the input layer’s features which could not be joined
+
+        prefix : [string]
+            Add a prefix to joined fields in order to easily identify them and avoid field name collision
 
         Returns
         -------
-        _type_
-            _description_
+        Qgsvectorlayer [vector: any]
+            the output vector layer for the join.
         """
         logger.info("Clipping layers")
         try:
