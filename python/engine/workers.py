@@ -423,17 +423,20 @@ class Worker:
 
         Parameters
         ----------
-        layer : _type_
-            _description_
-        predicate : _type_
-            _description_
-        intersect : _type_
-            _description_
+        layer : Qgsvectorlayer [vector: any]
+            Input vector layer. 
+
+        predicate : [enumeration] [list] Default: [0]
+            Type of spatial relation the source feature should have with the target feature so that they could be joined. One or more of:
+            0 — intersect, 1 — contain, 2 — equal, 3 — touch, 4 — overlap, 5 — are within 6 — cross.
+
+        intersect : Qgsvectorlayer [vector: any]
+            Intersection vector layer
 
         Returns
         -------
-        _type_
-            _description_
+        Qgsvectorlayer [vector: any]
+            the output vector layer for the join.
         """
         logger.info("Extracting by location")
         try:
@@ -454,21 +457,26 @@ class Worker:
             sys.exit()
 
     def randomExtract(layer, method, number):
-        """_summary_
+        """
+        Takes a vector layer and generates a new one that contains only a subset of the features in the input layer.
+        The subset is defined randomly, based on feature IDs, using a percentage or count value to define 
+        the total number of features in the subset.
 
         Parameters
         ----------
-        layer : _type_
-            _description_
+        layer : Qgsvectorlayer [vector: any]
+            Input vector layer. 
+
         method : _type_
             _description_
-        number : _type_
-            _description_
+
+        number : [enumeration] Default: 0
+            Random selection method. One of: 0 — Number of selected features, 1 — Percentage of selected features
 
         Returns
         -------
-        _type_
-            _description_
+        Qgsvectorlayer [vector: polygon/line]
+            The result output from the algorithem
         """
         logger.info("Extracting random features")
         try:
@@ -489,19 +497,23 @@ class Worker:
             sys.exit()
 
     def difference(layer, overlay):
-        """_summary_
+        """
+        Extracts features from the input layer that don’t fall within the boundaries of the overlay layer.
+        Input layer features that partially overlap the overlay layer feature(s) are split along the 
+        boundary of those feature(s.
 
         Parameters
         ----------
-        layer : _type_
-            _description_
-        overlay : _type_
-            _description_
+        layer : Qgsvectorlayer [vector: any]
+            Layer to extract (parts of) features from.
+
+        overlay : Qgsvectorlayer [vector: any]
+            Layer containing the geometries that will be subtracted from the iniput layer geometries
 
         Returns
         -------
-        _type_
-            _description_
+        Qgsvectorlayer [vector: polygon/line]
+            The result output from the algorithem
         """
         logger.info("Finding differences")
         try:
