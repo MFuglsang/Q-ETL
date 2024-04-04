@@ -14,12 +14,12 @@ class Constructor:
 
     def layerFromWKT(type, wktList, epsg):
         logger.info("Creating layer from WKT")
-        logger.info("Number of features " + str(len(wktList)) + ', type: ' + type)
+        logger.info(f'Number of features {str(len(wktList))}, type: {type}')
 
         if type in ['Point', 'Line','Polygon','MultiPoint', 'MultiLine', 'MultiPolygon']:
 
             try:
-                wkt_layer = QgsVectorLayer(type + "?crs=epsg:" + str(epsg), "WKT_Layer", "Memory")
+                wkt_layer = QgsVectorLayer(f'{type}?crs=epsg:{str(epsg)}', "WKT_Layer", "Memory")
 
                 features = []
                 for elm in wktList:
@@ -32,12 +32,12 @@ class Constructor:
                 wkt_layer.commitChanges()
 
                 logger.info("layerFromWKT finished")
-                logger.info("Returning  " + str(wkt_layer.featureCount()) +" features")
+                logger.info(f'Returning {str(wkt_layer.featureCount())} features')
                 return wkt_layer
 
             except Exception as error:
                 logger.error("An error occured in crating WKT layer")
-                logger.error(type(error).__name__ + " – " + str(error) )
+                logger.error(f'{type(error).__name__}  –  {str(error)}')
                 logger.critical("Program terminated" )
                 sys.exit()
         else:
@@ -48,7 +48,7 @@ class Constructor:
 
     def bboxFromLayer(layer):
         logger.info("Extracting bbox from layer" )
-        logger.info("Processing " + str(layer.featureCount()) +" features")
+        logger.info(f'Processing {str(layer.featureCount())} features')
         try:
             ext = layer.extent()
             xmin = ext.xMinimum()
@@ -61,6 +61,6 @@ class Constructor:
             return data
         except Exception as error:
             logger.error("An error occured extracting bbox")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()

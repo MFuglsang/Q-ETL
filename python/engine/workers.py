@@ -13,19 +13,22 @@ class Worker:
     ## ##################################
 
     def extractByExpression(layer, expression):
-        """_summary_
+        """
+        Creates a vector layer from an input layer, containing only matching features.
+        The criteria for adding features to the resulting layer is based on a QGIS expression.
 
         Parameters
         ----------
-        layer : _type_
-            _description_
-        expression : _type_
-            _description_
+        layer : QgsVectorLayer
+            The QgsVectorLayer that is used as input.
+
+        expression : String
+            Expression to filter the vector layer
 
         Returns
         -------
-        _type_
-            _description_
+        QgsVectorLayer
+            The QgsVectorLayer output layer.
         """
         logger.info("Extracting by expression")
         try:
@@ -34,32 +37,38 @@ class Worker:
                 'EXPRESSION': expression,
                 'OUTPUT': 'memory:extracted'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:extractbyexpression', parameter)['OUTPUT']
             logger.info("Extractbyexpression  finished")
             return result
         except Exception as error:
             logger.error("An error occured in extractByExpression")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
     def addAutoIncrementalField(layer, fieldname, start):
-        """_summary_
+        """
+        Adds a new integer field to a vector layer, with a sequential value for each feature.
+        This field can be used as a unique ID for features in the layer. The new attribute is not added to the input layer but a new layer is generated instead.
+        The initial starting value for the incremental series can be specified. Optionally, the incremental series can be based on grouping 
+        fields and a sort order for features can also be specified.
 
         Parameters
         ----------
-        layer : _type_
-            _description_
-        fieldname : _type_
-            _description_
-        start : _type_
-            _description_
+        layer : QgsVectorLayer
+            The QgsVectorLayer that is used as input.
+
+        fieldname : String
+            Name of the field with autoincremental values.
+
+        start : Integer
+            Choose the initial number of the incremental count, Default: 0.
 
         Returns
         -------
-        _type_
-            _description_
+        QgsVectorLayer
+            The QgsVectorLayer output layer.
         """
         logger.info("Adding incremental field")
         try:
@@ -75,29 +84,31 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             result = processing.run('native:addautoincrementalfield', parameter)['OUTPUT']
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             logger.info("addAutoIncrementalField  finished")
             return result
         except Exception as error:
             logger.error("An error occured in addAutoIncrementalField")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
     def deleteColumns (layer, columns):
-        """_summary_
+        """
+        Takes a vector layer and generates a new one that has the same features but without the selected columns.
 
         Parameters
         ----------
-        layer : _type_
-            _description_
-        columns : _type_
-            _description_
+        layer : QgsVectorLayer
+            Input vector layer to drop field(s) from
+
+        columns : List of tablefields
+            The field(s) to drop
 
         Returns
         -------
-        _type_
-            _description_
+        QgsVectorLayer
+            The QgsVectorLayer output layer.
         """
         logger.info("deleting fields")
         try:
@@ -107,12 +118,12 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             result = processing.run('native:deletecolumn', parameter)['OUTPUT']
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             logger.info("deleteColumns  finished")
             return result
         except Exception as error:
             logger.error("An error occured in deleteColumns")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -161,14 +172,35 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             result = processing.run('native:fieldcalculator', parameter)['OUTPUT']
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             logger.info("fieldCalculator  finished")
             return result
         except Exception as error:
             logger.error("An error occured in fieldCalculator")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
+
+    def timeStamper(layer, ts_fieldname):
+        """
+            Create an attribute woth current timestamp on features.
+
+        Parameters
+        ----------
+        layer : Qgsvectorlayer [vector: any]
+            The Qgsvectorlayer input for the algorithem
+
+        ts_fieldname : String
+            The name of the new timestamp field
+
+        Returns
+        -------
+        Qgsvectorlayer [vector: any]
+            The result output from the algorithem
+        """
+        logger.info(f'Creating timestamp {ts_fieldname} using fieldCalculator')
+        newLayer = Worker.fieldCalculator(layer, ts_fieldname, 5, 0, 0, ' now() ')
+        return newLayer
         
     def renameTableField (layer, field, newname):
         """
@@ -202,12 +234,80 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             result = processing.run('native:renametablefield', parameter)['OUTPUT']
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             logger.info("renameTableField  finished")
             return result
         except Exception as error:
             logger.error("An error occured in renameTableField")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
+            sys.exit()
+
+    def attributeindex(layer, field):
+        """
+        Creates an index to speed up queries made against a field in a table.
+        Support for index creation is dependent on the layer's data provider and the field type.
+
+        Parameters
+        ----------
+        layer : Qgsvectorlayer [vector: any]
+            The Qgsvectorlayer input for the algorithem
+
+        field : Field
+            The field to base the index on
+
+        Returns
+        -------
+        Qgsvectorlayer [vector: any]
+            The result output from the algorithem
+        """
+        logger.info("Crating attribute index on " + layer + " on filed " + field)
+        try:
+            parameter = {
+                'INPUT': field,
+                'FIELD': field,
+                'OUTPUT': 'memory:extracted'
+            }
+            result = processing.run('native:createattributeindex', parameter)['OUTPUT']
+            logger.info(f'Parameters: {str(parameter)}')
+            logger.info("createattributeindex  finished")
+            return result
+        except Exception as error:
+            logger.error("An error occured in createattributeindex")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
+            sys.exit()
+
+    
+    def spatialindex(layer):
+        """
+        Creates an index to speed up access to the features in a layer based on their spatial location.
+        Support for spatial index creation is dependent on the layer's data provider.
+
+        Parameters
+        ----------
+        layer : Qgsvectorlayer [vector: any]
+            The Qgsvectorlayer input for the algorithem
+
+        Returns
+        -------
+        Qgsvectorlayer [vector: any]
+            The result output from the algorithem
+        """
+        
+        logger.info("Crating spatial index on " + layer)
+        try:
+            parameter = {
+                'INPUT': field,
+                'OUTPUT': 'memory:extracted'
+            }
+            result = processing.run('native:createspatialindex', parameter)['OUTPUT']
+            logger.info(f'Parameters: {str(parameter)}')
+            logger.info("createspatialindex  finished")
+            return result
+        except Exception as error:
+            logger.error("An error occured in createspatialindex")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -216,19 +316,23 @@ class Worker:
     ## ##################################
             
     def clip(layer, overlay):
-        """_summary_
+        """
+        Clips a vector layer using the features of an additional polygon layer.
+        Only the parts of the features in the input layer that fall within the polygons of 
+        the overlay layer will be added to the resulting layer.
 
         Parameters
         ----------
-        layer : _type_
-            _description_
-        overlay : _type_
-            _description_
+        layer : Qgsvectorlayer [vector: any]
+            Layer containing the features to be clipped
+
+        overlay : [vector: polygon]
+            Layer containing the clipping features
 
         Returns
         -------
-        _type_
-            _description_
+        Qgsvectorlayer [vector: any]
+            Layer to contain the features from the input layer that are inside the overlay (clipping) layer
         """
         logger.info("Clipping layers")
         try:
@@ -237,40 +341,60 @@ class Worker:
                 'OVERLAY': overlay,
                 'OUTPUT': 'memory:extracted'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:clip', parameter)['OUTPUT']
             logger.info("Clip  finished")
             return result
         except Exception as error:
             logger.error("An error occured in Clip")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
     def joinByLocation(layer, predicate, join, join_fields, method, discard_nomatching, prefix):
-        """_summary_
-
+        """
+        Takes an input vector layer and creates a new vector layer that is an extended version of
+        the input one, with additional attributes in its attribute table.
+        The additional attributes and their values are taken from a second vector layer.
+        A spatial criteria is applied to select the values from the second layer that are added to each 
+        feature from the first layer.
+        
         Parameters
         ----------
-        layer : _type_
-            _description_
-        predicate : _type_
-            _description_
-        join : _type_
-            _description_
-        join_fields : _type_
-            _description_
-        method : _type_
-            _description_
-        discard_nomatching : _type_
-            _description_
-        prefix : _type_
-            _description_
+        layer : Qgsvectorlayer [vector: any]
+            Input vector layer. 
+            The output layer will consist of the features of this layer with attributes from 
+            matching features in the second layer.
+
+        predicate : [enumeration] [list] Default: [0]
+            Type of spatial relation the source feature should have with the target feature so that they could be joined. One or more of:
+            0 — intersect, 1 — contain, 2 — equal, 3 — touch, 4 — overlap, 5 — are within 6 — cross.
+
+        join : [vector: any]
+            The join layer. 
+            Features of this vector layer will add their attributes to the source layer attribute table if 
+            they satisfy the spatial relationship.
+
+        join_fields : [tablefield: any] [list]
+            Select the specific fields you want to add from the join layer. 
+            By default all the fields are added.
+
+        method : [enumeration]           	
+            The type of the final joined layer. One of: 
+            0 — Create separate feature for each matching feature (one-to-many)
+            1 — Take attributes of the first matching feature only (one-to-one)
+            2 — Take attributes of the feature with largest overlap only (one-to-one)
+
+        discard_nomatching : [boolean] Default: False
+            Remove from the output the input layer’s features which could not be joined
+
+        prefix : [string]
+            Add a prefix to joined fields in order to easily identify them and avoid field name collision
 
         Returns
         -------
-        _type_
-            _description_
+        Qgsvectorlayer [vector: any]
+            the output vector layer for the join.
         """
         logger.info("Clipping layers")
         try:
@@ -284,13 +408,13 @@ class Worker:
                 'PREFIX':prefix,
                 'OUTPUT': 'memory:extracted'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:joinattributesbylocation', parameter)['OUTPUT']
             logger.info("joinByLocation finished")
             return result
         except Exception as error:
             logger.error("An error occured in joinByLocation")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -299,17 +423,20 @@ class Worker:
 
         Parameters
         ----------
-        layer : _type_
-            _description_
-        predicate : _type_
-            _description_
-        intersect : _type_
-            _description_
+        layer : Qgsvectorlayer [vector: any]
+            Input vector layer. 
+
+        predicate : [enumeration] [list] Default: [0]
+            Type of spatial relation the source feature should have with the target feature so that they could be joined. One or more of:
+            0 — intersect, 1 — contain, 2 — equal, 3 — touch, 4 — overlap, 5 — are within 6 — cross.
+
+        intersect : Qgsvectorlayer [vector: any]
+            Intersection vector layer
 
         Returns
         -------
-        _type_
-            _description_
+        Qgsvectorlayer [vector: any]
+            the output vector layer for the join.
         """
         logger.info("Extracting by location")
         try:
@@ -319,32 +446,37 @@ class Worker:
                 'INTERSECT':intersect,
                 'OUTPUT': 'memory:extracted'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:extractbylocation', parameter)['OUTPUT']
             logger.info("extractByLocation finished")
             return result
         except Exception as error:
             logger.error("An error occured in extractByLocation")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
     def randomExtract(layer, method, number):
-        """_summary_
+        """
+        Takes a vector layer and generates a new one that contains only a subset of the features in the input layer.
+        The subset is defined randomly, based on feature IDs, using a percentage or count value to define 
+        the total number of features in the subset.
 
         Parameters
         ----------
-        layer : _type_
-            _description_
+        layer : Qgsvectorlayer [vector: any]
+            Input vector layer. 
+
         method : _type_
             _description_
-        number : _type_
-            _description_
+
+        number : [enumeration] Default: 0
+            Random selection method. One of: 0 — Number of selected features, 1 — Percentage of selected features
 
         Returns
         -------
-        _type_
-            _description_
+        Qgsvectorlayer [vector: polygon/line]
+            The result output from the algorithem
         """
         logger.info("Extracting random features")
         try:
@@ -354,30 +486,34 @@ class Worker:
                 'NUMBER':number,
                 'OUTPUT': 'memory:extracted'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:randomextract', parameter)['OUTPUT']
             logger.info("randomExtract finished")
             return result
         except Exception as error:
             logger.error("An error occured in randomExtract")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
     def difference(layer, overlay):
-        """_summary_
+        """
+        Extracts features from the input layer that don’t fall within the boundaries of the overlay layer.
+        Input layer features that partially overlap the overlay layer feature(s) are split along the 
+        boundary of those feature(s.
 
         Parameters
         ----------
-        layer : _type_
-            _description_
-        overlay : _type_
-            _description_
+        layer : Qgsvectorlayer [vector: any]
+            Layer to extract (parts of) features from.
+
+        overlay : Qgsvectorlayer [vector: any]
+            Layer containing the geometries that will be subtracted from the iniput layer geometries
 
         Returns
         -------
-        _type_
-            _description_
+        Qgsvectorlayer [vector: polygon/line]
+            The result output from the algorithem
         """
         logger.info("Finding differences")
         try:
@@ -386,13 +522,13 @@ class Worker:
                 'OVERLAY': overlay,
                 'OUTPUT': 'memory:extracted'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:difference', parameter)['OUTPUT']
             logger.info("Difference  finished")
             return result
         except Exception as error:
             logger.error("An error occured in Difference")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -430,13 +566,13 @@ class Worker:
                 'TARGET_CRS': QgsCoordinateReferenceSystem(targetEPSG),
                 'OUTPUT': 'memory:Reprojected'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:reprojectlayer', parameter)['OUTPUT']
             logger.info("Reproject finished")
             return result
         except Exception as error:
             logger.error("An error occured reprojectiong layer")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -473,13 +609,13 @@ class Worker:
                     'TOLERANCE':tolerance,
                     'OUTPUT': 'memory:Reprojected'
                 }
-                logger.info("Parameters: " + str(parameter))
+                logger.info(f'Parameters: {str(parameter)}')
                 result = processing.run('native:simplifygeometries', parameter)['OUTPUT']
                 logger.info("Simplifygeometries finished")
                 return result
             except Exception as error:
                 logger.error("An error occured in simplifygeometries")
-                logger.error(type(error).__name__ + " – " + str(error) )
+                logger.error(f'{type(error).__name__}  –  {str(error)}')
                 logger.critical("Program terminated" )
                 sys.exit()
 
@@ -515,7 +651,7 @@ class Worker:
             return result
         except Exception as error:
             logger.error("An error occured in forceRHR")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -575,14 +711,14 @@ class Worker:
                 'PREFIX':prefix,
                 'OUTPUT': 'memory:joined'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:joinattributestable', parameter)['OUTPUT']
             logger.info("Joinattributestable finished")
             logger.info("Returning " + str(result.featureCount()) +" features")
             return result
         except Exception as error:
             logger.error("An error occured in joinattributestable")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -621,14 +757,14 @@ class Worker:
                 'SEPARATE_DISJOINT' : False,
                 'OUTPUT': 'memory:dissolved'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:dissolve', parameter)['OUTPUT']
             logger.info("DissolveFeatures finished")
             logger.info("Returning " + str(result.featureCount()) +" features")
             return result
         except Exception as error:
             logger.error("An error occured in dissolveFeatures")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -685,13 +821,13 @@ class Worker:
                 'DISSOLVE': dissolve,
                 'OUTPUT': 'memory:buffer'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:buffer', parameter)['OUTPUT']
             logger.info("BufferLayer finished")
             return result
         except Exception as error:
             logger.error("An error occured in BufferLayer")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 
@@ -720,13 +856,55 @@ class Worker:
                 'INPUT': layer,
                 'OUTPUT': 'memory:buffer'
             }
-            logger.info("Parameters: " + str(parameter))
+            logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:fixgeometries', parameter)['OUTPUT']
             logger.info("FixGeometry finished")
             return result
         except Exception as error:
             logger.error("An error occured in FixGeometry")
-            logger.error(type(error).__name__ + " – " + str(error) )
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
+            sys.exit()
+
+    def randomselection(layer,method, number):
+        """
+        Takes a vector layer and selects a subset of its features. No new layer is generated by this algorithm.
+        The subset is defined randomly, based on feature IDs, using a percentage or count value to define the 
+        total number of features in the subset.
+
+        Parameters
+        ----------
+        layer : Qgsvectorlayer [vector: any]
+            The Qgsvectorlayer input for the algorithem
+
+        method : Integer
+            Random selection method. One of: 0 — Number of selected features, 1 — Percentage of selected features
+        
+        number : Integer
+            Number or percentage of features to select
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
+        logger.info("Performing random selection")
+        logger.info("Processing " + str(layer.featureCount()) +" features")
+        try:
+            parameter = {
+                'INPUT': layer,
+                'METHOD':method,
+                'NUMBER':number,
+                'OUTPUT': 'memory:buffer'
+            }
+            logger.info(f'Parameters: {str(parameter)}')
+            result = processing.run('native:randomextract', parameter)['OUTPUT']
+            logger.info("Returning " + str(result.featureCount()) +" features")
+            logger.info("randomextract finished")
+            return result
+        except Exception as error:
+            logger.error("An error occured in FixGeometry")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
 

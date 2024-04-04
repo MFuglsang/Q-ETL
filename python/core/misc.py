@@ -29,6 +29,15 @@ def validateEnvironment(settings):
     else:
         logger.info('QGIS_Plugin_Path found')
 
+    isExist = os.path.exists(settings['QGIS_bin_folder'])
+    if not isExist:
+        
+        logger.error('QGIS_Bin_Folder not found')
+        logger.critical('Program terminated')
+        sys.exit()
+    else:
+        logger.info('QGIS_Bin_Folder found')
+
     ## Locating the logdir
     isExist = os.path.exists(settings['logdir'])
     if not isExist:
@@ -57,6 +66,12 @@ def validateEnvironment(settings):
 
 def describeEngine(scriptfolder, algorithms, version):
     logger = get_logger()
+    qgis_supported = get_qgis_support()
+
+    try:
+        supported = qgis_supported[version]
+    except:
+        supported = 'Not tested'
     try:
         import psutil
     except ImportError:
@@ -89,6 +104,7 @@ def describeEngine(scriptfolder, algorithms, version):
     logger.info("Available memmory: " + info['ram'] + " ")
     logger.info("")
     logger.info("QGIS version: " + str(version) + "                ")
+    logger.info("QGIS ETL status: " + str(supported) + "                ")
     logger.info("Script folder: " + str(scriptfolder) + "")
     algs = []
     for s in algorithms:
@@ -107,6 +123,12 @@ def get_config():
         settings = json.load(file)
 
     return settings
+
+def get_qgis_support():
+    inputfile =  path.abspath(path.join(argv[0] ,"../..")) + '\\qgis_versions.json'
+    with open(inputfile, 'r') as file:
+        qgis_support = json.load(file)
+    return qgis_support
 
 def get_postgres_connections(settings):
     ini = QSettings(settings['QGIS_ini_Path'], QSettings.IniFormat)
@@ -144,6 +166,7 @@ def script_finished():
     logger.info('##################################################')
 
 def script_failed():
+    logger = get_logger()
     now = datetime.now()
     logger.info('')
     logger.info('##################################################')
