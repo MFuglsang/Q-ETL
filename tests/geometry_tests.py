@@ -1,63 +1,21 @@
-#####################################
-## BOILERPLATE PART
-## DO NOT CHANGE 
-#####################################
-
-import sys, os
-from qgis.core import QgsApplication, Qgis
-
-sys.path.append("python/config")
-from _local_configuration import *
-
-sys.path.append("python/log")
-import filelog 
-
-sys.path.append("python/misc")
-from misc import *
-
-settings = loadConfig()
-settings['logfile'] = createLogFile(os.path.basename(__file__), settings['logdir'])
-
-QgsApplication.setPrefixPath(settings["Qgs_PrefixPath"], True)
-qgs = QgsApplication([], False)
-qgs.initQgis()
-
-## Loading the Processing plugin...
-sys.path.append(settings["QGIS_Plugin_Path"])
-import processing
-from processing.core.Processing import Processing
-from processing.script.ScriptUtils import *
-from qgis.analysis import QgsNativeAlgorithms
-
-Processing.initialize()
-QgsApplication.processingRegistry().addProvider(QgsNativeAlgorithms())
-from processing.script import ScriptUtils
-
-describeEngine(ScriptUtils.scriptsFolders(), QgsApplication.processingRegistry().providerById("script").algorithms(), Qgis.QGIS_VERSION,  settings)
-filelog.infoWriter('Loading ressources', 'INFO', settings)
-
-## Loading stuff on the running QGIS...
-sys.path.append("python/workers")
-sys.path.append("python/inputters")
-sys.path.append("python/outputters")
-
-import config, general, attributes, geometry, analysis, inputreaders, outputwriters
-
-filelog.infoWriter("QGIS ETL engine ready", 'INFO', settings)
-
-#####################################
-## SCRIPT PART (WRITE CODE HERE) 
-#####################################
-
-wfslayer = inputreaders.wfs('https://geofyn.admin.gc2.io/wfs/geofyn/fynbus/25832?SERVICE=WFS&REQUEST=GetFeature&VERSION=1.1.0&TYPENAME=fynbus:routes_25832_v&SRSNAME=urn:ogc:def:crs:EPSG::25832', settings)
-outputwriters.file(wfslayer, "C:/temp/wfs.geojson", "GeoJson", settings)
+from core import *
+from engine import *
 
 
-#####################################
-## EXITING THE SCRIPT
-#####################################y
+## Reading a WFS service
+reader = Input_Reader
+wfslayer = reader.wfs("srsname='EPSG:25832' typename='fynbus:stops' url='https://geofyn.admin.gc2.io/wfs/geofyn/fynbus/25832'")
 
-qgs.exitQgis()
+constructor = Constructor
+wkt_layer = constructor.layerFromWKT('Polygon', ['POLYGON((583236.3880179754 6133175.800300173,592670.0559112764 6133175.800300173,592670.0559112764 6145538.787693995,583236.3880179754 6145538.787693995,583236.3880179754 6133175.800300173))'], 25832)
 
-endScript(settings)
-cleanUp(settings)
+worker = Worker
+
+attribute_layer = worker.fieldCalculator(wkt_layer, 'name', 2, 0, 16, "'Case area'")
+
+clip_layer = worker.clip(wfslayer, wkt_layer)
+not_inside_layer = worker.difference(wfslayer, wkt_layer)
+
+extract_layer = worker.extractByLocation(wfslayer, 1, attribute_layer)
+
+

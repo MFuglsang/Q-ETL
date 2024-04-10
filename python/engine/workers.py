@@ -1,7 +1,7 @@
 from core.logger import *
 import sys
 from qgis.analysis import QgsNativeAlgorithms
-from qgis.core import QgsCoordinateReferenceSystem
+from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer
 from qgis import processing
 
 
@@ -12,7 +12,7 @@ class Worker:
     ## ATTRIBUTE WORKERS
     ## ##################################
 
-    def extractByExpression(layer: str, expression: str):
+    def extractByExpression(layer: QgsVectorLayer, expression: str):
         """
         Creates a vector layer from an input layer, containing only matching features.
         The criteria for adding features to the resulting layer is based on a QGIS expression.
@@ -47,7 +47,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def addAutoIncrementalField(layer: str, fieldname: str, start: int):
+    def addAutoIncrementalField(layer: QgsVectorLayer, fieldname: str, start: int):
         """
         Adds a new integer field to a vector layer, with a sequential value for each feature.
         This field can be used as a unique ID for features in the layer. The new attribute is not added to the input layer but a new layer is generated instead.
@@ -93,7 +93,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def deleteColumns (layer: str, columns: list):
+    def deleteColumns (layer: QgsVectorLayer, columns: list):
         """
         Takes a vector layer and generates a new one that has the same features but without the selected columns.
 
@@ -127,7 +127,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def fieldCalculator (layer: str, fieldname: str, fieldtype: int, fieldlength: int, fieldprecision: int, formula: str):
+    def fieldCalculator (layer: QgsVectorLayer, fieldname: str, fieldtype: int, fieldlength: int, fieldprecision: int, formula: str):
         """
         Scripting the field calcualtor
         You can use all the supported expressions and functions.
@@ -136,8 +136,8 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
 
         fieldname : String
             The name of the new calcualted field
@@ -157,7 +157,7 @@ class Worker:
 
         Returns
         -------
-        Qgsvectorlayer [vector: any]
+        QgsVectorLayer [vector: any]
             The result output from the algorithem
         """
         logger.info("Calculating field")
@@ -181,28 +181,28 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def timeStamper(layer: str, ts_fieldname: str):
+    def timeStamper(layer: QgsVectorLayer, ts_fieldname: str):
         """
             Create an attribute woth current timestamp on features.
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
 
         ts_fieldname : String
             The name of the new timestamp field
 
         Returns
         -------
-        Qgsvectorlayer [vector: any]
+        QgsVectorLayer [vector: any]
             The result output from the algorithem
         """
         logger.info(f'Creating timestamp {ts_fieldname} using fieldCalculator')
         newLayer = Worker.fieldCalculator(layer, ts_fieldname, 5, 0, 0, ' now() ')
         return newLayer
         
-    def renameTableField (layer: str, field: str, newname: str):
+    def renameTableField (layer: QgsVectorLayer, field: str, newname: str):
         """
         Renames an existing field from a vector layer.  
         The original layer is not modified. A new layer is generated where the attribute table contains the renamed field.
@@ -210,8 +210,8 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
 
         field : Tablefield
             The field that is to be renamed
@@ -222,7 +222,7 @@ class Worker:
 
         Returns
         -------
-        Qgsvectorlayer [vector: any]
+        QgsVectorLayer [vector: any]
             The result output from the algorithem
         """
         logger.info("Renaming field")
@@ -243,22 +243,22 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def attributeindex(layer: str, field: str):
+    def attributeindex(layer: QgsVectorLayer, field: str):
         """
         Creates an index to speed up queries made against a field in a table.
         Support for index creation is dependent on the layer's data provider and the field type.
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
 
         field : Field
             The field to base the index on
 
         Returns
         -------
-        Qgsvectorlayer [vector: any]
+        QgsVectorLayer [vector: any]
             The result output from the algorithem
         """
         logger.info("Crating attribute index on " + layer + " on filed " + field)
@@ -279,19 +279,19 @@ class Worker:
             sys.exit()
 
     
-    def spatialindex(layer: str):
+    def spatialindex(layer: QgsVectorLayer):
         """
         Creates an index to speed up access to the features in a layer based on their spatial location.
         Support for spatial index creation is dependent on the layer's data provider.
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
 
         Returns
         -------
-        Qgsvectorlayer [vector: any]
+        QgsVectorLayer [vector: any]
             The result output from the algorithem
         """
         
@@ -315,7 +315,7 @@ class Worker:
     ## ANALYSIS WORKERS
     ## ##################################
             
-    def clip(layer: str, overlay: str):
+    def clip(layer: QgsVectorLayer, overlay: str):
         """
         Clips a vector layer using the features of an additional polygon layer.
         Only the parts of the features in the input layer that fall within the polygons of 
@@ -323,7 +323,7 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
+        layer : QgsVectorLayer [vector: any]
             Layer containing the features to be clipped
 
         overlay : [vector: polygon]
@@ -331,7 +331,7 @@ class Worker:
 
         Returns
         -------
-        Qgsvectorlayer [vector: any]
+        QgsVectorLayer [vector: any]
             Layer to contain the features from the input layer that are inside the overlay (clipping) layer
         """
         logger.info("Clipping layers")
@@ -351,7 +351,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def joinByLocation(layer: str, predicate: int, join: str, join_fields: list, method: int, discard_nomatching: bool, prefix: str):
+    def joinByLocation(layer: QgsVectorLayer, predicate: int, join: str, join_fields: list, method: int, discard_nomatching: bool, prefix: str):
         """
         Takes an input vector layer and creates a new vector layer that is an extended version of
         the input one, with additional attributes in its attribute table.
@@ -361,7 +361,7 @@ class Worker:
         
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
+        layer : QgsVectorLayer [vector: any]
             Input vector layer. 
             The output layer will consist of the features of this layer with attributes from 
             matching features in the second layer.
@@ -393,7 +393,7 @@ class Worker:
 
         Returns
         -------
-        Qgsvectorlayer [vector: any]
+        QgsVectorLayer [vector: any]
             the output vector layer for the join.
         """
         logger.info("Clipping layers")
@@ -418,24 +418,24 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def extractByLocation(layer: str, predicate: int, intersect: str):
+    def extractByLocation(layer: QgsVectorLayer, predicate: int, intersect: str):
         """_summary_
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
+        layer : QgsVectorLayer [vector: any]
             Input vector layer. 
 
         predicate : [enumeration] Default: [0]
             Type of spatial relation the source feature should have with the target feature so that they could be joined. One or more of:
             0 — intersect, 1 — contain, 2 — equal, 3 — touch, 4 — overlap, 5 — are within 6 — cross.
 
-        intersect : Qgsvectorlayer [vector: any]
+        intersect : QgsVectorLayer [vector: any]
             Intersection vector layer
 
         Returns
         -------
-        Qgsvectorlayer [vector: any]
+        QgsVectorLayer [vector: any]
             the output vector layer for the join.
         """
         logger.info("Extracting by location")
@@ -456,7 +456,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def randomExtract(layer: str, method: int, number: int):
+    def randomExtract(layer: QgsVectorLayer, method: int, number: int):
         """
         Takes a vector layer and generates a new one that contains only a subset of the features in the input layer.
         The subset is defined randomly, based on feature IDs, using a percentage or count value to define 
@@ -464,7 +464,7 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
+        layer : QgsVectorLayer [vector: any]
             Input vector layer. 
 
         method : [enumeration] Default: 0
@@ -475,7 +475,7 @@ class Worker:
 
         Returns
         -------
-        Qgsvectorlayer [vector: polygon/line]
+        QgsVectorLayer [vector: polygon/line]
             The result output from the algorithem
         """
         logger.info("Extracting random features")
@@ -496,7 +496,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def difference(layer: str, overlay: str):
+    def difference(layer: QgsVectorLayer, overlay: QgsVectorLayer):
         """
         Extracts features from the input layer that don’t fall within the boundaries of the overlay layer.
         Input layer features that partially overlap the overlay layer feature(s) are split along the 
@@ -504,15 +504,15 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
+        layer : QgsVectorLayer [vector: any]
             Layer to extract (parts of) features from.
 
-        overlay : Qgsvectorlayer [vector: any]
+        overlay : QgsVectorLayer [vector: any]
             Layer containing the geometries that will be subtracted from the iniput layer geometries
 
         Returns
         -------
-        Qgsvectorlayer [vector: polygon/line]
+        QgsVectorLayer [vector: polygon/line]
             The result output from the algorithem
         """
         logger.info("Finding differences")
@@ -537,7 +537,7 @@ class Worker:
     ## ##################################
             
 
-    def reproject(layer: str, targetEPSG: int):
+    def reproject(layer: QgsVectorLayer, targetEPSG: int):
         """
         Reprojects a vector layer in a different CRS.
         The reprojected layer will have the same features and attributes of the input layer.
@@ -545,8 +545,8 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: polygon]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: polygon]
+            The QgsVectorLayer input for the algorithem
 
         targetEPSG : Integer
             The EPSG code og the target coordinate system.
@@ -554,7 +554,7 @@ class Worker:
 
         Returns
         -------
-        Qgsvectorlayer [vector: polygon]
+        QgsVectorLayer [vector: polygon]
             The result output from the algorithem
         """
 
@@ -576,7 +576,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def simplify(layer: str, method: int, tolerance:int):
+    def simplify(layer: QgsVectorLayer, method: int, tolerance:int):
             """
             Simplifies the geometries in a line or polygon layer. 
             It creates a new layer with the same features as the ones in the input layer, but with geometries containing a lower number of vertices.
@@ -584,8 +584,8 @@ class Worker:
 
             Parameters
             ----------
-            layer : Qgsvectorlayer [vector: polygon]
-                The Qgsvectorlayer input for the algorithem
+            layer : QgsVectorLayer [vector: polygon]
+                The QgsVectorLayer input for the algorithem
 
             method : Integer
                 Simplification method. One of: 0 — Distance (Douglas-Peucker), 1 — Snap to grid, 2 — Area (Visvalingam)
@@ -597,7 +597,7 @@ class Worker:
 
             Returns
             -------
-            Qgsvectorlayer [vector: polygon/line]
+            QgsVectorLayer [vector: polygon/line]
                 The result output from the algorithem
             """
 
@@ -619,7 +619,7 @@ class Worker:
                 logger.critical("Program terminated" )
                 sys.exit()
 
-    def forceRHR(layer: str):
+    def forceRHR(layer: QgsVectorLayer):
         """
         Forces polygon geometries to respect the Right-Hand-Rule, in which the area that is bounded
         by a polygon is to the right of the boundary. 
@@ -629,13 +629,13 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: polygon]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: polygon]
+            The QgsVectorLayer input for the algorithem
 
 
         Returns
         -------
-        Qgsvectorlayer [vector: polygon]
+        QgsVectorLayer [vector: polygon]
             The result output from the algorithem
         """
 
@@ -655,7 +655,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def join_by_attribute(layer1: str, layer1_field:str, layer2: str, layer2_field: str, fields_to_copy: list, method:int, discard: bool, prefix:str):
+    def join_by_attribute(layer1: QgsVectorLayer, layer1_field:str, layer2: QgsVectorLayer, layer2_field: str, fields_to_copy: list, method:int, discard: bool, prefix:str):
         """
         Takes an input vector layer and creates a new vector layer that is an extended version of the input one, 
         with additional attributes in its attribute table.
@@ -665,14 +665,14 @@ class Worker:
 
         Parameters
         ----------
-        layer1 : Qgsvectorlayer [vector: any]
-            The 1. Qgsvectorlayer input for the algorithem
+        layer1 : QgsVectorLayer [vector: any]
+            The 1. QgsVectorLayer input for the algorithem
 
         layer1_field : String
             Field of the source layer to use for the join
 
-        layer2 : Qgsvectorlayer [vector: any]
-            The 2. Qgsvectorlayer input for the algorithem
+        layer2 : QgsVectorLayer [vector: any]
+            The 2. QgsVectorLayer input for the algorithem
 
         layer2_field : String
             Field of the source layer to use for the join
@@ -693,7 +693,7 @@ class Worker:
 
         Returns
         -------
-        Qgsvectorlayer [vector: polygon]
+        QgsVectorLayer [vector: polygon]
             The result output from the algorithem
 
         """
@@ -722,7 +722,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def dissolveFeatures(layer: str, fieldList: list, disjoined: bool):
+    def dissolveFeatures(layer: QgsVectorLayer, fieldList: list, disjoined: bool):
         """
         Takes a vector layer and combines its features into new features. 
         One or more attributes can be specified to dissolve features belonging to the same class 
@@ -732,8 +732,8 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
 
         fieldList : List
             List of fields to dissolve on. Default []
@@ -744,7 +744,7 @@ class Worker:
 
         Returns
         -------
-        Qgsvectorlayer [vector: polygon]
+        QgsVectorLayer [vector: polygon]
             The result output from the algorithem
 
         """
@@ -768,7 +768,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def bufferLayer(layer: str, distance: int, segements: int, endcapStyle: int, joinStyle: int, miterLimit: int, dissolve: bool):
+    def bufferLayer(layer: QgsVectorLayer, distance: int, segements: int, endcapStyle: int, joinStyle: int, miterLimit: int, dissolve: bool):
         """
         Computes a buffer area for all the features in an input layer, using a fixed or data defined distance.
         It is possible to use a negative distance for polygon input layers.
@@ -777,8 +777,8 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
 
         distance : Integer
             The buffer distance. Default: 10.0
@@ -804,7 +804,7 @@ class Worker:
 
         Returns
         -------
-        Qgsvectorlayer [vector: polygon]
+        QgsVectorLayer [vector: polygon]
             The result output from the algorithem
         """
 
@@ -831,7 +831,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def fixGeometry(layer: str):
+    def fixGeometry(layer: QgsVectorLayer):
         """
         Attempts to create a valid representation of a given invalid geometry without losing any of the input vertices.
         Already valid geometries are returned without further intervention. Always outputs multi-geometry layer.
@@ -839,13 +839,13 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
 
 
         Returns
         -------
-        Qgsvectorlayer [vector: any]
+        QgsVectorLayer [vector: any]
             The result output from the algorithem
 
         """
@@ -866,7 +866,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def randomselection(layer: str, method: int, number: int):
+    def randomselection(layer: QgsVectorLayer, method: int, number: int):
         """
         Takes a vector layer and selects a subset of its features. No new layer is generated by this algorithm.
         The subset is defined randomly, based on feature IDs, using a percentage or count value to define the 
@@ -874,8 +874,8 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
 
         method : Integer
             Random selection method. One of: 0 — Number of selected features, 1 — Percentage of selected features

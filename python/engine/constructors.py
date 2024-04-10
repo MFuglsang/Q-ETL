@@ -4,7 +4,8 @@ import sys
 from qgis.core import (
                        QgsVectorLayer,
                        QgsFeature,
-                       QgsGeometry)
+                       QgsGeometry,
+                       QgsVectorLayer)
 from qgis.analysis import QgsNativeAlgorithms
 from qgis import processing
 
@@ -12,7 +13,7 @@ class Constructor:
 
     logger = get_logger()
 
-    def layerFromWKT(type: str, wktList: list, epsg: int):
+    def layerFromWKT(type: QgsVectorLayer, wktList: list, epsg: int):
         """
         Create a layer from a list of wkt's.
 

@@ -3,7 +3,7 @@ from core.misc import get_config
 import sys, copy, os
 import subprocess
 from random import randrange
-from qgis.core import QgsVectorFileWriter, QgsVectorLayerExporter, QgsProject
+from qgis.core import QgsVectorFileWriter, QgsVectorLayerExporter, QgsProject, QgsVectorLayer
 from core.misc import script_failed
 
 import processing
@@ -16,7 +16,7 @@ class Output_Writer:
 
     logger = get_logger()
 
-    def postgis(layer: str, connection : str, dbname: str, schema: str, tablename: str, overwrite: bool):
+    def postgis(layer: QgsVectorLayer, connection : str, dbname: str, schema: str, tablename: str, overwrite: bool):
         """
         A function that exports a QgsVectorLayer into a Postgis database.
 
@@ -71,7 +71,7 @@ class Output_Writer:
             logger.critical("Program terminated")
             script_failed()
 
-    def geopackage(layer: str, layername: str, geopackage: str, overwrite: bool):
+    def geopackage(layer: QgsVectorLayer, layername: str, geopackage: str, overwrite: bool):
         """
         A function that writes a QgsVectorLayer to a Geopackage file. 
 
@@ -165,7 +165,7 @@ class Output_Writer:
             logger.critical("Program terminated")
             script_failed()
 
-    def mssql(layer: str, connection: str, driver: str, schema: str, table: str, overwrite: str, geom_type: str, geom_name: str, ogr2ogr_params: str):
+    def mssql(layer: QgsVectorLayer, connection: str, driver: str, schema: str, table: str, overwrite: str, geom_type: str, geom_name: str, ogr2ogr_params: str):
         """
         A function that exports a QgsVectorLayer into a MSSQL database using ogr2ogr.
         The function writes the data to a temporary geojson file, that is then importet to the database with ogr2ogr.
@@ -259,7 +259,7 @@ class Output_Writer:
             logger.critical("Program terminated")
             script_failed()
 
-    def filegdb(layer: str, layername: str, path: str):
+    def filegdb(layer: QgsVectorLayer, layername: str, path: str):
         """
         A function that export a QgsVectorLayer into an ESRI File
 
