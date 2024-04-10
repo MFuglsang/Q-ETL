@@ -16,7 +16,7 @@ class Output_Writer:
 
     logger = get_logger()
 
-    def postgis(layer, connection, dbname, schema, tablename, overwrite=True):
+    def postgis(layer: str, connection : str, dbname: str, schema: str, tablename: str, overwrite: bool):
         """
         A function that exports a QgsVectorLayer into a Postgis database.
 
@@ -37,7 +37,7 @@ class Output_Writer:
         tablename : str
             The name of the table that will be imported
         
-        overwrite : str
+        overwrite : bool
             Defaults to True. Should the resulting table in Postgis be overwritten if it exists. If set to False, then it will append the data.
         """
 
@@ -71,7 +71,7 @@ class Output_Writer:
             logger.critical("Program terminated")
             script_failed()
 
-    def geopackage(layer, layername, geopackage, overwrite):
+    def geopackage(layer: str, layername: str, geopackage: str, overwrite: bool):
         """
         A function that writes a QgsVectorLayer to a Geopackage file. 
 
@@ -110,7 +110,7 @@ class Output_Writer:
             logger.critical("Program terminated")
             script_failed()
 
-    def file(layer, path, format):
+    def file(layer: str, path: str, format: str):
         """_summary_
 
         Parameters
@@ -135,7 +135,7 @@ class Output_Writer:
             logger.critical("Program terminated")
             script_failed()
 
-    def textfile(file, list,  newline):
+    def textfile(file: str, list: list, newline: bool):
         """
         Create an output file from a list of lines. 
 
@@ -165,7 +165,7 @@ class Output_Writer:
             logger.critical("Program terminated")
             script_failed()
 
-    def mssql(layer, connection, driver, schema, table, overwrite, geom_type, geom_name, ogr2ogr_params):
+    def mssql(layer: str, connection: str, driver: str, schema: str, table: str, overwrite: str, geom_type: str, geom_name: str, ogr2ogr_params: str):
         """
         A function that exports a QgsVectorLayer into a MSSQL database using ogr2ogr.
         The function writes the data to a temporary geojson file, that is then importet to the database with ogr2ogr.
@@ -259,7 +259,7 @@ class Output_Writer:
             logger.critical("Program terminated")
             script_failed()
 
-    def filegdb(layer, layername, path):
+    def filegdb(layer: str, layername: str, path: str):
         """
         A function that export a QgsVectorLayer into an ESRI File
 
