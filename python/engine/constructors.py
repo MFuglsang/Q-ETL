@@ -12,7 +12,27 @@ class Constructor:
 
     logger = get_logger()
 
-    def layerFromWKT(type, wktList, epsg):
+    def layerFromWKT(type: str, wktList: list, epsg: int):
+        """
+        Create a layer from a list of wkt's.
+
+        Parameters
+        ----------
+        type : String
+            One of 'Point', 'Line','Polygon','MultiPoint', 'MultiLine', 'MultiPolygon'
+
+        wktList : List
+            List of wkt's to be added to the new layer
+
+        epsg : integer
+            The epsg code corrosponding to the wkt features coordinate system.
+
+        Returns
+        -------
+        QgsVectorLayer
+            The output layers containing the wkt's
+        """
+
         logger.info("Creating layer from WKT")
         logger.info(f'Number of features {str(len(wktList))}, type: {type}')
 
@@ -46,7 +66,20 @@ class Constructor:
                 logger.critical("Program terminated" )
                 sys.exit()
 
-    def bboxFromLayer(layer):
+    def bboxFromLayer(layer: str):
+        """_summary_
+
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            The layer, that the bbox is calculated uppon.
+
+        Returns
+        -------
+        QgsVectorLayer
+            The output layer, containing the bbox from the input layer
+            
+        """
         logger.info("Extracting bbox from layer" )
         logger.info(f'Processing {str(layer.featureCount())} features')
         try:
