@@ -10,7 +10,7 @@ def initialize_logger(settings):
     now = datetime.now()
     filename = argv[0].split('\\')[-1].split('.')[0]
     global logfile
-    logfile = logdir +  filename + '_' + now.strftime("%d%m%Y_%H_%M") + '.txt'
+    logfile = logdir + '/' +  filename + '_' + now.strftime("%d%m%Y_%H_%M") + '.txt'
     global logger
     logger = logging.getLogger('QGIS ETL')
     logger.setLevel(logging.DEBUG)
@@ -22,7 +22,6 @@ def initialize_logger(settings):
     consoleHandler.setFormatter(logFormatter)
     logger.addHandler(consoleHandler)
     logger.addHandler(fh)
-    print('got logs baby')
     return logger
     
 
