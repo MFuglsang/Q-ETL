@@ -12,7 +12,7 @@ class Worker:
     ## ATTRIBUTE WORKERS
     ## ##################################
 
-    def extractByExpression(layer, expression):
+    def extractByExpression(layer: str, expression: str):
         """
         Creates a vector layer from an input layer, containing only matching features.
         The criteria for adding features to the resulting layer is based on a QGIS expression.
@@ -47,7 +47,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def addAutoIncrementalField(layer, fieldname, start):
+    def addAutoIncrementalField(layer: str, fieldname: str, start: int):
         """
         Adds a new integer field to a vector layer, with a sequential value for each feature.
         This field can be used as a unique ID for features in the layer. The new attribute is not added to the input layer but a new layer is generated instead.
@@ -93,7 +93,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def deleteColumns (layer, columns):
+    def deleteColumns (layer: str, columns: list):
         """
         Takes a vector layer and generates a new one that has the same features but without the selected columns.
 
@@ -127,7 +127,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def fieldCalculator (layer, fieldname, fieldtype, fieldlength, fieldprecision, formula):
+    def fieldCalculator (layer: str, fieldname: str, fieldtype: int, fieldlength: int, fieldprecision: int, formula: str):
         """
         Scripting the field calcualtor
         You can use all the supported expressions and functions.
@@ -181,7 +181,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def timeStamper(layer, ts_fieldname):
+    def timeStamper(layer: str, ts_fieldname: str):
         """
             Create an attribute woth current timestamp on features.
 
@@ -202,7 +202,7 @@ class Worker:
         newLayer = Worker.fieldCalculator(layer, ts_fieldname, 5, 0, 0, ' now() ')
         return newLayer
         
-    def renameTableField (layer, field, newname):
+    def renameTableField (layer: str, field: str, newname: str):
         """
         Renames an existing field from a vector layer.  
         The original layer is not modified. A new layer is generated where the attribute table contains the renamed field.
@@ -243,7 +243,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def attributeindex(layer, field):
+    def attributeindex(layer: str, field: str):
         """
         Creates an index to speed up queries made against a field in a table.
         Support for index creation is dependent on the layer's data provider and the field type.
@@ -279,7 +279,7 @@ class Worker:
             sys.exit()
 
     
-    def spatialindex(layer):
+    def spatialindex(layer: str):
         """
         Creates an index to speed up access to the features in a layer based on their spatial location.
         Support for spatial index creation is dependent on the layer's data provider.
@@ -298,7 +298,7 @@ class Worker:
         logger.info("Crating spatial index on " + layer)
         try:
             parameter = {
-                'INPUT': field,
+                'INPUT': layer,
                 'OUTPUT': 'memory:extracted'
             }
             result = processing.run('native:createspatialindex', parameter)['OUTPUT']
@@ -315,7 +315,7 @@ class Worker:
     ## ANALYSIS WORKERS
     ## ##################################
             
-    def clip(layer, overlay):
+    def clip(layer: str, overlay: str):
         """
         Clips a vector layer using the features of an additional polygon layer.
         Only the parts of the features in the input layer that fall within the polygons of 
@@ -351,7 +351,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def joinByLocation(layer, predicate, join, join_fields, method, discard_nomatching, prefix):
+    def joinByLocation(layer: str, predicate: int, join: str, join_fields: list, method: int, discard_nomatching: bool, prefix: str):
         """
         Takes an input vector layer and creates a new vector layer that is an extended version of
         the input one, with additional attributes in its attribute table.
@@ -366,7 +366,7 @@ class Worker:
             The output layer will consist of the features of this layer with attributes from 
             matching features in the second layer.
 
-        predicate : [enumeration] [list] Default: [0]
+        predicate : [enumeration] Default: [0]
             Type of spatial relation the source feature should have with the target feature so that they could be joined. One or more of:
             0 — intersect, 1 — contain, 2 — equal, 3 — touch, 4 — overlap, 5 — are within 6 — cross.
 
@@ -418,7 +418,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def extractByLocation(layer, predicate, intersect):
+    def extractByLocation(layer: str, predicate: int, intersect: str):
         """_summary_
 
         Parameters
@@ -426,7 +426,7 @@ class Worker:
         layer : Qgsvectorlayer [vector: any]
             Input vector layer. 
 
-        predicate : [enumeration] [list] Default: [0]
+        predicate : [enumeration] Default: [0]
             Type of spatial relation the source feature should have with the target feature so that they could be joined. One or more of:
             0 — intersect, 1 — contain, 2 — equal, 3 — touch, 4 — overlap, 5 — are within 6 — cross.
 
@@ -456,7 +456,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def randomExtract(layer, method, number):
+    def randomExtract(layer: str, method: int, number: int):
         """
         Takes a vector layer and generates a new one that contains only a subset of the features in the input layer.
         The subset is defined randomly, based on feature IDs, using a percentage or count value to define 
@@ -467,11 +467,11 @@ class Worker:
         layer : Qgsvectorlayer [vector: any]
             Input vector layer. 
 
-        method : _type_
-            _description_
+        method : [enumeration] Default: 0
+            Random selection method. One of: 0 — Number of selected features 1 — Percentage of selected features
 
-        number : [enumeration] Default: 0
-            Random selection method. One of: 0 — Number of selected features, 1 — Percentage of selected features
+        number : [number] Default: 10
+            Number or percentage of features to select
 
         Returns
         -------
@@ -496,7 +496,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def difference(layer, overlay):
+    def difference(layer: str, overlay: str):
         """
         Extracts features from the input layer that don’t fall within the boundaries of the overlay layer.
         Input layer features that partially overlap the overlay layer feature(s) are split along the 
@@ -537,7 +537,7 @@ class Worker:
     ## ##################################
             
 
-    def reproject(layer, targetEPSG):
+    def reproject(layer: str, targetEPSG: int):
         """
         Reprojects a vector layer in a different CRS.
         The reprojected layer will have the same features and attributes of the input layer.
@@ -576,7 +576,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def simplify(layer, method, tolerance):
+    def simplify(layer: str, method: int, tolerance:int):
             """
             Simplifies the geometries in a line or polygon layer. 
             It creates a new layer with the same features as the ones in the input layer, but with geometries containing a lower number of vertices.
@@ -619,7 +619,7 @@ class Worker:
                 logger.critical("Program terminated" )
                 sys.exit()
 
-    def forceRHR(layer):
+    def forceRHR(layer: str):
         """
         Forces polygon geometries to respect the Right-Hand-Rule, in which the area that is bounded
         by a polygon is to the right of the boundary. 
@@ -655,7 +655,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def join_by_attribute(layer1, layer1_field, layer2, layer2_field, fields_to_copy, method, discard, prefix):
+    def join_by_attribute(layer1: str, layer1_field:str, layer2: str, layer2_field: str, fields_to_copy: list, method:int, discard: bool, prefix:str):
         """
         Takes an input vector layer and creates a new vector layer that is an extended version of the input one, 
         with additional attributes in its attribute table.
@@ -722,7 +722,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def dissolveFeatures(layer, fieldList, disjoined):
+    def dissolveFeatures(layer: str, fieldList: list, disjoined: bool):
         """
         Takes a vector layer and combines its features into new features. 
         One or more attributes can be specified to dissolve features belonging to the same class 
@@ -768,7 +768,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def bufferLayer(layer, distance, segements, endcapStyle, joinStyle, miterLimit, dissolve):
+    def bufferLayer(layer: str, distance: int, segements: int, endcapStyle: int, joinStyle: int, miterLimit: int, dissolve: bool):
         """
         Computes a buffer area for all the features in an input layer, using a fixed or data defined distance.
         It is possible to use a negative distance for polygon input layers.
@@ -831,7 +831,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def fixGeometry(layer):
+    def fixGeometry(layer: str):
         """
         Attempts to create a valid representation of a given invalid geometry without losing any of the input vertices.
         Already valid geometries are returned without further intervention. Always outputs multi-geometry layer.
@@ -866,7 +866,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def randomselection(layer,method, number):
+    def randomselection(layer: str, method: int, number: int):
         """
         Takes a vector layer and selects a subset of its features. No new layer is generated by this algorithm.
         The subset is defined randomly, based on feature IDs, using a percentage or count value to define the 
