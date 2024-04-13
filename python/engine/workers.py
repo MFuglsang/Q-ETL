@@ -1,9 +1,10 @@
 from core.logger import *
 import sys
+from core.misc import get_config
 from qgis.analysis import QgsNativeAlgorithms
 from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer
 from qgis import processing
-
+import pyodbc 
 
 class Worker:
     logger = get_logger() 
@@ -908,3 +909,30 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
+    def execute_sql(connection: str, database : str, driver: str, sql_expression: str):
+        config = get_config()
+        if database in ('Postgis', 'Mssql'):
+            logger.info(f'Running SQL executor on {database}' )
+        else :
+            logger.info(f'Unsupported database: {database}' )
+            logger.critical("Program terminated" )
+            sys.exit()
+        try:
+            dbconnection = config['DatabaseConnections'][connection]
+            if database == 'Mssql':
+                if driver == "":
+                    mssqldriver = 'SQL Server'
+                else :
+                    mssqldriver = 'driver'
+                cnxn = pyodbc.connect('DRIVER={'+mssqldriver+'};Server='+dbconnection['host']+';Database='+dbconnection['databasename']+';User ID='+dbconnection['user']+';Password='+dbconnection['password'])
+                logger.info("Using connection :" + 'DRIVER={'+mssqldriver+'};Server='+dbconnection['host']+';Database='+dbconnection['databasename']+';User ID='+dbconnection['user']+';Password=xxxxxxxx')
+                cursor = cnxn.cursor()
+                cursor.execute(sql_expression) 
+                logger.info("SQL executor finished")
+
+            
+        except Exception as error:
+            logger.error("An error occured running SQL executor")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
+            sys.exit()
