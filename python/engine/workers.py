@@ -909,7 +909,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def execute_sql(connection: str, database : str, driver: str, sql_expression: str):
+    def execute_sql(connection: str, database: str, driver: str, sql_expression: str):
         """
         Execute an SQL query against a database. 
         This can be used to create tables, truncate, build indexes etc.
@@ -947,6 +947,7 @@ class Worker:
                 cnxn = pyodbc.connect('DRIVER={'+mssqldriver+'};Server='+dbconnection['host']+';Database='+dbconnection['databasename']+';User ID='+dbconnection['user']+';Password='+dbconnection['password'])
                 logger.info("Using connection :" + 'DRIVER={'+mssqldriver+'};Server='+dbconnection['host']+';Database='+dbconnection['databasename']+';User ID='+dbconnection['user']+';Password=xxxxxxxx')
                 cursor = cnxn.cursor()
+                logger.info(f'Query: {sql_expression}' )
                 cursor.execute(sql_expression) 
                 logger.info("SQL executor finished")
             
@@ -955,6 +956,7 @@ class Worker:
                 connection = psycopg2.connect(user=dbconnection['user'], password=dbconnection['password'], host=dbconnection['host'], port=dbconnection['port'], database=dbconnection['databasename'])
                 logger.info("Using connection : user="+ dbconnection['user']+", password=xxxxxx, host="+dbconnection['host']+", port="+dbconnection['port']+", database="+dbconnection['databasename'] )
                 cursor = connection.cursor()
+                logger.info(f'Query: {sql_expression}' )
                 cursor.execute(sql_expression)
                 connection.commit()
                 cursor.close()
