@@ -930,7 +930,7 @@ class Worker:
         """
 
         config = get_config()
-        if database in ('Postgis', 'Mssql'):
+        if database in ('Postgres', 'Mssql'):
             logger.info(f'Running SQL executor on {database}' )
         else :
             logger.info(f'Unsupported database: {database}, use one of "Mssql" or "Postgres"' )
@@ -959,6 +959,7 @@ class Worker:
                 connection.commit()
                 cursor.close()
                 connection.close()
+                logger.info("SQL executor finished")
                 
         except Exception as error:
             logger.error("An error occured running SQL executor")
