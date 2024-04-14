@@ -9,6 +9,7 @@
         "MyPostGIS" : {
             "host" : "",
             "port" : "",
+            "databasename":"",
             "user" : "",
             "password": ""
         },
