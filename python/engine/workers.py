@@ -4,7 +4,7 @@ from core.misc import get_config
 from qgis.analysis import QgsNativeAlgorithms
 from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer
 from qgis import processing
-import pyodbc 
+
 
 class Worker:
     logger = get_logger() 
@@ -910,16 +910,36 @@ class Worker:
             sys.exit()
 
     def execute_sql(connection: str, database : str, driver: str, sql_expression: str):
+        """
+        Execute an SQL query against a database. 
+        This can be used to create tables, truncate, build indexes etc.
+        The database type must be specified in the 'database' parameter (one of 'Mssql' or 'Postgres')
+        The default Mssql driver is 'SQL Server' - if this needs to be overwritten, specify the parameter driver, else leave it empty.
+        SQL statments must be trippel double-quoted - prepare the statement in the QGIS sql executor tool for testing. 
+
+        Parameters
+        ----------
+        connection : str
+            Name of a database connection from settings.json
+        database : str
+            The database type, one of 'Mssql' or 'Postgres'.
+        driver : str
+            The name of the Mssql driver, if 'SQL Server' is not working. Else, leave it blank
+        sql_expression : str
+            The SQL expression to be executed. Use trippel double-quotes arraound the expression
+        """
+
         config = get_config()
         if database in ('Postgis', 'Mssql'):
             logger.info(f'Running SQL executor on {database}' )
         else :
-            logger.info(f'Unsupported database: {database}' )
+            logger.info(f'Unsupported database: {database}, use one of "Mssql" or "Postgres"' )
             logger.critical("Program terminated" )
             sys.exit()
         try:
             dbconnection = config['DatabaseConnections'][connection]
             if database == 'Mssql':
+                import pyodbc 
                 if driver == "":
                     mssqldriver = 'SQL Server'
                 else :
@@ -929,8 +949,17 @@ class Worker:
                 cursor = cnxn.cursor()
                 cursor.execute(sql_expression) 
                 logger.info("SQL executor finished")
-
             
+            if database == 'Postgres':
+                import psycopg2
+                connection = psycopg2.connect(user=dbconnection['user'], password=dbconnection['password'], host=dbconnection['host'], port=dbconnection['port'], database=dbconnection['databasename'])
+                logger.info("Using connection : user="+ dbconnection['user']+", password=xxxxxx, host="+dbconnection['host']+", port="+dbconnection['port']+", database="+dbconnection['databasename'] )
+                cursor = connection.cursor()
+                cursor.execute(sql_expression)
+                connection.commit()
+                cursor.close()
+                connection.close()
+                
         except Exception as error:
             logger.error("An error occured running SQL executor")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
