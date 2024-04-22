@@ -168,11 +168,43 @@ def script_finished():
 def script_failed():
     logger = get_logger()
     now = datetime.now()
+    config = get_config()
+    try:
+        if config["emailConfiguration"]["emailOnError"] == 'True':
+            logger.info('')
+            import smtplib
+            from email.mime.text import MIMEText
+
+            smtp_server = ["emailConfiguration"]["smtp_server"]
+            smtp_port = ["emailConfiguration"]["smtp_port"]
+            smtp_username = ["emailConfiguration"]["smtp_username"]
+            smtp_password = ["emailConfiguration"]["smtp_password"]
+            messageFrom = ["emailConfiguration"]["message_from"]
+
+            message = MIMEText(f'The QGIS ETL job {argv[0]} has failed. Timestamp: {now}')
+            message['Subject'] = 'QGIS ETL job FAILED'
+            message['From'] = messageFrom
+            message['To'] = 'morten.w.fuglsang@gmail.com'
+
+            # Establish a connection to the SMTP server
+            smtp_connection = smtplib.SMTP(smtp_server, smtp_port)
+            smtp_connection.starttls()
+
+            # Log in to the SMTP server
+            smtp_connection.login(smtp_username, smtp_password)
+
+            # Send the email
+            smtp_connection.send_message(message)
+
+            # Close the SMTP connection
+            smtp_connection.quit()
+
+    except:
+        pass
+
     logger.info('')
-    logger.info('##################################################')
     logger.info('JOB: ' + argv[0] + ' FAILED')
-    logger.info('ENDTIME: ' + now.strftime("%d/%m/%Y, %H:%M"))
-    logger.info('##################################################')
+
     sys.exit()
     
 
