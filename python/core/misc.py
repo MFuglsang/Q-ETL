@@ -173,7 +173,7 @@ def script_failed():
         if config["emailConfiguration"]["emailOnError"] == 'True':
             email = True
     except:
-        pass
+            email = False
 
     if email == True:
         try:
