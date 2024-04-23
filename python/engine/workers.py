@@ -909,7 +909,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def execute_sql(connection: str, database: str, driver: str, sql_expression: str):
+    def execute_sql(connection, database, driver, sql_expression):
         """
         Execute an SQL query against a database. 
         This can be used to create tables, truncate, build indexes etc.
@@ -927,6 +927,12 @@ class Worker:
             The name of the Mssql driver, if 'SQL Server' is not working. Else, leave it blank
         sql_expression : str
             The SQL expression to be executed. Use trippel double-quotes arraound the expression
+
+        Returns
+        -------
+        Errorcode : int
+            Returns 0 if the SQL is executed without errors.
+
         """
 
         config = get_config()
@@ -950,6 +956,7 @@ class Worker:
                 logger.info(f'Query: {sql_expression}' )
                 cursor.execute(sql_expression) 
                 logger.info("SQL executor finished")
+                return 0
             
             if database == 'Postgres':
                 import psycopg2
@@ -962,6 +969,7 @@ class Worker:
                 cursor.close()
                 connection.close()
                 logger.info("SQL executor finished")
+                return 0
                 
         except Exception as error:
             logger.error("An error occured running SQL executor")
