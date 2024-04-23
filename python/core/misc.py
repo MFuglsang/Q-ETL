@@ -171,6 +171,12 @@ def script_failed():
     config = get_config()
     try:
         if config["emailConfiguration"]["emailOnError"] == 'True':
+            email = True
+    except:
+        pass
+
+    if email == True:
+        try:
             logger.info('')
             import smtplib
             from email.mime.text import MIMEText
@@ -180,11 +186,12 @@ def script_failed():
             smtp_username = ["emailConfiguration"]["smtp_username"]
             smtp_password = ["emailConfiguration"]["smtp_password"]
             messageFrom = ["emailConfiguration"]["message_from"]
+            messageTo = ["emailConfiguration"]["message_to"]
 
             message = MIMEText(f'The QGIS ETL job {argv[0]} has failed. Timestamp: {now}')
             message['Subject'] = 'QGIS ETL job FAILED'
             message['From'] = messageFrom
-            message['To'] = 'morten.w.fuglsang@gmail.com'
+            message['To'] = messageTo
 
             # Establish a connection to the SMTP server
             smtp_connection = smtplib.SMTP(smtp_server, smtp_port)
@@ -198,9 +205,10 @@ def script_failed():
 
             # Close the SMTP connection
             smtp_connection.quit()
+            logger.info(f'Error Email sent to {message['To']} with subject {message['Subject']}' )
 
-    except:
-        pass
+        except:
+            logger.info(f'An error occured sending error Email to {message['To']} ' )
 
     logger.info('')
     logger.info('JOB: ' + argv[0] + ' FAILED')

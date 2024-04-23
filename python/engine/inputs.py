@@ -27,7 +27,12 @@ class Input_Reader:
             logger.info(f'Reading WFS layer: {uri}')
             layer = QgsVectorLayer(uri, "WFS_Layer" , 'WFS')
             logger.info("Finished reading the WFS service")
-            return layer
+            if layer.featureCount() == 0:
+                logger.error(f'An error occured reading the WFS {uri}')
+                logger.critical("Program terminated")
+                script_failed()
+            else :
+                return layer
         except Exception as error:
             logger.error(f'An error occured reading the WFS {uri}')
             logger.error(f'{type(error).__name__}  –  {str(error)}')

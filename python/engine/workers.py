@@ -3,6 +3,7 @@ import sys
 from qgis.analysis import QgsNativeAlgorithms
 from qgis.core import QgsCoordinateReferenceSystem
 from qgis import processing
+from core.misc import script_failed
 
 
 class Worker:
@@ -45,7 +46,7 @@ class Worker:
             logger.error("An error occured in extractByExpression")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
     def addAutoIncrementalField(layer, fieldname, start):
         """
@@ -91,7 +92,7 @@ class Worker:
             logger.error("An error occured in addAutoIncrementalField")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
     def deleteColumns (layer, columns):
         """
@@ -125,7 +126,7 @@ class Worker:
             logger.error("An error occured in deleteColumns")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
     def fieldCalculator (layer, fieldname, fieldtype, fieldlength, fieldprecision, formula):
         """
@@ -179,7 +180,7 @@ class Worker:
             logger.error("An error occured in fieldCalculator")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
     def timeStamper(layer, ts_fieldname):
         """
@@ -241,7 +242,7 @@ class Worker:
             logger.error("An error occured in renameTableField")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
     def attributeindex(layer, field):
         """
@@ -276,7 +277,7 @@ class Worker:
             logger.error("An error occured in createattributeindex")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
     
     def spatialindex(layer):
@@ -309,7 +310,7 @@ class Worker:
             logger.error("An error occured in createspatialindex")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
     ## ##################################
     ## ANALYSIS WORKERS
@@ -349,7 +350,7 @@ class Worker:
             logger.error("An error occured in Clip")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
     def joinByLocation(layer, predicate, join, join_fields, method, discard_nomatching, prefix):
         """
@@ -416,7 +417,7 @@ class Worker:
             logger.error("An error occured in joinByLocation")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
     def extractByLocation(layer, predicate, intersect):
         """_summary_
@@ -454,7 +455,7 @@ class Worker:
             logger.error("An error occured in extractByLocation")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
     def randomExtract(layer, method, number):
         """
@@ -494,7 +495,7 @@ class Worker:
             logger.error("An error occured in randomExtract")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
     def difference(layer, overlay):
         """
@@ -530,7 +531,7 @@ class Worker:
             logger.error("An error occured in Difference")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
     ## ##################################
     ## GEOMETRY WORKERS
@@ -574,7 +575,7 @@ class Worker:
             logger.error("An error occured reprojectiong layer")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
     def simplify(layer, method, tolerance):
             """
@@ -617,7 +618,7 @@ class Worker:
                 logger.error("An error occured in simplifygeometries")
                 logger.error(f'{type(error).__name__}  –  {str(error)}')
                 logger.critical("Program terminated" )
-                sys.exit()
+                script_failed()
 
     def forceRHR(layer):
         """
@@ -653,7 +654,7 @@ class Worker:
             logger.error("An error occured in forceRHR")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
     def join_by_attribute(layer1, layer1_field, layer2, layer2_field, fields_to_copy, method, discard, prefix):
         """
@@ -720,7 +721,7 @@ class Worker:
             logger.error("An error occured in joinattributestable")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
     def dissolveFeatures(layer, fieldList, disjoined):
         """
@@ -766,7 +767,7 @@ class Worker:
             logger.error("An error occured in dissolveFeatures")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
     def bufferLayer(layer, distance, segements, endcapStyle, joinStyle, miterLimit, dissolve):
         """
@@ -829,7 +830,7 @@ class Worker:
             logger.error("An error occured in BufferLayer")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
     def fixGeometry(layer):
         """
@@ -864,7 +865,7 @@ class Worker:
             logger.error("An error occured in FixGeometry")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
     def randomselection(layer,method, number):
         """
@@ -906,5 +907,5 @@ class Worker:
             logger.error("An error occured in FixGeometry")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            sys.exit()
+            script_failed()
 
