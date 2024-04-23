@@ -8,58 +8,79 @@ import json
 from PyQt5.QtCore import QSettings
 
 def validateEnvironment(settings):
+    
     logger = get_logger()
     logger.info('Validating Environment and settings')
     ## validating QGIS ressources
-    isExist = os.path.exists(settings['Qgs_PrefixPath'])
-    if not isExist:
-        
-        logger.error('Qgs_PrefixPath not found')
-        logger.critical('Program terminated')
-        sys.exit()
-    else:
-        logger.info('Qgs_PrefixPath found')
-    
-    isExist = os.path.exists(settings['QGIS_Plugin_Path'])
-    if not isExist:
-        
-        logger.error('QGIS_Plugin_Path not found')
-        logger.critical('Program terminated')
-        sys.exit()
-    else:
-        logger.info('QGIS_Plugin_Path found')
+    try:
+        isExist = os.path.exists(settings['Qgs_PrefixPath'])
+        if not isExist:
+            
+            logger.error('Qgs_PrefixPath not found')
+            logger.critical('Program terminated')
+            script_failed()
+        else:
+            logger.info('Qgs_PrefixPath found')
+    except:
+        logger.info('Qgs_PrefixPath not configured')
+        script_failed()
+    try:    
+        isExist = os.path.exists(settings['QGIS_Plugin_Path'])
+        if not isExist:
+            
+            logger.error('QGIS_Plugin_Path not found')
+            logger.critical('Program terminated')
+            script_failed()
+        else:
+            logger.info('QGIS_Plugin_Path found')
+    except:
+        logger.info('QGIS_Plugin_Path not configured')
+        script_failed()
 
-    isExist = os.path.exists(settings['QGIS_bin_folder'])
-    if not isExist:
-        
-        logger.error('QGIS_Bin_Folder not found')
-        logger.critical('Program terminated')
-        sys.exit()
-    else:
-        logger.info('QGIS_Bin_Folder found')
+    try:
+        isExist = os.path.exists(settings['QGIS_bin_folder'])
+        if not isExist:
+            
+            logger.error('QGIS_Bin_Folder not found')
+            logger.critical('Program terminated')
+            script_failed()
+        else:
+            logger.info('QGIS_Bin_Folder found')
+    except : 
+        logger.info('QGIS_Bin_Folder Not configured')
+        script_failed()
 
     ## Locating the logdir
-    isExist = os.path.exists(settings['logdir'])
-    if not isExist:
-        logger.error('Logdir does not exist')
-        logger.critical('Program terminated')
-        sys.exit()
-    else:
-        logger.info('Logdir found')
+    try:
+        isExist = os.path.exists(settings['logdir'])
+        if not isExist:
+            logger.error('Logdir does not exist')
+            logger.critical('Program terminated')
+            script_failed()
+        else:
+            logger.info('Logdir found')
 
-    if settings['logdir'][-1] != '/':
-        settings['logdir'] = settings['logdir'] + '/'
+        if settings['logdir'][-1] != '/':
+            settings['logdir'] = settings['logdir'] + '/'
+    except:
+        logger.info('Logdir not configured')
+        script_failed()
 
     ## Locating the temp folder
-    isExist = os.path.exists(settings['TempFolder'])
-    if not isExist:
-        logger.error('TempFolder does not exist')
-        logger.critical('Program terminated')
-        sys.exit()
-    else:
-        logger.info('TempFolder found')
-    if settings['TempFolder'][-1] != '/':
-        settings['TempFolder'] = settings['TempFolder'] + '/'
+    try:
+        isExist = os.path.exists(settings['TempFolder'])
+        if not isExist:
+            logger.error('TempFolder does not exist')
+            logger.critical('Program terminated')
+            script_failed()
+        else:
+            logger.info('TempFolder found')
+        if settings['TempFolder'][-1] != '/':
+            settings['TempFolder'] = settings['TempFolder'] + '/'
+    except: 
+        logger.info('TempFolder not configured')
+        script_failed()
+
 
     logger.info('')  
     logger.info('Environement and settings OK !')     
@@ -205,10 +226,10 @@ def script_failed():
 
             # Close the SMTP connection
             smtp_connection.quit()
-            logger.info(f'Error Email sent to {message['To']} with subject {message['Subject']}' )
+            logger.info(f'Error Email sent to {message["To"]} with subject {message["Subject"]}' )
 
         except:
-            logger.info(f'An error occured sending error Email to {message['To']} ' )
+            logger.info(f'An error occured sending error Email to {message["To"]} ' )
 
     logger.info('')
     logger.info('JOB: ' + argv[0] + ' FAILED')
