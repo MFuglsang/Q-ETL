@@ -29,7 +29,5 @@
         "smtp_password" : "",
         "message_from" : "",
         "message_to" : ""
-
-
     } 
 }

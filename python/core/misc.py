@@ -6,6 +6,8 @@ from sys import argv
 import os.path as path
 import json
 from PyQt5.QtCore import QSettings
+import smtplib
+from email.mime.text import MIMEText
 
 def validateEnvironment(settings):
     
@@ -199,15 +201,13 @@ def script_failed():
     if email == True:
         try:
             logger.info('')
-            import smtplib
-            from email.mime.text import MIMEText
 
-            smtp_server = ["emailConfiguration"]["smtp_server"]
-            smtp_port = ["emailConfiguration"]["smtp_port"]
-            smtp_username = ["emailConfiguration"]["smtp_username"]
-            smtp_password = ["emailConfiguration"]["smtp_password"]
-            messageFrom = ["emailConfiguration"]["message_from"]
-            messageTo = ["emailConfiguration"]["message_to"]
+            smtp_server = config["emailConfiguration"]["smtp_server"]
+            smtp_port = config["emailConfiguration"]["smtp_port"]
+            smtp_username = config["emailConfiguration"]["smtp_username"]
+            smtp_password = config["emailConfiguration"]["smtp_password"]
+            messageFrom = config["emailConfiguration"]["message_from"]
+            messageTo = config["emailConfiguration"]["message_to"]
 
             message = MIMEText(f'The QGIS ETL job {argv[0]} has failed. Timestamp: {now}')
             message['Subject'] = 'QGIS ETL job FAILED'
@@ -215,11 +215,14 @@ def script_failed():
             message['To'] = messageTo
 
             # Establish a connection to the SMTP server
-            smtp_connection = smtplib.SMTP(smtp_server, smtp_port)
-            smtp_connection.starttls()
+            if len(smtp_port) > 0:
+                smtp_connection = smtplib.SMTP(smtp_server, smtp_port)
+                smtp_connection.starttls()
 
-            # Log in to the SMTP server
-            smtp_connection.login(smtp_username, smtp_password)
+                # # Log in to the SMTP server
+                smtp_connection.login(smtp_username, smtp_password)
+            else:
+                smtp_connection = smtplib.SMTP(smtp_server)
 
             # Send the email
             smtp_connection.send_message(message)
