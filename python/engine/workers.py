@@ -1,5 +1,6 @@
 from core.logger import *
 import sys
+import shutil
 from core.misc import get_config
 from qgis.analysis import QgsNativeAlgorithms
 from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer
@@ -977,3 +978,69 @@ class Worker:
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
             sys.exit()
+
+    def fileDeleter(file: str):
+        """
+        Delete a specific file.
+
+        Parameters
+        ----------
+        file : str
+            The full path to the file to be deleted
+
+        Returns
+        -------
+        None
+        
+        """
+
+        logger.info(f'Deleting file {file}')
+        try:
+
+            if os.path.exists(file):
+                os.remove(file)
+                logger.info(f'File {file} deleted')
+            else:
+                logger.info(f'File {file} does not exist')
+            return None
+        except Exception as error:
+            logger.error("An error occured deleting file")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
+            script_failed()
+
+    def folderTruncator(folder: str):
+        """
+        Deletes all contents of a folder (files and directories), but not the folder it self.
+
+        Parameters
+        ----------
+        folder : str
+            Full path to the folder to be truncated
+
+        Returns
+        -------
+        None
+
+        """
+
+        logger.info(f'Truncating folder {folder}')
+        try:
+            for root, dirs, files in os.walk(folder):
+                for f in files:
+                    os.unlink(os.path.join(root, f))
+                for d in dirs:
+                    shutil.rmtree(os.path.join(root, d))
+            logger.info(f'Folder {folder} truncated')
+
+            return None
+        except Exception as error:
+            logger.error("An error occured truncating folder")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
+            script_failed()
+
+   
+
+
+        
