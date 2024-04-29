@@ -26,3 +26,5 @@ Checkout the _Getting started_ guide on the Wiki page [here](https://github.com/
 
 ## Download
 Download the latest release [here](https://github.com/MFuglsang/QGIS_ETL/releases).
+
+If you want to contact the QGIS_ETL team, reach out to contact.qgis.etl@gmail.com !!
