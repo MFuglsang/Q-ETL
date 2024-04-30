@@ -1040,7 +1040,25 @@ class Worker:
             logger.critical("Program terminated" )
             script_failed()
 
-   
+    def mergeVectorLayers(layers: list, crs: str ):
+        logger.info("Performing mergeVectorLayers")
+        logger.info(f'Processing {str(len(layers))} layers')
+        try:
+            parameter = {
+                'INPUT': layers,
+                'CRS':crs,
+                'OUTPUT': 'memory:buffer'
+            }
+            logger.info(f'Parameters: {str(parameter)}')
+            result = processing.run('native:mergevectorlayers', parameter)['OUTPUT']
+            logger.info("Returning " + str(result.featureCount()) +" features")
+            logger.info("mergeVectorLayers finished")
+            return result
+        except Exception as error:
+            logger.error("An error occured in mergeVectorLayers")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
+            script_failed()
 
 
         
