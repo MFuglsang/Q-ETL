@@ -888,8 +888,8 @@ class Worker:
 
         Returns
         -------
-        _type_
-            _description_
+        QgsVectorLayer [vector: any]
+            The result output from the algorithem
         """
         logger.info("Performing random selection")
         logger.info("Processing " + str(layer.featureCount()) +" features")
@@ -1041,6 +1041,29 @@ class Worker:
             script_failed()
 
     def mergeVectorLayers(layers: list, crs: str ):
+        """
+        Combines multiple vector layers of the same geometry type into a single one.
+        The attribute table of the resulting layer will contain the fields from all input layers. 
+        If fields with the same name but different types are found then the exported field will be automatically 
+        converted into a string type field. New fields storing the original layer name and source are also added.
+
+        Optionally, the destination coordinate reference system (CRS) for the merged layer can be set. If it is 
+        not set, the CRS will be taken from the first input layer. All layers will be reprojected to match this CRS.
+
+        Parameters
+        ----------
+        layer : List [vector: any] [list]
+            The layers that are to be merged into a single layer. Layers should be of the same geometry type.
+
+        CRS : [crs]
+            Choose the CRS for the output layer. If not specified, the CRS of the first input layer is used.
+        
+        Returns
+        -------
+        QgsVectorLayer [vector: any]
+            The result output from the algorithem
+        
+        """
         logger.info("Performing mergeVectorLayers")
         logger.info(f'Processing {str(len(layers))} layers')
         try:
