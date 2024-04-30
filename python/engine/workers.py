@@ -608,6 +608,7 @@ class Worker:
             logger.info("Processing " + str(layer.featureCount()) +" features")
             try:
                 parameter = {
+                    'INPUT': layer,
                     'METHOD':method,
                     'TOLERANCE':tolerance,
                     'OUTPUT': 'memory:Reprojected'
