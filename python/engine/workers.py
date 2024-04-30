@@ -604,14 +604,14 @@ class Worker:
                 The result output from the algorithem
             """
 
-            logger.info("Running reporjector V2")
+            logger.info("Running simplify")
             logger.info("Processing " + str(layer.featureCount()) +" features")
             try:
                 parameter = {
                     'INPUT': layer,
                     'METHOD':method,
                     'TOLERANCE':tolerance,
-                    'OUTPUT': 'memory:Reprojected'
+                    'OUTPUT': 'memory:simplify'
                 }
                 logger.info(f'Parameters: {str(parameter)}')
                 result = processing.run('native:simplifygeometries', parameter)['OUTPUT']
