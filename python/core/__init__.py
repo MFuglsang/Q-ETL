@@ -9,6 +9,7 @@ settings = get_config()
 logger = initialize_logger(settings)
 start_logfile()
 
+
 from core.misc import validateEnvironment, describeEngine, get_postgres_connections, get_bin_folder, script_finished
 settings['bin_path'] = get_bin_folder(settings)
 validateEnvironment(settings)

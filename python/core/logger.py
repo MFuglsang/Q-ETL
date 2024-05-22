@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 import os
 from sys import argv
+import sys, traceback
 
 logfile = None
 
@@ -20,10 +21,17 @@ def initialize_logger(settings):
     fh.setFormatter(logFormatter)
     consoleHandler = logging.StreamHandler()
     consoleHandler.setFormatter(logFormatter)
+    consoleHandler.setLevel(logging.DEBUG)
     logger.addHandler(consoleHandler)
     logger.addHandler(fh)
+    sys.excepthook = exc_handler
+
+    
+    
     return logger
     
+def exc_handler(exctype, value, tb):
+    logger.exception(''.join(traceback.format_exception(exctype, value, tb)))
 
 def start_logfile():
     now = datetime.now()
