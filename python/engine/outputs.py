@@ -16,7 +16,7 @@ class Output_Writer:
 
     logger = get_logger()
 
-    def postgis(layer: QgsVectorLayer, connection : str, dbname: str, schema: str, tablename: str, overwrite: bool):
+    def postgis(layer: QgsVectorLayer, connection : str, dbname: str, schema: str, tablename: str, overwrite: bool = True):
         """
         A function that exports a QgsVectorLayer into a Postgis database.
 
@@ -283,4 +283,47 @@ class Output_Writer:
             logger.error("An error occured exporting layer to ESRI File Geodatabase")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated")
+            script_failed()
+
+    def packageLayers(layers: list, path: str,  overwrite: bool, style: bool):
+        """
+        Adds layers to a GeoPackage.
+        If the GeoPackage exists and Overwrite existing GeoPackage is checked, 
+        it will be overwritten (removed and recreated). 
+        If the GeoPackage exists and Overwrite existing GeoPackage is not checked, the layer will be appended.
+
+        Parameters
+        ----------
+        input : [vector: any] [list]
+            The (vector) layers to import into the GeoPackage. 
+            Raster layers are not supported. If a raster layer is added, a QgsProcessingException will be thrown.
+
+        overwrite : [boolean]Default: False
+            If the specified GeoPackage exists, setting this option to True will make sure that it is deleted 
+            and a new one will be created before the layers are added. If set to False, layers will be appended.
+
+        style : [boolean] Default: True
+            Save the layer styles
+
+        path : str
+            The full path for the Geopackage to be created
+
+        """
+
+        logger.info("Performing packageLayers")
+        logger.info(f'Processing {str(len(layers))} layers')
+        try:
+            parameter = {
+                'INPUT': layers,
+                'OVERWRITE': overwrite,
+                'SAVE_STYLES': style,
+                'OUTPUT': path
+            }
+            logger.info(f'Parameters: {str(parameter)}')
+            processing.run('native:package', parameter)['OUTPUT']           
+            logger.info("packageLayers finished")
+        except Exception as error:
+            logger.error("An error occured in packageLayers")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
             script_failed()

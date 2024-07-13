@@ -611,7 +611,7 @@ class Worker:
                     'INPUT': layer,
                     'METHOD':method,
                     'TOLERANCE':tolerance,
-                    'OUTPUT': 'memory:simplifygeometries'
+                    'OUTPUT': 'memory:simplify'
                 }
                 logger.info(f'Parameters: {str(parameter)}')
                 result = processing.run('native:simplifygeometries', parameter)['OUTPUT']
@@ -889,8 +889,8 @@ class Worker:
 
         Returns
         -------
-        _type_
-            _description_
+        QgsVectorLayer [vector: any]
+            The result output from the algorithem
         """
         logger.info("Performing random selection")
         logger.info("Processing " + str(layer.featureCount()) +" features")
@@ -1041,7 +1041,48 @@ class Worker:
             logger.critical("Program terminated" )
             script_failed()
 
-   
+    def mergeVectorLayers(layers: list, crs: str ):
+        """
+        Combines multiple vector layers of the same geometry type into a single one.
+        The attribute table of the resulting layer will contain the fields from all input layers. 
+        If fields with the same name but different types are found then the exported field will be automatically 
+        converted into a string type field. New fields storing the original layer name and source are also added.
+
+        Optionally, the destination coordinate reference system (CRS) for the merged layer can be set. If it is 
+        not set, the CRS will be taken from the first input layer. All layers will be reprojected to match this CRS.
+
+        Parameters
+        ----------
+        layer : List [vector: any] [list]
+            The layers that are to be merged into a single layer. Layers should be of the same geometry type.
+
+        CRS : [crs]
+            Choose the CRS for the output layer. If not specified, the CRS of the first input layer is used.
+        
+        Returns
+        -------
+        QgsVectorLayer [vector: any]
+            The result output from the algorithem
+        
+        """
+        logger.info("Performing mergeVectorLayers")
+        logger.info(f'Processing {str(len(layers))} layers')
+        try:
+            parameter = {
+                'INPUT': layers,
+                'CRS':crs,
+                'OUTPUT': 'memory:buffer'
+            }
+            logger.info(f'Parameters: {str(parameter)}')
+            result = processing.run('native:mergevectorlayers', parameter)['OUTPUT']
+            logger.info("Returning " + str(result.featureCount()) +" features")
+            logger.info("mergeVectorLayers finished")
+            return result
+        except Exception as error:
+            logger.error("An error occured in mergeVectorLayers")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
+            script_failed()
 
 
         
