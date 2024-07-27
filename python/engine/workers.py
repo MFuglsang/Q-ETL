@@ -15,6 +15,7 @@ class Worker:
     ## ATTRIBUTE WORKERS
     ## ##################################
 
+
     def extractByExpression(layer: QgsVectorLayer, expression: str):
         """
         Creates a vector layer from an input layer, containing only matching features.
