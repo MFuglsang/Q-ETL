@@ -9,8 +9,10 @@ from PyQt5.QtCore import QSettings
 import smtplib
 from email.mime.text import MIMEText
 from qgis.core import QgsVectorFileWriter, QgsProject
+from random import randrange
 
 def create_tempfile(layer: str, toolname: str):
+    logger = get_logger()
     config = get_config()
     try:
         logger.info('Creating Temporary file')
@@ -25,6 +27,12 @@ def create_tempfile(layer: str, toolname: str):
         logger.error(f'{type(error).__name__}  –  {str(error)}')
         logger.critical("Program terminated")
         script_failed()
+
+def delete_tempfile(tmp_path):
+        try:
+            os.remove(tmp_path)
+        except:
+            logger.info('Could not delete temporary layer - manual cleanup is required')
 
 
 def validateEnvironment(settings):

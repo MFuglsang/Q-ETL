@@ -2,7 +2,7 @@ from core.logger import *
 from core.misc import get_config
 import sys
 import shutil
-from core.misc import get_config
+from core.misc import get_config, create_tempfile, delete_tempfile
 from qgis.analysis import QgsNativeAlgorithms
 from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsVectorFileWriter, QgsProject, QgsFeatureRequest, QgsProcessingContext
 from qgis import processing
@@ -37,18 +37,11 @@ class Integrations:
         logger.info(f'Creating Geopandas dataframe from layer  {str(layer)}')
         config = get_config()
         try:
-            logger.info(f'Creating temporary layer in Temp folder')
-            tmp_path = f'{config["TempFolder"]}QGIS-ETL_to_dataframe_{str(randrange(1000))}.fgb'
-            options = QgsVectorFileWriter.SaveVectorOptions()
-            options.driverName = 'FlatGeobuf'
-            QgsVectorFileWriter.writeAsVectorFormatV3(layer, tmp_path, QgsProject.instance().transformContext(), options)
-            logger.info('Temporary layer created')
-
+            tmp_path = create_tempfile(layer, 'to_dataframe')
             logger.info('Creating dataframe')
             df = gpd.read_file(tmp_path)
             logger.info('Dataframe creation finished')
-            logger.info('Temporary layer removed')
-            os.remove(tmp_path)
+            delete_tempfile(tmp_path)
             return df
 
         except Exception as error:
@@ -72,7 +65,7 @@ class Integrations:
             The QGIS layer from the input dataframe
         """
 
-        logger.info(f'Creationg layer from Geopandas dataframe ')
+        logger.info(f'Creating layer from Geopandas dataframe ')
         config = get_config()
         try:
             logger.info(f'Creating temporary layer in Temp folder')
