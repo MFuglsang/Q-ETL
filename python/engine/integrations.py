@@ -4,7 +4,7 @@ import sys
 import shutil
 from core.misc import get_config
 from qgis.analysis import QgsNativeAlgorithms
-from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsVectorFileWriter, QgsProject
+from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsVectorFileWriter, QgsProject, QgsFeatureRequest, QgsProcessingContext
 from qgis import processing
 from random import randrange
 import geopandas as gpd
@@ -38,7 +38,7 @@ class Integrations:
         config = get_config()
         try:
             logger.info(f'Creating temporary layer in Temp folder')
-            tmp_path = f'{config["TempFolder"]}_to_dataframe_{str(randrange(1000))}.fgb'
+            tmp_path = f'{config["TempFolder"]}QGIS-ETL_to_dataframe_{str(randrange(1000))}.fgb'
             options = QgsVectorFileWriter.SaveVectorOptions()
             options.driverName = 'FlatGeobuf'
             QgsVectorFileWriter.writeAsVectorFormatV3(layer, tmp_path, QgsProject.instance().transformContext(), options)
@@ -76,12 +76,28 @@ class Integrations:
         config = get_config()
         try:
             logger.info(f'Creating temporary layer in Temp folder')
-            tmp_path = f'{config["TempFolder"]}_from_dataframe_{str(randrange(1000))}.fgb'
+            tmp_path = f'{config["TempFolder"]}QGIS-ETL_from_dataframe_{str(randrange(1000))}.fgb'
             dataframe.to_file(tmp_path, driver='FlatGeobuf')
             logger.info('Temporary layer created')
 
             logger.info('Creating QGIS layer')
-            layer =  QgsVectorLayer(tmp_path, f'QgsLayer_ {str(randrange(1000))}', "ogr")
+            tmp_layer =  QgsVectorLayer(tmp_path, f'QgsLayer_ {str(randrange(1000))}', "ogr")
+            #layer = tmp_layer.materialize(QgsFeatureRequest().setFilterFids(tmp_layer.allFeatureIds()))
+
+            tmp_layer.selectAll()
+            
+            context  = QgsProcessingContext()
+            layer = processing.run("native:saveselectedfeatures", {'INPUT': tmp_layer, 'OUTPUT': 'memory:'}, context=context)['OUTPUT']
+            layer.removeSelection()
+            try:
+                QgsProject.instance().removeMapLayer(tmp_layer.id())
+                context.temporaryLayerStore().removeAllMapLayers()   
+                tmp_layer = None
+                del tmp_layer, dataframe
+                os.remove(tmp_path)
+            except:
+                logger.info('Could not delete temporary layer - manual cleanup is required')
+
             logger.info('Layer creation finished')
             return layer
 
