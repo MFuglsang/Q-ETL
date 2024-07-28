@@ -8,6 +8,24 @@ import json
 from PyQt5.QtCore import QSettings
 import smtplib
 from email.mime.text import MIMEText
+from qgis.core import QgsVectorFileWriter, QgsProject
+
+def create_tempfile(layer: str, toolname: str):
+    config = get_config()
+    try:
+        logger.info('Creating Temporary file')
+        tmp_path = f'{config["TempFolder"]}QGIS-ETL_{toolname}_{str(randrange(1000))}.fgb'
+        options = QgsVectorFileWriter.SaveVectorOptions()
+        options.driverName = 'FlatGeobuf'
+        QgsVectorFileWriter.writeAsVectorFormatV3(layer, tmp_path, QgsProject.instance().transformContext(), options)
+        logger.info('Temporary file created')
+        return tmp_path
+    except Exception as error:
+        logger.error("An error occured creating temporary file")
+        logger.error(f'{type(error).__name__}  –  {str(error)}')
+        logger.critical("Program terminated")
+        script_failed()
+
 
 def validateEnvironment(settings):
     
