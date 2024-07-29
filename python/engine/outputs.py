@@ -4,7 +4,7 @@ import sys, copy, os
 import subprocess
 from random import randrange
 from qgis.core import QgsVectorFileWriter, QgsVectorLayerExporter, QgsProject, QgsVectorLayer
-from core.misc import script_failed
+from core.misc import script_failed, create_tempfile, delete_tempfile
 
 import processing
 from processing.core.Processing import Processing
@@ -109,6 +109,48 @@ class Output_Writer:
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated")
             script_failed()
+
+    def append_geopackage(layer: str, layername: str, geopackage: str):
+        """
+        Append a layer to an existing geopackage.
+        If the new layer does not exist, it will be created. It it exists, the features will be appended to the layer.
+
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            The QgsVectorLayer that is to be written to a file
+
+        layername : String
+            The name of the layer in the geopackage file
+
+        geopackage : String
+            The full path for the geopackage to be created
+
+        """
+
+        if os.path.isfile(geopackage):
+            logger.info(f'Geopackage {geopackage} exists, appending layer')
+            tempfile = create_tempfile(layer, 'append_geopackage')
+
+            try:
+                config = get_config()
+                ## ogr2ogr parameters
+                table = f'-nln "{layername}"'
+                ogr2ogrstring = f'{config["QGIS_bin_folder"]}/ogr2ogr.exe -f "GPKG" {geopackage} {tempfile} -nln {layername} -update -append'
+                logger.info(f'Writing new layer {layername} to: {geopackage}')
+                logger.info(f'Ogr2ogr command {ogr2ogrstring}')
+                ogr2ogrstring.join(' -progress')
+                run = subprocess.run(ogr2ogrstring, stderr=subprocess.STDOUT)
+                if run.stdout:
+                    logger.info(run.stdout)
+                delete_tempfile(tempfile)
+                logger.info(f'Append to geopackage completed')
+
+            except Exception as error:
+                logger.error("An error occured appending layer to geopackage")
+                logger.error(f'{type(error).__name__}  –  {str(error)}')
+                logger.critical("Program terminated")
+                script_failed()    
 
     def file(layer: str, path: str, format: str):
         """_summary_
