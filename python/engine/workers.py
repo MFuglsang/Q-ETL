@@ -1,6 +1,7 @@
 from core.logger import *
 import sys
 import shutil
+import sqlite3
 from core.misc import get_config
 from qgis.analysis import QgsNativeAlgorithms
 from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer
@@ -1085,5 +1086,38 @@ class Worker:
             logger.critical("Program terminated" )
             script_failed()
 
+    def delete_geopacakge_layers(geopackage: str, layernames: list):
+        """
+        Deletes one or more tables from a geopackage
 
+        Parameters
+        ----------
+        geopackage : str
+            The full path for the geopackage file
+        layernames : list
+            List of layernames to be deleted
+
+        """
+        logger.info("Performing delete_geopacakge_layer")
+        logger.info(f"Deleting layers {layernames}")
+
+        if os.path.isfile(geopackage):
+            try:
+                for layer in layernames:
+                    logger.info(f"Deleting layer {layer}")
+                    parameter = {'DATABASE':'{0}|layername={1}'.format(geopackage, layer),
+                    'SQL':'drop table {0}'.format(layer)}
+                    logger.info(f'Parameters: {str(parameter)}')
+                    processing.run("native:spatialiteexecutesql", parameter )
+                    logger.info(f"Layer deleted")
+                logger.info(f"Finished deleting layers")
+
+                
+            except Exception as error:
+                logger.error("An error occured in delete_geopacakge_layer")
+                logger.error(f'{type(error).__name__}  –  {str(error)}')
+                logger.critical("Program terminated" )
+                script_failed()
+        else:    
+            pass
         

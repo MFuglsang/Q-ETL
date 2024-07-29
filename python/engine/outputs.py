@@ -150,7 +150,11 @@ class Output_Writer:
                 logger.error("An error occured appending layer to geopackage")
                 logger.error(f'{type(error).__name__}  –  {str(error)}')
                 logger.critical("Program terminated")
-                script_failed()    
+                script_failed() 
+        else:
+            logger.error("Target geopackage not found")
+            logger.critical("Program terminated")
+            script_failed()     
 
     def file(layer: str, path: str, format: str):
         """
