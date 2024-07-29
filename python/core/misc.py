@@ -15,8 +15,8 @@ def create_tempfile(layer: str, toolname: str):
     logger = get_logger()
     config = get_config()
     try:
-        logger.info('Creating Temporary file')
         tmp_path = f'{config["TempFolder"]}QGIS-ETL_{toolname}_{str(randrange(1000))}.fgb'
+        logger.info(f'Creating Temporary file {tmp_path}')
         options = QgsVectorFileWriter.SaveVectorOptions()
         options.driverName = 'FlatGeobuf'
         QgsVectorFileWriter.writeAsVectorFormatV3(layer, tmp_path, QgsProject.instance().transformContext(), options)
@@ -29,8 +29,10 @@ def create_tempfile(layer: str, toolname: str):
         script_failed()
 
 def delete_tempfile(tmp_path):
+        logger = get_logger()
         try:
             os.remove(tmp_path)
+            logger.info(f'Temporary file {tmp_path} deleted')
         except:
             logger.info('Could not delete temporary layer - manual cleanup is required')
 

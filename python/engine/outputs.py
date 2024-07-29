@@ -127,7 +127,7 @@ class Output_Writer:
             The full path for the geopackage to be created
 
         """
-
+        logger.info("Running append layer to Geopackage")
         if os.path.isfile(geopackage):
             logger.info(f'Geopackage {geopackage} exists, appending layer')
             tempfile = create_tempfile(layer, 'append_geopackage')
@@ -153,8 +153,7 @@ class Output_Writer:
                 script_failed()    
 
     def file(layer: str, path: str, format: str):
-        """_summary_
-
+        """
         Parameters
         ----------
         layer : QgsVectorLayer
