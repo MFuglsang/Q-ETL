@@ -36,7 +36,6 @@ def delete_tempfile(tmp_path):
         except:
             logger.info('Could not delete temporary layer - manual cleanup is required')
 
-
 def validateEnvironment(settings):
     
     logger = get_logger()

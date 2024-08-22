@@ -4,13 +4,34 @@ import shutil
 import sqlite3
 from core.misc import get_config
 from qgis.analysis import QgsNativeAlgorithms
-from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer
+from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsProcessingFeedback
 from qgis import processing
 from core.misc import script_failed
 
 
 class Worker:
+
+    def printProgressBar(value,label):
+        n_bar = 40 #size of progress bar
+        max = 100
+        j= value/max
+        sys.stdout.write('\r')
+        bar = '█' * int(n_bar * j)
+        bar = bar + '-' * int(n_bar * (1-j))
+        sys.stdout.write(f"{label.ljust(10)} | [{bar:{n_bar}s}] {int(100 * j)}% ")
+        sys.stdout.flush()
+        sys.stdout.write('')        
+
+    def progress_changed(progress):
+        Worker.printProgressBar(progress, '%')
+
+
+    progress = QgsProcessingFeedback()
+    progress.progressChanged.connect(progress_changed)
+
     logger = get_logger() 
+
+
 
     ## ##################################
     ## ATTRIBUTE WORKERS
@@ -43,7 +64,7 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:extractbyexpression', parameter)['OUTPUT']
+            result = processing.run('native:extractbyexpression', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("Extractbyexpression  finished")
             return result
         except Exception as error:
@@ -88,7 +109,7 @@ class Worker:
                 'SORT_NULLS_FIRST':False,
                 'OUTPUT': 'memory:extracted'
             }
-            result = processing.run('native:addautoincrementalfield', parameter)['OUTPUT']
+            result = processing.run('native:addautoincrementalfield', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info(f'Parameters: {str(parameter)}')
             logger.info("addAutoIncrementalField  finished")
             return result
@@ -116,13 +137,14 @@ class Worker:
             The QgsVectorLayer output layer.
         """
         logger.info("deleting fields")
+
         try:
             parameter = {
                 'INPUT': layer,
                 'COLUMN':columns,
                 'OUTPUT': 'memory:extracted'
             }
-            result = processing.run('native:deletecolumn', parameter)['OUTPUT']
+            result = processing.run('native:deletecolumn', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info(f'Parameters: {str(parameter)}')
             logger.info("deleteColumns  finished")
             return result
@@ -176,7 +198,7 @@ class Worker:
                 'FORMULA': formula,
                 'OUTPUT': 'memory:extracted'
             }
-            result = processing.run('native:fieldcalculator', parameter)['OUTPUT']
+            result = processing.run('native:fieldcalculator', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info(f'Parameters: {str(parameter)}')
             logger.info("fieldCalculator  finished")
             return result
@@ -238,7 +260,7 @@ class Worker:
                 'NEW_NAME': newname,
                 'OUTPUT': 'memory:extracted'
             }
-            result = processing.run('native:renametablefield', parameter)['OUTPUT']
+            result = processing.run('native:renametablefield', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info(f'Parameters: {str(parameter)}')
             logger.info("renameTableField  finished")
             return result
@@ -273,7 +295,7 @@ class Worker:
                 'FIELD': field,
                 'OUTPUT': 'memory:extracted'
             }
-            result = processing.run('native:createattributeindex', parameter)['OUTPUT']
+            result = processing.run('native:createattributeindex', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info(f'Parameters: {str(parameter)}')
             logger.info("createattributeindex  finished")
             return result
@@ -306,7 +328,7 @@ class Worker:
                 'INPUT': layer,
                 'OUTPUT': 'memory:extracted'
             }
-            result = processing.run('native:createspatialindex', parameter)['OUTPUT']
+            result = processing.run('native:createspatialindex', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info(f'Parameters: {str(parameter)}')
             logger.info("createspatialindex  finished")
             return result
@@ -347,7 +369,7 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:clip', parameter)['OUTPUT']
+            result = processing.run('native:clip', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("Clip  finished")
             return result
         except Exception as error:
@@ -414,7 +436,7 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:joinattributesbylocation', parameter)['OUTPUT']
+            result = processing.run('native:joinattributesbylocation', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("joinByLocation finished")
             return result
         except Exception as error:
@@ -452,7 +474,7 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:extractbylocation', parameter)['OUTPUT']
+            result = processing.run('native:extractbylocation', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("extractByLocation finished")
             return result
         except Exception as error:
@@ -492,7 +514,7 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:randomextract', parameter)['OUTPUT']
+            result = processing.run('native:randomextract', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("randomExtract finished")
             return result
         except Exception as error:
@@ -528,7 +550,7 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:difference', parameter)['OUTPUT']
+            result = processing.run('native:difference', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("Difference  finished")
             return result
         except Exception as error:
@@ -572,7 +594,7 @@ class Worker:
                 'OUTPUT': 'memory:Reprojected'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:reprojectlayer', parameter)['OUTPUT']
+            result = processing.run('native:reprojectlayer', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("Reproject finished")
             return result
         except Exception as error:
@@ -616,7 +638,7 @@ class Worker:
                     'OUTPUT': 'memory:simplify'
                 }
                 logger.info(f'Parameters: {str(parameter)}')
-                result = processing.run('native:simplifygeometries', parameter)['OUTPUT']
+                result = processing.run('native:simplifygeometries', parameter, feedback=Worker.progress)['OUTPUT']
                 logger.info("Simplifygeometries finished")
                 return result
             except Exception as error:
@@ -652,7 +674,7 @@ class Worker:
                 'INPUT': layer,
                 'OUTPUT': 'memory:forced'
             }
-            result = processing.run('native:forcerhr', parameter)['OUTPUT']
+            result = processing.run('native:forcerhr', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("forceRHR finished")
             return result
         except Exception as error:
@@ -718,7 +740,7 @@ class Worker:
                 'OUTPUT': 'memory:joined'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:joinattributestable', parameter)['OUTPUT']
+            result = processing.run('native:joinattributestable', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("Joinattributestable finished")
             logger.info("Returning " + str(result.featureCount()) +" features")
             return result
@@ -764,7 +786,7 @@ class Worker:
                 'OUTPUT': 'memory:dissolved'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:dissolve', parameter)['OUTPUT']
+            result = processing.run('native:dissolve', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("DissolveFeatures finished")
             logger.info("Returning " + str(result.featureCount()) +" features")
             return result
@@ -828,7 +850,7 @@ class Worker:
                 'OUTPUT': 'memory:buffer'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:buffer', parameter)['OUTPUT']
+            result = processing.run('native:buffer', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("BufferLayer finished")
             return result
         except Exception as error:
@@ -863,7 +885,7 @@ class Worker:
                 'OUTPUT': 'memory:buffer'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:fixgeometries', parameter)['OUTPUT']
+            result = processing.run('native:fixgeometries', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("FixGeometry finished")
             return result
         except Exception as error:
@@ -899,7 +921,7 @@ class Worker:
                 'OUTPUT': 'memory:buffer'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:centroids', parameter)['OUTPUT']
+            result = processing.run('native:centroids', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("Centroids finished")
             return result
         except Exception as error:
@@ -940,7 +962,7 @@ class Worker:
                 'OUTPUT': 'memory:buffer'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:randomextract', parameter)['OUTPUT']
+            result = processing.run('native:randomextract', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("Returning " + str(result.featureCount()) +" features")
             logger.info("randomextract finished")
             return result
@@ -1112,7 +1134,7 @@ class Worker:
                 'OUTPUT': 'memory:buffer'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:mergevectorlayers', parameter)['OUTPUT']
+            result = processing.run('native:mergevectorlayers', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("Returning " + str(result.featureCount()) +" features")
             logger.info("mergeVectorLayers finished")
             return result
