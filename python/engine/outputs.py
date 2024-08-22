@@ -42,26 +42,22 @@ class Output_Writer:
         """
 
         logger.info(f'Exporting {str(layer.featureCount())} features to Postgis')
+        tempfile = create_tempfile(layer, 'postgis')
+        logger.info('Temporary layer created')
 
         try:
             config = get_config()
             dbConnection = config['DatabaseConnections'][connection]
-            logger.info('Creating temporary folder in Temp folder')
-            tmp_path = f'{config["TempFolder"]}postgis_layer_{str(randrange(1000))}.geojson'
-            options = QgsVectorFileWriter.SaveVectorOptions()
-            options.driverName = 'GeoJSON'
-            QgsVectorFileWriter.writeAsVectorFormatV3(layer, tmp_path, QgsProject.instance().transformContext(), options)
-            logger.info('Temporary layer created')
 
             # ogr2ogr parameters
             table = f'-nln "{schema}.{tablename}"'
             ogrconnection = f'PG:"host={dbConnection["host"]} port={dbConnection["port"]} dbname={dbname} schemas={schema} user={dbConnection["user"]} password={dbConnection["password"]}"'
-            ogr2ogrstring = f'{config["QGIS_bin_folder"]}/ogr2ogr.exe -f "PostgreSQL" {ogrconnection} {tmp_path} {table}'
+            ogr2ogrstring = f'{config["QGIS_bin_folder"]}/ogr2ogr.exe -f "PostgreSQL" {ogrconnection} {tempfile} {table}'
             if overwrite:
                 ogr2ogrstring = f'{ogr2ogrstring} -overwrite'
             logger.info(f'Writing to PostGIS database {dbname}')
             run = subprocess.run(ogr2ogrstring, capture_output=True)
-            os.remove(tmp_path)
+            delete_tempfile(tempfile)
             logger.info('Temporary layer removed')
             logger.info('Export to PostGIS completed')
             
