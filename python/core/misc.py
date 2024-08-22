@@ -235,7 +235,7 @@ def script_failed():
             smtp_username = config["emailConfiguration"]["smtp_username"]
             smtp_password = config["emailConfiguration"]["smtp_password"]
             messageFrom = config["emailConfiguration"]["message_from"]
-            messageTo = config["emailConfiguration"]["message_to"]
+            messageTo = ', '.join(config["emailConfiguration"]["message_to"])
 
             message = MIMEText(f'The QGIS ETL job {argv[0]} has failed. Timestamp: {now}')
             message['Subject'] = 'QGIS ETL job FAILED'

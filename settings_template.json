@@ -28,6 +28,6 @@
         "smtp_username" : "",
         "smtp_password" : "",
         "message_from" : "",
-        "message_to" : ""
+        "message_to" : []
     } 
 }
