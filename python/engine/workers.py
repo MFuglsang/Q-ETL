@@ -1107,7 +1107,7 @@ class Worker:
         logger.info(f'Processing {str(len(layers))} layers')
         try:
             parameter = {
-                'INPUT': layers,
+                'LAYERS': layers,
                 'CRS':crs,
                 'OUTPUT': 'memory:buffer'
             }
