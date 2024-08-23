@@ -11,6 +11,7 @@ from core.misc import script_failed
 
 class Worker:
 
+    ## Method that draws the progress bar
     def printProgressBar(value,label):
         n_bar = 40 #size of progress bar
         max = 100
@@ -22,13 +23,15 @@ class Worker:
         sys.stdout.flush()
         sys.stdout.write('')        
 
+    ## The progress bar function
     def progress_changed(progress):
         Worker.printProgressBar(progress, '%')
 
-
+    ## The shared element for progress across all workers
     progress = QgsProcessingFeedback()
     progress.progressChanged.connect(progress_changed)
 
+    ## The shared element for logging across all workers
     logger = get_logger() 
 
 
