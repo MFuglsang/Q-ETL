@@ -1,8 +1,8 @@
 <img src="../ressources/images/logo.png" width="400" height="85"> 
 
-# QGIS ETL 
+# Q-ETL 
 
-A Python framework to create ETL processes using QGIS as the engine.
+A Python framework to create ETL processes powered by the QGIS engine.
 
 ## Basic example
 
@@ -26,3 +26,8 @@ Checkout the _Getting started_ guide on the Wiki page [here](https://github.com/
 
 ## Download
 Download the latest release [here](https://github.com/MFuglsang/QGIS_ETL/releases).
+
+## About the project
+The Q-ETL project builds uppon the work of the QGIS project (https://www.qgis.org/). 
+The project is not developed, endorsed by, or otherwise realted to the QGIS project. 
+
