@@ -13,7 +13,7 @@ def initialize_logger(settings):
     global logfile
     logfile = logdir + '/' +  filename + '_' + now.strftime("%d%m%Y_%H_%M") + '.txt'
     global logger
-    logger = logging.getLogger('QGIS ETL')
+    logger = logging.getLogger('Q-ETL')
     logger.setLevel(logging.DEBUG)
     fh = logging.FileHandler(logfile)
     fh.setLevel(logging.DEBUG)
@@ -36,7 +36,7 @@ def exc_handler(exctype, value, tb):
 def start_logfile():
     now = datetime.now()
     logger.info('##################################################')
-    logger.info('QGIS ETL JOB LOG')
+    logger.info('Q-ETL JOB LOG')
     logger.info('JOB: ' + argv[0])
     logger.info('STARTTIME: ' + now.strftime("%d/%m/%Y, %H:%M"))
     logger.info('##################################################')
