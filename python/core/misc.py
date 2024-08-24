@@ -217,7 +217,7 @@ def script_finished():
     logger.info('##################################################')
     logger.info('JOB: ' + argv[0] + ' FINISHED')
     logger.info('ENDTIME: ' + now.strftime("%d/%m/%Y, %H:%M"))
-    logger.info(f'Peak memory usage: {peak / 10**7} GB')
+    logger.info(f'Peak memory usage: {round((peak / 10**7), 2)} GB')
     logger.info('##################################################')
 
     tracemalloc.stop()
