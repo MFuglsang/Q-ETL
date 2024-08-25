@@ -181,7 +181,7 @@ class Input_Reader:
         A function that reads a layer from a mssql database using QgsDataSourceUri
 
         Args:
-            table (string): table name
+            table (string): table name in database
             connection (string): connection name in settings
             dbname (string): database name
             schema (string): schema name
@@ -196,7 +196,7 @@ class Input_Reader:
             config = get_config()
             dbConnection = config['DatabaseConnections'][connection]
             uri = QgsDataSourceUri()
-            logger.info(f'Reading from MSSQL database {dbname}')
+            logger.info(f'Reading from MSSQL database {dbname}, table {schema}.{dbname}')
             # set host name, port, database name, username and password
             uri.setConnection(dbConnection["host"], dbConnection["port"], dbname, dbConnection["user"], dbConnection["password"])
             # set database schema, table name, geometry column and optionally
@@ -206,7 +206,7 @@ class Input_Reader:
             layer = QgsVectorLayer(uri.uri(False), "layer", "mssql")
             # ogr2ogr parameters
             logger.info('Import from MSSQL completed')
-            logger.info(f'Importing {str(layer.featureCount())} features from MSSQL')
+            logger.info(f'Imported {str(layer.featureCount())} features from MSSQL')
             return layer    
         
         except Exception as error:
