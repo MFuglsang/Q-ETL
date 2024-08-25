@@ -1,4 +1,4 @@
-# QGIS ETL 
+# Q-ETL 
 
 A Python framework to create ETL processes using QGIS as the engine.
 
