@@ -20,9 +20,9 @@ writer.file(reprojectedLayer, "C:/temp/kommuner_4326.geojson", "GeoJson")
 To run the job, simply call the <YourProject>.cmd file (as described in [Step 3](https://github.com/MFuglsang/QGIS_ETL/wiki/Getting-started#step-3---the-python-project-file) and [Step 4](https://github.com/MFuglsang/QGIS_ETL/wiki/Getting-started#step-4---the-project-cmd-file) in the [_Getting started_](https://github.com/MFuglsang/QGIS_ETL/wiki/Getting-started) guide), and the job will execute. The translation log is placed in the log directory as specified in the configuration
 
 ## Quickstart
-Checkout the _Getting started_ guide on the Wiki page [here](https://github.com/MFuglsang/QGIS_ETL/wiki/Getting-started).
+Checkout the _Getting started_ guide on the Wiki page [here](https://github.com/MFuglsang/Q-ETL/wiki/Getting-started).
 
 ## Download
-Download the latest release [here](https://github.com/MFuglsang/QGIS_ETL/releases).
+Download the latest release [here](https://github.com/MFuglsang/Q-ETL/releases).
 
-If you want to contact the QGIS_ETL team, reach out to contact.qgis.etl@gmail.com !!
+If you want to contact the Q-ETL team, feel free to open a discussion or an issue.
