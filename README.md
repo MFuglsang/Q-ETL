@@ -1,5 +1,3 @@
-<img src="../ressources/images/logo.png" width="400" height="85"> 
-
 # QGIS ETL 
 
 A Python framework to create ETL processes using QGIS as the engine.
