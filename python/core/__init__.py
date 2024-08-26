@@ -3,6 +3,9 @@ from qgis.core import QgsApplication, Qgis
 from core.logger import *
 from core.misc import get_config
 import atexit
+import tracemalloc
+
+tracemalloc.start()
 
 #settings = _local_configuration.loadConfig()
 settings = get_config()

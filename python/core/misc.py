@@ -10,6 +10,7 @@ import smtplib
 from email.mime.text import MIMEText
 from qgis.core import QgsVectorFileWriter, QgsProject
 from random import randrange
+import tracemalloc
 
 def create_tempfile(layer: str, toolname: str):
     logger = get_logger()
@@ -151,7 +152,8 @@ def describeEngine(scriptfolder, algorithms, version):
     logger.info("Architecture: " + info['architecture'] + " ")
     logger.info("Processor: " + info['processor'] +  " ")
     logger.info("Number of cores : " + str(info['cores']) + " ")
-    logger.info("Available memmory: " + info['ram'] + " ")
+    logger.info("Available memory: " + info['ram'] + " ")
+    logger.info("Memory-profiling : Active ")
     logger.info("")
     logger.info("QGIS version: " + str(version) + "                ")
     logger.info("QGIS ETL status: " + str(supported) + "                ")
@@ -209,11 +211,16 @@ def get_bin_folder(settings):
 def script_finished():
     logger = get_logger()
     now = datetime.now()
+    current, peak = tracemalloc.get_traced_memory()
+    logger.info('')
     logger.info('')
     logger.info('##################################################')
     logger.info('JOB: ' + argv[0] + ' FINISHED')
     logger.info('ENDTIME: ' + now.strftime("%d/%m/%Y, %H:%M"))
+    logger.info(f'Peak memory usage: {round((peak / 10**7), 2)} GB')
     logger.info('##################################################')
+
+    tracemalloc.stop()
 
 def script_failed():
     logger = get_logger()
