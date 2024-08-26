@@ -16,7 +16,7 @@ def create_tempfile(layer: str, toolname: str):
     logger = get_logger()
     config = get_config()
     try:
-        tmp_path = f'{config["TempFolder"]}QGIS-ETL_{toolname}_{str(randrange(1000))}.fgb'
+        tmp_path = f'{config["TempFolder"]}QETL_{toolname}_{str(randrange(1000))}.fgb'
         logger.info(f'Creating Temporary file {tmp_path}')
         options = QgsVectorFileWriter.SaveVectorOptions()
         options.driverName = 'FlatGeobuf'
@@ -156,14 +156,14 @@ def describeEngine(scriptfolder, algorithms, version):
     logger.info("Memory-profiling : Active ")
     logger.info("")
     logger.info("QGIS version: " + str(version) + "                ")
-    logger.info("QGIS ETL status: " + str(supported) + "                ")
+    logger.info("Q-ETL status: " + str(supported) + "                ")
     logger.info("Script folder: " + str(scriptfolder) + "")
     algs = []
     for s in algorithms:
         algs.append(s.displayName()) 
     logger.info("Available custom Scripts : " + str(algs) + "")
     logger.info("##################################################")
-    logger.info("QGIS ETL engine ready")
+    logger.info("Q-ETL engine ready")
     logger.info("")
     logger.info("----- Starting Script -----")
 
@@ -243,8 +243,8 @@ def script_failed():
             messageFrom = config["emailConfiguration"]["message_from"]
             messageTo = ', '.join(config["emailConfiguration"]["message_to"])
 
-            message = MIMEText(f'The QGIS ETL job {argv[0]} has failed. Timestamp: {now}')
-            message['Subject'] = 'QGIS ETL job FAILED'
+            message = MIMEText(f'The Q-ETL job {argv[0]} has failed. Timestamp: {now}')
+            message['Subject'] = 'Q-ETL job FAILED'
             message['From'] = messageFrom
             message['To'] = messageTo
 

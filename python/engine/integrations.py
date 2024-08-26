@@ -69,7 +69,7 @@ class Integrations:
         config = get_config()
         try:
             logger.info(f'Creating temporary layer in Temp folder')
-            tmp_path = f'{config["TempFolder"]}QGIS-ETL_from_dataframe_{str(randrange(1000))}.fgb'
+            tmp_path = f'{config["TempFolder"]}Q-ETL_from_dataframe_{str(randrange(1000))}.fgb'
             dataframe.to_file(tmp_path, driver='FlatGeobuf')
             logger.info('Temporary layer created')
 
