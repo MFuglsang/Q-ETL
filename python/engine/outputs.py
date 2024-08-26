@@ -168,7 +168,9 @@ class Output_Writer:
 
         logger.info(f'Writing {str(layer.featureCount())} features to: {path}')
         try:
-            QgsVectorFileWriter.writeAsVectorFormat(layer, path, "utf-8", layer.crs(), format)
+            options = QgsVectorFileWriter.SaveVectorOptions()
+            options.driverName = format
+            QgsVectorFileWriter.writeAsVectorFormatV3(layer, path, QgsProject.instance().transformContext(), options)
             logger.info("Export completed")
         except Exception as error:
             logger.error("An error occured exporting layer")
