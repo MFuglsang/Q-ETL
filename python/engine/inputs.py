@@ -141,81 +141,75 @@ class Input_Reader:
         layer = Input_Reader.fileBasedDB(file, layername, 'ESRI File Geodatabase')
         return layer
 
-
-    def postgis(table, connection, dbname, schema, geometryname="geom"):
+    def postGIS(connection, dbname, schema, table, geometryname='geom'):
         """        
-        A function that reads a layer from a postgis database using QgsDataSourceUri
+        A function that reads a layer from a PostGIS database
 
         Args:
-            table (string): table name
             connection (string): connection name in settings
             dbname (string): database name
             schema (string): schema name
+            table (string): table name
             geometryname (string,optional): name of geometry column. defaults to "geom"
 
         Returns:
             A QgsVectorLayer object containing data from the postgis database
         """
-        logger.info(f'importing {str(table)} layer from Postgis')
-
-        try:
-            config = get_config()
-            dbConnection = config['DatabaseConnections'][connection]
-            uri = QgsDataSourceUri()
-            logger.info(f'Reading from PostGIS database {dbname}')
-            # set host name, port, database name, username and password
-            uri.setConnection(dbConnection["host"], dbConnection["port"], dbname, dbConnection["user"], dbConnection["password"])
-            # set database schema, table name, geometry column and optionally
-            # subset (WHERE clause)
-            uri.setDataSource(schema, table, geometryname)
-
-            layer = QgsVectorLayer(uri.uri(False), "layer", "postgres")
-            # ogr2ogr parameters
-            logger.info('Import from PostGIS completed')
-            logger.info(f'Importing {str(layer.featureCount())} features from Postgis')
-            return layer    
-        
-        except Exception as error:
-            logger.error("An error occured importing from Postgis")
-            logger.error(f'{type(error).__name__}  –  {str(error)}')
-            logger.critical("Program terminated")
-            script_failed()
-            
-    def mssql(table, connection, dbname, schema, geometryname="geom"):
+        layer = Input_Reader.sqlDB('Postgres', connection, dbname, schema, table, geometryname)
+        return layer
+    
+    def mssql(connection, dbname, schema, table, geometryname='Geometri'):
         """        
-        A function that reads a layer from a mssql database using QgsDataSourceUri
+        A function that reads a layer from a MSSQL database
 
         Args:
-            table (string): table name in database
             connection (string): connection name in settings
             dbname (string): database name
             schema (string): schema name
+            table (string): table name
             geometryname (string,optional): name of geometry column. defaults to "geom"
 
         Returns:
-            A QgsVectorLayer object containing data from the mssql database
+            A QgsVectorLayer object containing data from the postgis database
         """
-        logger.info(f'importing {str(table)} layer from MSSQL')
+        layer = Input_Reader.sqlDB('MSSQL', connection, dbname, schema, table, geometryname)
+        return layer
+
+    def sqlDB(db_type, connection, dbname, schema, table, geometryname="geom"):
+        """        
+        A function that reads a layer from a SQL database
+
+        Args:
+            db_type (string): Type of SQL database. Postgres and MSSQL supported.
+            connection (string): connection name in settings
+            dbname (string): database name
+            schema (string): schema name
+            table (string): table name
+            geometryname (string,optional): name of geometry column. defaults to "geom"
+
+        Returns:
+            A QgsVectorLayer object containing data from the postgis database
+        """
+
+        logger.info(f'Importing {schema}.{table} layer from {db_type}')
 
         try:
             config = get_config()
             dbConnection = config['DatabaseConnections'][connection]
             uri = QgsDataSourceUri()
-            logger.info(f'Reading from MSSQL database {dbname}, table {schema}.{dbname}')
-            # set host name, port, database name, username and password
+            logger.info(f'Reading from {db_type} database {dbname}, table {schema}.{table}')
+            
             uri.setConnection(dbConnection["host"], dbConnection["port"], dbname, dbConnection["user"], dbConnection["password"])
-            # set database schema, table name, geometry column and optionally
-            # subset (WHERE clause)
             uri.setDataSource(schema, table, geometryname)
 
-            layer = QgsVectorLayer(uri.uri(False), "layer", "mssql")
-            # ogr2ogr parameters
-            logger.info('Import from MSSQL completed')
-            logger.info(f'Imported {str(layer.featureCount())} features from MSSQL')
+            layer = QgsVectorLayer(uri.uri(False), "layer", f"{db_type.lower()}")
+            
+            logger.info(f'Import from {db_type} completed')
+            logger.info(f'Imported {str(layer.featureCount())} features from {db_type}')
             return layer    
         
         except Exception as error:
-            logger.error("An error occured importing from MSSQL")
+            logger.error("An error occured importing from {db_type}")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated")
             script_failed()
