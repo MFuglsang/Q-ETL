@@ -9,6 +9,7 @@
         "MyPostGIS" : {
             "host" : "",
             "port" : "",
+            "databasename":"",
             "user" : "",
             "password": ""
         },
@@ -19,5 +20,14 @@
             "user" : "",
             "password": ""
         }
-    }
+    },
+    "emailConfiguration" : {
+        "emailOnError" : "True",
+        "smtp_server" : "",
+        "smtp_port" : "",
+        "smtp_username" : "",
+        "smtp_password" : "",
+        "message_from" : "",
+        "message_to" : []
+    } 
 }

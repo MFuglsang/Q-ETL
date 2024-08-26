@@ -3,11 +3,15 @@ from qgis.core import QgsApplication, Qgis
 from core.logger import *
 from core.misc import get_config
 import atexit
+import tracemalloc
+
+tracemalloc.start()
 
 #settings = _local_configuration.loadConfig()
 settings = get_config()
 logger = initialize_logger(settings)
 start_logfile()
+
 
 from core.misc import validateEnvironment, describeEngine, get_postgres_connections, get_bin_folder, script_finished
 settings['bin_path'] = get_bin_folder(settings)

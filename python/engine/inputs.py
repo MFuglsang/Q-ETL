@@ -3,6 +3,7 @@ import sys
 from qgis.core import QgsVectorLayer, QgsDataSourceUri
 from random import randrange
 from core.misc import script_failed
+from pathlib import Path
 from core.misc import get_config
 
 
@@ -88,6 +89,11 @@ class Input_Reader:
             script_failed()
 
     def fileBasedDB(file, layername, format):
+
+        if Path(file).exists() == False:
+            logger.error(f'{file} does not exist')
+            script_failed()
+        
         logger.info(f'Reading {format}: {file}')
         try:
             uri = f'{file}|layername={layername}'
@@ -120,7 +126,6 @@ class Input_Reader:
 
         layer = Input_Reader.fileBasedDB(file, layername, 'Geopackage')
         return layer
-
 
     def filegdb(file, layername):
         """
