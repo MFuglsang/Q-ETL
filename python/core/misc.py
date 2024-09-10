@@ -12,6 +12,12 @@ from qgis.core import QgsVectorFileWriter, QgsProject
 from random import randrange
 import tracemalloc
 
+def layerHasFeatures(layer: str):
+    if layer.featureCount() == 0:
+        return False
+    else:
+        return True
+
 def create_tempfile(layer: str, toolname: str):
     logger = get_logger()
     config = get_config()
@@ -226,11 +232,8 @@ def script_failed():
     logger = get_logger()
     now = datetime.now()
     config = get_config()
-    try:
-        if config["emailConfiguration"]["emailOnError"] == 'True':
-            email = True
-    except:
-            email = False
+
+    email = config["emailConfiguration"]["emailOnError"]
 
     if email == True:
         try:

@@ -1,5 +1,6 @@
 
 from core.logger import *
+from core.misc import layerHasFeatures
 import sys
 from qgis.core import (
                        QgsVectorLayer,
@@ -53,7 +54,8 @@ class Constructor:
                 wkt_layer.commitChanges()
 
                 logger.info("layerFromWKT finished")
-                logger.info(f'Returning {str(wkt_layer.featureCount())} features')
+                if layerHasFeatures(layer):
+                    logger.info(f'Returning {str(wkt_layer.featureCount())} features')
                 return wkt_layer
 
             except Exception as error:
@@ -82,7 +84,8 @@ class Constructor:
             
         """
         logger.info("Extracting bbox from layer" )
-        logger.info(f'Processing {str(layer.featureCount())} features')
+        if layerHasFeatures(layer):
+            logger.info(f'Processing {str(layer.featureCount())} features')
         try:
             ext = layer.extent()
             xmin = ext.xMinimum()
