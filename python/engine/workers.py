@@ -2,7 +2,7 @@ from core.logger import *
 import sys
 import shutil
 import sqlite3
-from core.misc import get_config
+from core.misc import get_config, layerHasFeatures
 from qgis.analysis import QgsNativeAlgorithms
 from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsProcessingFeedback
 from qgis import processing
@@ -987,7 +987,7 @@ class Worker:
             logger.critical("Program terminated" )
             script_failed()
 
-    def execute_sql(connection, database, driver, sql_expression):
+    def execute_sql(connection, databasetype, sql_expression, pgdb_name=None, driver=None):
         """
         Execute an SQL query against a database. 
         This can be used to create tables, truncate, build indexes etc.
@@ -999,12 +999,14 @@ class Worker:
         ----------
         connection : str
             Name of a database connection from settings.json
-        database : str
+        databasetype : str
             The database type, one of 'Mssql' or 'Postgres'.
-        driver : str
-            The name of the Mssql driver, if 'SQL Server' is not working. Else, leave it blank
         sql_expression : str
             The SQL expression to be executed. Use trippel double-quotes arraound the expression
+        pgdb_name: str
+            Name of postgres database if databasetype is  Postgres. Defaults to None.
+        driver : str
+            Defaults to None. The name of the Mssql driver, if 'SQL Server' is not working.
 
         Returns
         -------
@@ -1014,15 +1016,15 @@ class Worker:
         """
 
         config = get_config()
-        if database in ('Postgres', 'Mssql'):
-            logger.info(f'Running SQL executor on {database}' )
+        if databasetype in ('Postgres', 'Mssql'):
+            logger.info(f'Running SQL executor on {databasetype}' )
         else :
-            logger.info(f'Unsupported database: {database}, use one of "Mssql" or "Postgres"' )
+            logger.info(f'Unsupported database: {databasetype}, use one of "Mssql" or "Postgres"' )
             logger.critical("Program terminated" )
             sys.exit()
         try:
             dbconnection = config['DatabaseConnections'][connection]
-            if database == 'Mssql':
+            if databasetype == 'Mssql':
                 import pyodbc 
                 if driver == "":
                     mssqldriver = 'SQL Server'
@@ -1036,10 +1038,10 @@ class Worker:
                 logger.info("SQL executor finished")
                 return 0
             
-            if database == 'Postgres':
+            if databasetype == 'Postgres':
                 import psycopg2
-                connection = psycopg2.connect(user=dbconnection['user'], password=dbconnection['password'], host=dbconnection['host'], port=dbconnection['port'], database=dbconnection['databasename'])
-                logger.info("Using connection : user="+ dbconnection['user']+", password=xxxxxx, host="+dbconnection['host']+", port="+dbconnection['port']+", database="+dbconnection['databasename'] )
+                connection = psycopg2.connect(user=dbconnection['user'], password=dbconnection['password'], host=dbconnection['host'], port=dbconnection['port'], database=pgdb_name)
+                logger.info("Using connection : user="+ dbconnection['user']+", password=xxxxxx, host="+dbconnection['host']+", port="+dbconnection['port']+", database="+pgdb_name )
                 cursor = connection.cursor()
                 logger.info(f'Query: {sql_expression}' )
                 cursor.execute(sql_expression)
