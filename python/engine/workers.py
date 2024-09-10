@@ -2,7 +2,7 @@ from core.logger import *
 import sys
 import shutil
 import sqlite3
-from core.misc import get_config
+from core.misc import get_config, layerHasFeatures
 from qgis.analysis import QgsNativeAlgorithms
 from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsProcessingFeedback
 from qgis import processing
@@ -589,7 +589,8 @@ class Worker:
         """
 
         logger.info("Running reporjector V2")
-        logger.info("Processing " + str(layer.featureCount()) +" features")
+        if layerHasFeatures(layer):
+            logger.info("Processing " + str(layer.featureCount()) +" features")
         try:
             parameter = {
                 'INPUT': layer,
@@ -632,7 +633,8 @@ class Worker:
             """
 
             logger.info("Running simplify")
-            logger.info("Processing " + str(layer.featureCount()) +" features")
+            if layerHasFeatures(layer):
+                logger.info("Processing " + str(layer.featureCount()) +" features")
             try:
                 parameter = {
                     'INPUT': layer,
@@ -671,7 +673,8 @@ class Worker:
         """
 
         logger.info("Running force right-hand rule")
-        logger.info("Processing " + str(layer.featureCount()) +" features")
+        if layerHasFeatures(layer):
+            logger.info("Processing " + str(layer.featureCount()) +" features")
         try:
             parameter = {
                 'INPUT': layer,
@@ -729,7 +732,8 @@ class Worker:
 
         """
         logger.info("Joining features features")
-        logger.info("Processing " + str(layer1.featureCount()) +" features")
+        if layerHasFeatures(layer1):
+            logger.info("Processing " + str(layer1.featureCount()) +" features")
         try:
             parameter = {
                 'INPUT':layer1,
@@ -745,7 +749,8 @@ class Worker:
             logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:joinattributestable', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("Joinattributestable finished")
-            logger.info("Returning " + str(result.featureCount()) +" features")
+            if layerHasFeatures(result):
+                logger.info("Returning " + str(result.featureCount()) +" features")
             return result
         except Exception as error:
             logger.error("An error occured in joinattributestable")
@@ -780,7 +785,8 @@ class Worker:
 
         """
         logger.info("Dissolving features")
-        logger.info("Processing " + str(layer.featureCount()) +" features")
+        if layerHasFeatures(layer):
+            logger.info("Processing " + str(layer.featureCount()) +" features")
         try:
             parameter = {
                 'INPUT': layer,
@@ -791,7 +797,8 @@ class Worker:
             logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:dissolve', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("DissolveFeatures finished")
-            logger.info("Returning " + str(result.featureCount()) +" features")
+            if layerHasFeatures(result):
+                logger.info("Returning " + str(result.featureCount()) +" features")
             return result
         except Exception as error:
             logger.error("An error occured in dissolveFeatures")
@@ -840,7 +847,8 @@ class Worker:
         """
 
         logger.info("Creating buffer layer")
-        logger.info("Processing " + str(layer.featureCount()) +" features")
+        if layerHasFeatures(layer):
+            logger.info("Processing " + str(layer.featureCount()) +" features")
         try:
             parameter = {
                 'INPUT': layer,
@@ -881,7 +889,8 @@ class Worker:
 
         """
         logger.info("Fixing geometries")
-        logger.info("Processing " + str(layer.featureCount()) +" features")
+        if layerHasFeatures(layer):
+            logger.info("Processing " + str(layer.featureCount()) +" features")
         try:
             parameter = {
                 'INPUT': layer,
@@ -916,7 +925,8 @@ class Worker:
 
         """
         logger.info("Creating centroids")
-        logger.info("Processing " + str(layer.featureCount()) +" features")
+        if layerHasFeatures(layer):
+            logger.info("Processing " + str(layer.featureCount()) +" features")
         try:
             parameter = {
                 'INPUT': layer,
@@ -956,7 +966,8 @@ class Worker:
             The result output from the algorithem
         """
         logger.info("Performing random selection")
-        logger.info("Processing " + str(layer.featureCount()) +" features")
+        if layerHasFeatures(layer):
+            logger.info("Processing " + str(layer.featureCount()) +" features")
         try:
             parameter = {
                 'INPUT': layer,
@@ -966,7 +977,8 @@ class Worker:
             }
             logger.info(f'Parameters: {str(parameter)}')
             result = processing.run('native:randomextract', parameter, feedback=Worker.progress)['OUTPUT']
-            logger.info("Returning " + str(result.featureCount()) +" features")
+            if layerHasFeatures(result):
+                logger.info("Returning " + str(result.featureCount()) +" features")
             logger.info("randomextract finished")
             return result
         except Exception as error:
