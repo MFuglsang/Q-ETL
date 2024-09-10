@@ -1,4 +1,5 @@
 from core.logger import *
+from core.misc import layerHasFeatures
 import sys
 from qgis.core import QgsVectorLayer, QgsDataSourceUri
 from random import randrange
@@ -29,12 +30,7 @@ class Input_Reader:
             logger.info(f'Reading WFS layer: {uri}')
             layer = QgsVectorLayer(uri, "WFS_Layer" , 'WFS')
             logger.info("Finished reading the WFS service")
-            if layer.featureCount() == 0:
-                logger.error(f'An error occured reading the WFS {uri}')
-                logger.critical("Program terminated")
-                script_failed()
-            else :
-                return layer
+            return layer
         except Exception as error:
             logger.error(f'An error occured reading the WFS {uri}')
             logger.error(f'{type(error).__name__}  –  {str(error)}')
@@ -210,7 +206,8 @@ class Input_Reader:
             layer = QgsVectorLayer(uri.uri(False), "layer", f"{db_type.lower()}")
             
             logger.info(f'Import from {db_type} completed')
-            logger.info(f'Imported {str(layer.featureCount())} features from {db_type}')
+            if layerHasFeatures(layer):
+                logger.info(f'Imported {str(layer.featureCount())} features from {db_type}')
             return layer    
         
         except Exception as error:

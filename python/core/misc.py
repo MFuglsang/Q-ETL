@@ -12,6 +12,12 @@ from qgis.core import QgsVectorFileWriter, QgsProject
 from random import randrange
 import tracemalloc
 
+def layerHasFeatures(layer: str):
+    if layer.featureCount() == 0:
+        return False
+    else:
+        return True
+
 def create_tempfile(layer: str, toolname: str):
     logger = get_logger()
     config = get_config()

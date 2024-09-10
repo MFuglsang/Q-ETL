@@ -1,5 +1,5 @@
 from core.logger import *
-from core.misc import get_config
+from core.misc import get_config, layerHasFeatures
 import sys, copy, os
 import subprocess
 from random import randrange
@@ -41,7 +41,8 @@ class Output_Writer:
             Defaults to True. Should the resulting table in Postgis be overwritten if it exists. If set to False, then it will append the data.
         """
 
-        logger.info(f'Exporting {str(layer.featureCount())} features to Postgis')
+        if layerHasFeatures(layer):
+            logger.info(f'Exporting {str(layer.featureCount())} features to Postgis')
         tempfile = create_tempfile(layer, 'postgis')
         logger.info('Temporary layer created')
 
@@ -88,7 +89,8 @@ class Output_Writer:
 
         """
 
-        logger.info(f'Writing {str(layer.featureCount())} features to geopackage : {geopackage}')
+        if layerHasFeatures(layer):
+            logger.info(f'Writing {str(layer.featureCount())} features to geopackage : {geopackage}')
         try:
             layer.setName(layername)
             parameter = {'LAYERS': [layer],
@@ -166,7 +168,8 @@ class Output_Writer:
             The driver type used to write the data to the file. 
         """
 
-        logger.info(f'Writing {str(layer.featureCount())} features to: {path}')
+        if layerHasFeatures(layer):
+            logger.info(f'Writing {str(layer.featureCount())} features to: {path}')
         try:
             options = QgsVectorFileWriter.SaveVectorOptions()
             options.driverName = format
@@ -316,7 +319,8 @@ class Output_Writer:
             The name of the resulting layer in the ESRI File Geodatabase
         """
 
-        logger.info(f'Writing {str(layer.featureCount())} features to: {path}')
+        if layerHasFeatures(layer):
+            logger.info(f'Writing {str(layer.featureCount())} features to: {path}')
         try:
             options = QgsVectorFileWriter.SaveVectorOptions()
             options.driverName = 'OpenFileGDB'
