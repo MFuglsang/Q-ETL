@@ -232,11 +232,8 @@ def script_failed():
     logger = get_logger()
     now = datetime.now()
     config = get_config()
-    try:
-        if config["emailConfiguration"]["emailOnError"] == 'True':
-            email = True
-    except:
-            email = False
+
+    email = config["emailConfiguration"]["emailOnError"]
 
     if email == True:
         try:
