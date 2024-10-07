@@ -40,6 +40,36 @@ class Worker:
     ## ATTRIBUTE WORKERS
     ## ##################################
 
+    def promoteToMultipart(layer: QgsVectorLayer):
+        """
+        Generates a vectorlayer in which all geometries are multipart.
+
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            The QgsVectorLayer that is used as input.
+
+        Returns
+        -------
+        QgsVectorLayer
+            The QgsVectorLayer containing multi geometries.
+        """
+
+        logger.info('Collecting geometries')
+        try:
+            parameters = {
+                'INPUT': layer,
+                'OUTPUT': 'memory:multipart'
+            }
+            logger.info(f'Parameters: {str(parameters)}')
+            result = processing.run('native:promotetomulti', parameters, feedback=Worker.progress)['OUTPUT']
+            logger.info('Promote to multipart finished')
+            return result
+        except Exception as error:
+            logger.error("An error occured in promoteToMultipart")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
+            script_failed()
 
     def extractByExpression(layer: QgsVectorLayer, expression: str):
         """
