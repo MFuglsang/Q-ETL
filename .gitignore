@@ -8,4 +8,5 @@
 development.cmd
 settings.json
 /server/app/Q-ETL.xml
-/server/logs/*
+/server/logs/*.log
+/server/server.cmd
