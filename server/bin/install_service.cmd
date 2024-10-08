@@ -1,5 +1,5 @@
 cd ..
 cd app\
-.\WinSW-x64.exe install Q-ETL.xml
+.\Q-ETL.exe install Q-ETL.xml
 cd ..
 cd bin

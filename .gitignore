@@ -7,4 +7,5 @@
 /python/development.py
 development.cmd
 settings.json
-/server/config/Q-ETL.xml
+/server/app/Q-ETL.xml
+/server/logs/*
