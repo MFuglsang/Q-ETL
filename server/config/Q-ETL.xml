@@ -92,7 +92,7 @@
   <priority>Normal</priority>
 
   <!-- Production logpath - disable for debug logging-->
-  <logpath>..\..\logs</logpath>
+  <logpath>..\logs</logpath>
   
   <!-- Log configuration-->
   <log mode="roll-by-size-time">
