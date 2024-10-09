@@ -1,1 +1,0 @@
-"C:\Program Files\QGIS 3.36.0\apps\Python39\python.exe" C:\Projects\QGIS_ETL_Python\server\server.py 
