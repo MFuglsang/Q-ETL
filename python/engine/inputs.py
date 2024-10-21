@@ -1,8 +1,11 @@
 from core.logger import *
+from core.misc import layerHasFeatures
 import sys
-from qgis.core import QgsVectorLayer
+from qgis.core import QgsVectorLayer, QgsDataSourceUri
 from random import randrange
 from core.misc import script_failed
+from pathlib import Path
+from core.misc import get_config
 
 
 class Input_Reader:
@@ -87,6 +90,11 @@ class Input_Reader:
             script_failed()
 
     def fileBasedDB(file, layername, format):
+
+        if Path(file).exists() == False:
+            logger.error(f'{file} does not exist')
+            script_failed()
+        
         logger.info(f'Reading {format}: {file}')
         try:
             uri = f'{file}|layername={layername}'
@@ -120,7 +128,6 @@ class Input_Reader:
         layer = Input_Reader.fileBasedDB(file, layername, 'Geopackage')
         return layer
 
-
     def filegdb(file, layername):
         """
         A function that read a layer from an ESRI File Geodatabase using the OpenFileGDB driver.
@@ -134,3 +141,77 @@ class Input_Reader:
         """
         layer = Input_Reader.fileBasedDB(file, layername, 'ESRI File Geodatabase')
         return layer
+
+    def postGIS(connection, dbname, schema, table, geometryname='geom'):
+        """        
+        A function that reads a layer from a PostGIS database
+
+        Args:
+            connection (string): connection name in settings
+            dbname (string): database name
+            schema (string): schema name
+            table (string): table name
+            geometryname (string,optional): name of geometry column. defaults to "geom"
+
+        Returns:
+            A QgsVectorLayer object containing data from the postgis database
+        """
+        layer = Input_Reader.sqlDB('Postgres', connection, dbname, schema, table, geometryname)
+        return layer
+    
+    def mssql(connection, dbname, schema, table, geometryname='Geometri'):
+        """        
+        A function that reads a layer from a MSSQL database
+
+        Args:
+            connection (string): connection name in settings
+            dbname (string): database name
+            schema (string): schema name
+            table (string): table name
+            geometryname (string,optional): name of geometry column. defaults to "geom"
+
+        Returns:
+            A QgsVectorLayer object containing data from the postgis database
+        """
+        layer = Input_Reader.sqlDB('MSSQL', connection, dbname, schema, table, geometryname)
+        return layer
+
+    def sqlDB(db_type, connection, dbname, schema, table, geometryname="geom"):
+        """        
+        A function that reads a layer from a SQL database
+
+        Args:
+            db_type (string): Type of SQL database. Postgres and MSSQL supported.
+            connection (string): connection name in settings
+            dbname (string): database name
+            schema (string): schema name
+            table (string): table name
+            geometryname (string,optional): name of geometry column. defaults to "geom"
+
+        Returns:
+            A QgsVectorLayer object containing data from the postgis database
+        """
+
+        logger.info(f'Importing {schema}.{table} layer from {db_type}')
+
+        try:
+            config = get_config()
+            dbConnection = config['DatabaseConnections'][connection]
+            uri = QgsDataSourceUri()
+            logger.info(f'Reading from {db_type} database {dbname}, table {schema}.{table}')
+            
+            uri.setConnection(dbConnection["host"], dbConnection["port"], dbname, dbConnection["user"], dbConnection["password"])
+            uri.setDataSource(schema, table, geometryname)
+
+            layer = QgsVectorLayer(uri.uri(False), "layer", f"{db_type.lower()}")
+            
+            logger.info(f'Import from {db_type} completed')
+            if layerHasFeatures(layer):
+                logger.info(f'Imported {str(layer.featureCount())} features from {db_type}')
+            return layer    
+        
+        except Exception as error:
+            logger.error("An error occured importing from {db_type}")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated")
+            script_failed()

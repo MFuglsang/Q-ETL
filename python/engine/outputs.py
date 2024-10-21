@@ -1,10 +1,10 @@
 from core.logger import *
-from core.misc import get_config
+from core.misc import get_config, layerHasFeatures
 import sys, copy, os
 import subprocess
 from random import randrange
-from qgis.core import QgsVectorFileWriter, QgsVectorLayerExporter, QgsProject
-from core.misc import script_failed
+from qgis.core import QgsVectorFileWriter, QgsVectorLayerExporter, QgsProject, QgsVectorLayer
+from core.misc import script_failed, create_tempfile, delete_tempfile
 
 import processing
 from processing.core.Processing import Processing
@@ -16,7 +16,7 @@ class Output_Writer:
 
     logger = get_logger()
 
-    def postgis(layer, connection, dbname, schema, tablename, overwrite=True):
+    def postgis(layer: QgsVectorLayer, connection : str, dbname: str, schema: str, tablename: str, overwrite: bool = True):
         """
         A function that exports a QgsVectorLayer into a Postgis database.
 
@@ -37,31 +37,28 @@ class Output_Writer:
         tablename : str
             The name of the table that will be imported
         
-        overwrite : str
+        overwrite : bool
             Defaults to True. Should the resulting table in Postgis be overwritten if it exists. If set to False, then it will append the data.
         """
 
-        logger.info(f'Exporting {str(layer.featureCount())} features to Postgis')
+        if layerHasFeatures(layer):
+            logger.info(f'Exporting {str(layer.featureCount())} features to Postgis')
+        tempfile = create_tempfile(layer, 'postgis')
+        logger.info('Temporary layer created')
 
         try:
             config = get_config()
             dbConnection = config['DatabaseConnections'][connection]
-            logger.info('Creating temporary folder in Temp folder')
-            tmp_path = f'{config["TempFolder"]}postgis_layer_{str(randrange(1000))}.geojson'
-            options = QgsVectorFileWriter.SaveVectorOptions()
-            options.driverName = 'GeoJSON'
-            QgsVectorFileWriter.writeAsVectorFormatV3(layer, tmp_path, QgsProject.instance().transformContext(), options)
-            logger.info('Temporary layer created')
 
             # ogr2ogr parameters
             table = f'-nln "{schema}.{tablename}"'
             ogrconnection = f'PG:"host={dbConnection["host"]} port={dbConnection["port"]} dbname={dbname} schemas={schema} user={dbConnection["user"]} password={dbConnection["password"]}"'
-            ogr2ogrstring = f'{config["QGIS_bin_folder"]}/ogr2ogr.exe -f "PostgreSQL" {ogrconnection} {tmp_path} {table}'
+            ogr2ogrstring = f'{config["QGIS_bin_folder"]}/ogr2ogr.exe -f "PostgreSQL" {ogrconnection} {tempfile} {table}'
             if overwrite:
                 ogr2ogrstring = f'{ogr2ogrstring} -overwrite'
             logger.info(f'Writing to PostGIS database {dbname}')
             run = subprocess.run(ogr2ogrstring, capture_output=True)
-            os.remove(tmp_path)
+            delete_tempfile(tempfile)
             logger.info('Temporary layer removed')
             logger.info('Export to PostGIS completed')
             
@@ -71,7 +68,7 @@ class Output_Writer:
             logger.critical("Program terminated")
             script_failed()
 
-    def geopackage(layer, layername, geopackage, overwrite):
+    def geopackage(layer: QgsVectorLayer, layername: str, geopackage: str, overwrite: bool):
         """
         A function that writes a QgsVectorLayer to a Geopackage file. 
 
@@ -92,7 +89,8 @@ class Output_Writer:
 
         """
 
-        logger.info(f'Writing {str(layer.featureCount())} features to geopackage : {geopackage}')
+        if layerHasFeatures(layer):
+            logger.info(f'Writing {str(layer.featureCount())} features to geopackage : {geopackage}')
         try:
             layer.setName(layername)
             parameter = {'LAYERS': [layer],
@@ -110,9 +108,54 @@ class Output_Writer:
             logger.critical("Program terminated")
             script_failed()
 
-    def file(layer, path, format):
-        """_summary_
+    def append_geopackage(layer: str, layername: str, geopackage: str):
+        """
+        Append a layer to an existing geopackage.
+        If the new layer does not exist, it will be created. It it exists, the features will be appended to the layer.
 
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            The QgsVectorLayer that is to be written to a file
+
+        layername : String
+            The name of the layer in the geopackage file
+
+        geopackage : String
+            The full path for the geopackage to be created
+
+        """
+        logger.info("Running append layer to Geopackage")
+        if os.path.isfile(geopackage):
+            logger.info(f'Geopackage {geopackage} exists, appending layer')
+            tempfile = create_tempfile(layer, 'append_geopackage')
+
+            try:
+                config = get_config()
+                ## ogr2ogr parameters
+                table = f'-nln "{layername}"'
+                ogr2ogrstring = f'{config["QGIS_bin_folder"]}/ogr2ogr.exe -f "GPKG" {geopackage} {tempfile} -nln {layername} -update -append'
+                logger.info(f'Writing new layer {layername} to: {geopackage}')
+                logger.info(f'Ogr2ogr command {ogr2ogrstring}')
+                ogr2ogrstring.join(' -progress')
+                run = subprocess.run(ogr2ogrstring, stderr=subprocess.STDOUT)
+                if run.stdout:
+                    logger.info(run.stdout)
+                delete_tempfile(tempfile)
+                logger.info(f'Append to geopackage completed')
+
+            except Exception as error:
+                logger.error("An error occured appending layer to geopackage")
+                logger.error(f'{type(error).__name__}  –  {str(error)}')
+                logger.critical("Program terminated")
+                script_failed() 
+        else:
+            logger.error("Target geopackage not found")
+            logger.critical("Program terminated")
+            script_failed()     
+
+    def file(layer: str, path: str, format: str):
+        """
         Parameters
         ----------
         layer : QgsVectorLayer
@@ -125,9 +168,12 @@ class Output_Writer:
             The driver type used to write the data to the file. 
         """
 
-        logger.info(f'Writing {str(layer.featureCount())} features to: {path}')
+        if layerHasFeatures(layer):
+            logger.info(f'Writing {str(layer.featureCount())} features to: {path}')
         try:
-            QgsVectorFileWriter.writeAsVectorFormat(layer, path, "utf-8", layer.crs(), format)
+            options = QgsVectorFileWriter.SaveVectorOptions()
+            options.driverName = format
+            QgsVectorFileWriter.writeAsVectorFormatV3(layer, path, QgsProject.instance().transformContext(), options)
             logger.info("Export completed")
         except Exception as error:
             logger.error("An error occured exporting layer")
@@ -135,7 +181,7 @@ class Output_Writer:
             logger.critical("Program terminated")
             script_failed()
 
-    def textfile(file, list,  newline):
+    def textfile(file: str, list: list, newline: bool):
         """
         Create an output file from a list of lines. 
 
@@ -165,7 +211,7 @@ class Output_Writer:
             logger.critical("Program terminated")
             script_failed()
 
-    def mssql(layer, connection, driver, schema, table, overwrite, geom_type, geom_name, ogr2ogr_params):
+    def mssql(layer: QgsVectorLayer, connection: str, driver: str, schema: str, table: str, overwrite: str, geom_type: str, geom_name: str, ogr2ogr_params: str):
         """
         A function that exports a QgsVectorLayer into a MSSQL database using ogr2ogr.
         The function writes the data to a temporary geojson file, that is then importet to the database with ogr2ogr.
@@ -259,7 +305,7 @@ class Output_Writer:
             logger.critical("Program terminated")
             script_failed()
 
-    def filegdb(layer, layername, path):
+    def filegdb(layer: QgsVectorLayer, layername: str, path: str):
         """
         A function that export a QgsVectorLayer into an ESRI File
 
@@ -273,7 +319,8 @@ class Output_Writer:
             The name of the resulting layer in the ESRI File Geodatabase
         """
 
-        logger.info(f'Writing {str(layer.featureCount())} features to: {path}')
+        if layerHasFeatures(layer):
+            logger.info(f'Writing {str(layer.featureCount())} features to: {path}')
         try:
             options = QgsVectorFileWriter.SaveVectorOptions()
             options.driverName = 'OpenFileGDB'
@@ -283,4 +330,47 @@ class Output_Writer:
             logger.error("An error occured exporting layer to ESRI File Geodatabase")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated")
+            script_failed()
+
+    def packageLayers(layers: list, path: str,  overwrite: bool, style: bool):
+        """
+        Adds layers to a GeoPackage.
+        If the GeoPackage exists and Overwrite existing GeoPackage is checked, 
+        it will be overwritten (removed and recreated). 
+        If the GeoPackage exists and Overwrite existing GeoPackage is not checked, the layer will be appended.
+
+        Parameters
+        ----------
+        input : [vector: any] [list]
+            The (vector) layers to import into the GeoPackage. 
+            Raster layers are not supported. If a raster layer is added, a QgsProcessingException will be thrown.
+
+        overwrite : [boolean]Default: False
+            If the specified GeoPackage exists, setting this option to True will make sure that it is deleted 
+            and a new one will be created before the layers are added. If set to False, layers will be appended.
+
+        style : [boolean] Default: True
+            Save the layer styles
+
+        path : str
+            The full path for the Geopackage to be created
+
+        """
+
+        logger.info("Performing packageLayers")
+        logger.info(f'Processing {str(len(layers))} layers')
+        try:
+            parameter = {
+                'INPUT': layers,
+                'OVERWRITE': overwrite,
+                'SAVE_STYLES': style,
+                'OUTPUT': path
+            }
+            logger.info(f'Parameters: {str(parameter)}')
+            processing.run('native:package', parameter)['OUTPUT']           
+            logger.info("packageLayers finished")
+        except Exception as error:
+            logger.error("An error occured in packageLayers")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
             script_failed()
