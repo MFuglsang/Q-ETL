@@ -271,9 +271,12 @@ def script_failed():
         except:
             logger.info(f'An error occured sending error Email to {message["To"]} ' )
 
-    logger.info('')
-    logger.info('JOB: ' + argv[0] + ' FAILED')
 
+    logger.info('')
+    logger.info('##################################################')
+    logger.info('JOB: ' + argv[0] + ' FAILED')
+    logger.info('ENDTIME: ' + now.strftime("%d/%m/%Y, %H:%M"))
+    logger.info('##################################################')
     sys.exit()
     
 

@@ -7,3 +7,5 @@
 /python/development.py
 development.cmd
 settings.json
+/server/app/server.cmd
+/server/logs/*.log

@@ -6,7 +6,6 @@ from core.misc import get_config, layerHasFeatures
 from qgis.analysis import QgsNativeAlgorithms
 from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsProcessingFeedback
 from qgis import processing
-from core.misc import script_failed
 
 
 class Worker:
@@ -104,7 +103,7 @@ class Worker:
             logger.error("An error occured in extractByExpression")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     def addAutoIncrementalField(layer: QgsVectorLayer, fieldname: str, start: int):
         """
@@ -150,7 +149,7 @@ class Worker:
             logger.error("An error occured in addAutoIncrementalField")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     def deleteColumns (layer: QgsVectorLayer, columns: list):
         """
@@ -185,7 +184,7 @@ class Worker:
             logger.error("An error occured in deleteColumns")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     def fieldCalculator (layer: QgsVectorLayer, fieldname: str, fieldtype: int, fieldlength: int, fieldprecision: int, formula: str):
         """
@@ -239,7 +238,7 @@ class Worker:
             logger.error("An error occured in fieldCalculator")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     def timeStamper(layer: QgsVectorLayer, ts_fieldname: str):
         """
@@ -301,7 +300,7 @@ class Worker:
             logger.error("An error occured in renameTableField")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     def attributeindex(layer: QgsVectorLayer, field: str):
         """
@@ -336,7 +335,7 @@ class Worker:
             logger.error("An error occured in createattributeindex")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     
     def spatialindex(layer: QgsVectorLayer):
@@ -369,7 +368,7 @@ class Worker:
             logger.error("An error occured in createspatialindex")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     ## ##################################
     ## ANALYSIS WORKERS
@@ -409,7 +408,7 @@ class Worker:
             logger.error("An error occured in Clip")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     def joinByLocation(layer: QgsVectorLayer, predicate: int, join: str, join_fields: list, method: int, discard_nomatching: bool, prefix: str):
         """
@@ -476,7 +475,7 @@ class Worker:
             logger.error("An error occured in joinByLocation")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     def extractByLocation(layer: QgsVectorLayer, predicate: int, intersect: str):
         """_summary_
@@ -514,7 +513,7 @@ class Worker:
             logger.error("An error occured in extractByLocation")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     def randomExtract(layer: QgsVectorLayer, method: int, number: int):
         """
@@ -554,7 +553,7 @@ class Worker:
             logger.error("An error occured in randomExtract")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     def difference(layer: QgsVectorLayer, overlay: QgsVectorLayer):
         """
@@ -590,7 +589,7 @@ class Worker:
             logger.error("An error occured in Difference")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     ## ##################################
     ## GEOMETRY WORKERS
@@ -635,7 +634,7 @@ class Worker:
             logger.error("An error occured reprojectiong layer")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     def simplify(layer: QgsVectorLayer, method: int, tolerance:int):
             """
@@ -680,7 +679,7 @@ class Worker:
                 logger.error("An error occured in simplifygeometries")
                 logger.error(f'{type(error).__name__}  –  {str(error)}')
                 logger.critical("Program terminated" )
-                script_failed()
+                sys.exit()
 
     def forceRHR(layer: QgsVectorLayer):
         """
@@ -717,7 +716,7 @@ class Worker:
             logger.error("An error occured in forceRHR")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     def join_by_attribute(layer1: QgsVectorLayer, layer1_field:str, layer2: QgsVectorLayer, layer2_field: str, fields_to_copy: list, method:int, discard: bool, prefix:str):
         """
@@ -786,7 +785,7 @@ class Worker:
             logger.error("An error occured in joinattributestable")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     def dissolveFeatures(layer: QgsVectorLayer, fieldList: list, disjoined: bool):
         """
@@ -834,7 +833,7 @@ class Worker:
             logger.error("An error occured in dissolveFeatures")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     def bufferLayer(layer: QgsVectorLayer, distance: int, segements: int, endcapStyle: int, joinStyle: int, miterLimit: int, dissolve: bool):
         """
@@ -898,7 +897,7 @@ class Worker:
             logger.error("An error occured in BufferLayer")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     def fixGeometry(layer: QgsVectorLayer):
         """
@@ -934,7 +933,7 @@ class Worker:
             logger.error("An error occured in FixGeometry")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     def createCentroids(layer: str):
         """
@@ -1015,7 +1014,7 @@ class Worker:
             logger.error("An error occured in FixGeometry")
             logger.error(f'{type(error).__name__}  –  {str(error)}')
             logger.critical("Program terminated" )
-            script_failed()
+            sys.exit()
 
     def execute_sql(connection, databasetype, sql_expression, pgdb_name=None, driver=None):
         """

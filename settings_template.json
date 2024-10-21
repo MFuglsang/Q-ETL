@@ -20,6 +20,7 @@
             "user" : "",
             "password": ""
         }
+
     },
     "emailConfiguration" : {
         "emailOnError" : "True",
@@ -30,4 +31,5 @@
         "message_from" : "",
         "message_to" : []
     } 
+
 }

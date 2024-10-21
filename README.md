@@ -1,4 +1,3 @@
-<img src="../ressources/images/logo.png" width="400" height="85"> 
 
 # Q-ETL 
 
@@ -27,7 +26,9 @@ Checkout the _Getting started_ guide on the Wiki page [here](https://github.com/
 ## Download
 Download the latest release [here](https://github.com/MFuglsang/Q-ETL/releases).
 
+
 ## About the project
 The Q-ETL project builds uppon the work of the QGIS project (https://www.qgis.org/). 
 The project is not developed, endorsed by, or otherwise realted to the QGIS project. 
+
 
