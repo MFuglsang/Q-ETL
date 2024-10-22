@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 import os
 from sys import argv
+import sys, traceback
 
 logfile = None
 
@@ -10,9 +11,9 @@ def initialize_logger(settings):
     now = datetime.now()
     filename = argv[0].split('\\')[-1].split('.')[0]
     global logfile
-    logfile = logdir +  filename + '_' + now.strftime("%d%m%Y_%H_%M") + '.txt'
+    logfile = logdir + '/' +  filename + '_' + now.strftime("%d%m%Y_%H_%M") + '.txt'
     global logger
-    logger = logging.getLogger('QGIS ETL')
+    logger = logging.getLogger('Q-ETL')
     logger.setLevel(logging.DEBUG)
     fh = logging.FileHandler(logfile)
     fh.setLevel(logging.DEBUG)
@@ -20,16 +21,22 @@ def initialize_logger(settings):
     fh.setFormatter(logFormatter)
     consoleHandler = logging.StreamHandler()
     consoleHandler.setFormatter(logFormatter)
+    consoleHandler.setLevel(logging.DEBUG)
     logger.addHandler(consoleHandler)
     logger.addHandler(fh)
-    print('got logs baby')
+    sys.excepthook = exc_handler
+
+    
+    
     return logger
     
+def exc_handler(exctype, value, tb):
+    logger.exception(''.join(traceback.format_exception(exctype, value, tb)))
 
 def start_logfile():
     now = datetime.now()
     logger.info('##################################################')
-    logger.info('QGIS ETL JOB LOG')
+    logger.info('Q-ETL JOB LOG')
     logger.info('JOB: ' + argv[0])
     logger.info('STARTTIME: ' + now.strftime("%d/%m/%Y, %H:%M"))
     logger.info('##################################################')

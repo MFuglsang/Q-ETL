@@ -1,18 +1,77 @@
 from core.logger import *
+from core.misc import script_failed
 import sys
+import shutil
+import sqlite3
+from core.misc import get_config, layerHasFeatures
 from qgis.analysis import QgsNativeAlgorithms
-from qgis.core import QgsCoordinateReferenceSystem
+from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsProcessingFeedback
 from qgis import processing
 
 
 class Worker:
+
+    ## Method that draws the progress bar
+    def printProgressBar(value,label):
+        n_bar = 40 #size of progress bar
+        max = 100
+        j= value/max
+        sys.stdout.write('\r')
+        bar = '█' * int(n_bar * j)
+        bar = bar + '-' * int(n_bar * (1-j))
+        sys.stdout.write(f"{label.ljust(10)} | [{bar:{n_bar}s}] {int(100 * j)}% ")
+        sys.stdout.flush()
+        sys.stdout.write('')        
+
+    ## The progress bar function
+    def progress_changed(progress):
+        Worker.printProgressBar(progress, '%')
+
+    ## The shared element for progress across all workers
+    progress = QgsProcessingFeedback()
+    progress.progressChanged.connect(progress_changed)
+
+    ## The shared element for logging across all workers
     logger = get_logger() 
+
+
 
     ## ##################################
     ## ATTRIBUTE WORKERS
     ## ##################################
 
-    def extractByExpression(layer, expression):
+    def promoteToMultipart(layer: QgsVectorLayer):
+        """
+        Generates a vectorlayer in which all geometries are multipart.
+
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            The QgsVectorLayer that is used as input.
+
+        Returns
+        -------
+        QgsVectorLayer
+            The QgsVectorLayer containing multi geometries.
+        """
+
+        logger.info('Collecting geometries')
+        try:
+            parameters = {
+                'INPUT': layer,
+                'OUTPUT': 'memory:multipart'
+            }
+            logger.info(f'Parameters: {str(parameters)}')
+            result = processing.run('native:promotetomulti', parameters, feedback=Worker.progress)['OUTPUT']
+            logger.info('Promote to multipart finished')
+            return result
+        except Exception as error:
+            logger.error("An error occured in promoteToMultipart")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
+            script_failed()
+
+    def extractByExpression(layer: QgsVectorLayer, expression: str):
         """
         Creates a vector layer from an input layer, containing only matching features.
         The criteria for adding features to the resulting layer is based on a QGIS expression.
@@ -38,7 +97,7 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:extractbyexpression', parameter)['OUTPUT']
+            result = processing.run('native:extractbyexpression', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("Extractbyexpression  finished")
             return result
         except Exception as error:
@@ -47,7 +106,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def addAutoIncrementalField(layer, fieldname, start):
+    def addAutoIncrementalField(layer: QgsVectorLayer, fieldname: str, start: int):
         """
         Adds a new integer field to a vector layer, with a sequential value for each feature.
         This field can be used as a unique ID for features in the layer. The new attribute is not added to the input layer but a new layer is generated instead.
@@ -83,7 +142,7 @@ class Worker:
                 'SORT_NULLS_FIRST':False,
                 'OUTPUT': 'memory:extracted'
             }
-            result = processing.run('native:addautoincrementalfield', parameter)['OUTPUT']
+            result = processing.run('native:addautoincrementalfield', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info(f'Parameters: {str(parameter)}')
             logger.info("addAutoIncrementalField  finished")
             return result
@@ -93,7 +152,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def deleteColumns (layer, columns):
+    def deleteColumns (layer: QgsVectorLayer, columns: list):
         """
         Takes a vector layer and generates a new one that has the same features but without the selected columns.
 
@@ -111,13 +170,14 @@ class Worker:
             The QgsVectorLayer output layer.
         """
         logger.info("deleting fields")
+
         try:
             parameter = {
                 'INPUT': layer,
                 'COLUMN':columns,
                 'OUTPUT': 'memory:extracted'
             }
-            result = processing.run('native:deletecolumn', parameter)['OUTPUT']
+            result = processing.run('native:deletecolumn', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info(f'Parameters: {str(parameter)}')
             logger.info("deleteColumns  finished")
             return result
@@ -127,7 +187,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def fieldCalculator (layer, fieldname, fieldtype, fieldlength, fieldprecision, formula):
+    def fieldCalculator (layer: QgsVectorLayer, fieldname: str, fieldtype: int, fieldlength: int, fieldprecision: int, formula: str):
         """
         Scripting the field calcualtor
         You can use all the supported expressions and functions.
@@ -136,8 +196,8 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
 
         fieldname : String
             The name of the new calcualted field
@@ -157,7 +217,7 @@ class Worker:
 
         Returns
         -------
-        Qgsvectorlayer [vector: any]
+        QgsVectorLayer [vector: any]
             The result output from the algorithem
         """
         logger.info("Calculating field")
@@ -171,7 +231,7 @@ class Worker:
                 'FORMULA': formula,
                 'OUTPUT': 'memory:extracted'
             }
-            result = processing.run('native:fieldcalculator', parameter)['OUTPUT']
+            result = processing.run('native:fieldcalculator', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info(f'Parameters: {str(parameter)}')
             logger.info("fieldCalculator  finished")
             return result
@@ -181,28 +241,28 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def timeStamper(layer, ts_fieldname):
+    def timeStamper(layer: QgsVectorLayer, ts_fieldname: str):
         """
             Create an attribute woth current timestamp on features.
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
 
         ts_fieldname : String
             The name of the new timestamp field
 
         Returns
         -------
-        Qgsvectorlayer [vector: any]
+        QgsVectorLayer [vector: any]
             The result output from the algorithem
         """
         logger.info(f'Creating timestamp {ts_fieldname} using fieldCalculator')
         newLayer = Worker.fieldCalculator(layer, ts_fieldname, 5, 0, 0, ' now() ')
         return newLayer
         
-    def renameTableField (layer, field, newname):
+    def renameTableField (layer: QgsVectorLayer, field: str, newname: str):
         """
         Renames an existing field from a vector layer.  
         The original layer is not modified. A new layer is generated where the attribute table contains the renamed field.
@@ -210,8 +270,8 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
 
         field : Tablefield
             The field that is to be renamed
@@ -222,7 +282,7 @@ class Worker:
 
         Returns
         -------
-        Qgsvectorlayer [vector: any]
+        QgsVectorLayer [vector: any]
             The result output from the algorithem
         """
         logger.info("Renaming field")
@@ -233,7 +293,7 @@ class Worker:
                 'NEW_NAME': newname,
                 'OUTPUT': 'memory:extracted'
             }
-            result = processing.run('native:renametablefield', parameter)['OUTPUT']
+            result = processing.run('native:renametablefield', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info(f'Parameters: {str(parameter)}')
             logger.info("renameTableField  finished")
             return result
@@ -243,22 +303,22 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def attributeindex(layer, field):
+    def attributeindex(layer: QgsVectorLayer, field: str):
         """
         Creates an index to speed up queries made against a field in a table.
         Support for index creation is dependent on the layer's data provider and the field type.
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
 
         field : Field
             The field to base the index on
 
         Returns
         -------
-        Qgsvectorlayer [vector: any]
+        QgsVectorLayer [vector: any]
             The result output from the algorithem
         """
         logger.info("Crating attribute index on " + layer + " on filed " + field)
@@ -268,7 +328,7 @@ class Worker:
                 'FIELD': field,
                 'OUTPUT': 'memory:extracted'
             }
-            result = processing.run('native:createattributeindex', parameter)['OUTPUT']
+            result = processing.run('native:createattributeindex', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info(f'Parameters: {str(parameter)}')
             logger.info("createattributeindex  finished")
             return result
@@ -279,29 +339,29 @@ class Worker:
             sys.exit()
 
     
-    def spatialindex(layer):
+    def spatialindex(layer: QgsVectorLayer):
         """
         Creates an index to speed up access to the features in a layer based on their spatial location.
         Support for spatial index creation is dependent on the layer's data provider.
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
 
         Returns
         -------
-        Qgsvectorlayer [vector: any]
+        QgsVectorLayer [vector: any]
             The result output from the algorithem
         """
         
         logger.info("Crating spatial index on " + layer)
         try:
             parameter = {
-                'INPUT': field,
+                'INPUT': layer,
                 'OUTPUT': 'memory:extracted'
             }
-            result = processing.run('native:createspatialindex', parameter)['OUTPUT']
+            result = processing.run('native:createspatialindex', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info(f'Parameters: {str(parameter)}')
             logger.info("createspatialindex  finished")
             return result
@@ -315,7 +375,7 @@ class Worker:
     ## ANALYSIS WORKERS
     ## ##################################
             
-    def clip(layer, overlay):
+    def clip(layer: QgsVectorLayer, overlay: str):
         """
         Clips a vector layer using the features of an additional polygon layer.
         Only the parts of the features in the input layer that fall within the polygons of 
@@ -323,7 +383,7 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
+        layer : QgsVectorLayer [vector: any]
             Layer containing the features to be clipped
 
         overlay : [vector: polygon]
@@ -331,7 +391,7 @@ class Worker:
 
         Returns
         -------
-        Qgsvectorlayer [vector: any]
+        QgsVectorLayer [vector: any]
             Layer to contain the features from the input layer that are inside the overlay (clipping) layer
         """
         logger.info("Clipping layers")
@@ -342,7 +402,7 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:clip', parameter)['OUTPUT']
+            result = processing.run('native:clip', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("Clip  finished")
             return result
         except Exception as error:
@@ -351,7 +411,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def joinByLocation(layer, predicate, join, join_fields, method, discard_nomatching, prefix):
+    def joinByLocation(layer: QgsVectorLayer, predicate: int, join: str, join_fields: list, method: int, discard_nomatching: bool, prefix: str):
         """
         Takes an input vector layer and creates a new vector layer that is an extended version of
         the input one, with additional attributes in its attribute table.
@@ -361,12 +421,12 @@ class Worker:
         
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
+        layer : QgsVectorLayer [vector: any]
             Input vector layer. 
             The output layer will consist of the features of this layer with attributes from 
             matching features in the second layer.
 
-        predicate : [enumeration] [list] Default: [0]
+        predicate : [enumeration] Default: [0]
             Type of spatial relation the source feature should have with the target feature so that they could be joined. One or more of:
             0 — intersect, 1 — contain, 2 — equal, 3 — touch, 4 — overlap, 5 — are within 6 — cross.
 
@@ -393,7 +453,7 @@ class Worker:
 
         Returns
         -------
-        Qgsvectorlayer [vector: any]
+        QgsVectorLayer [vector: any]
             the output vector layer for the join.
         """
         logger.info("Clipping layers")
@@ -409,7 +469,7 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:joinattributesbylocation', parameter)['OUTPUT']
+            result = processing.run('native:joinattributesbylocation', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("joinByLocation finished")
             return result
         except Exception as error:
@@ -418,24 +478,24 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def extractByLocation(layer, predicate, intersect):
+    def extractByLocation(layer: QgsVectorLayer, predicate: int, intersect: str):
         """_summary_
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
+        layer : QgsVectorLayer [vector: any]
             Input vector layer. 
 
-        predicate : [enumeration] [list] Default: [0]
+        predicate : [enumeration] Default: [0]
             Type of spatial relation the source feature should have with the target feature so that they could be joined. One or more of:
             0 — intersect, 1 — contain, 2 — equal, 3 — touch, 4 — overlap, 5 — are within 6 — cross.
 
-        intersect : Qgsvectorlayer [vector: any]
+        intersect : QgsVectorLayer [vector: any]
             Intersection vector layer
 
         Returns
         -------
-        Qgsvectorlayer [vector: any]
+        QgsVectorLayer [vector: any]
             the output vector layer for the join.
         """
         logger.info("Extracting by location")
@@ -447,7 +507,7 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:extractbylocation', parameter)['OUTPUT']
+            result = processing.run('native:extractbylocation', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("extractByLocation finished")
             return result
         except Exception as error:
@@ -456,7 +516,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def randomExtract(layer, method, number):
+    def randomExtract(layer: QgsVectorLayer, method: int, number: int):
         """
         Takes a vector layer and generates a new one that contains only a subset of the features in the input layer.
         The subset is defined randomly, based on feature IDs, using a percentage or count value to define 
@@ -464,18 +524,18 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
+        layer : QgsVectorLayer [vector: any]
             Input vector layer. 
 
-        method : _type_
-            _description_
+        method : [enumeration] Default: 0
+            Random selection method. One of: 0 — Number of selected features 1 — Percentage of selected features
 
-        number : [enumeration] Default: 0
-            Random selection method. One of: 0 — Number of selected features, 1 — Percentage of selected features
+        number : [number] Default: 10
+            Number or percentage of features to select
 
         Returns
         -------
-        Qgsvectorlayer [vector: polygon/line]
+        QgsVectorLayer [vector: polygon/line]
             The result output from the algorithem
         """
         logger.info("Extracting random features")
@@ -487,7 +547,7 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:randomextract', parameter)['OUTPUT']
+            result = processing.run('native:randomextract', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("randomExtract finished")
             return result
         except Exception as error:
@@ -496,7 +556,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def difference(layer, overlay):
+    def difference(layer: QgsVectorLayer, overlay: QgsVectorLayer):
         """
         Extracts features from the input layer that don’t fall within the boundaries of the overlay layer.
         Input layer features that partially overlap the overlay layer feature(s) are split along the 
@@ -504,15 +564,15 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
+        layer : QgsVectorLayer [vector: any]
             Layer to extract (parts of) features from.
 
-        overlay : Qgsvectorlayer [vector: any]
+        overlay : QgsVectorLayer [vector: any]
             Layer containing the geometries that will be subtracted from the iniput layer geometries
 
         Returns
         -------
-        Qgsvectorlayer [vector: polygon/line]
+        QgsVectorLayer [vector: polygon/line]
             The result output from the algorithem
         """
         logger.info("Finding differences")
@@ -523,7 +583,7 @@ class Worker:
                 'OUTPUT': 'memory:extracted'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:difference', parameter)['OUTPUT']
+            result = processing.run('native:difference', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("Difference  finished")
             return result
         except Exception as error:
@@ -537,7 +597,7 @@ class Worker:
     ## ##################################
             
 
-    def reproject(layer, targetEPSG):
+    def reproject(layer: QgsVectorLayer, targetEPSG: int):
         """
         Reprojects a vector layer in a different CRS.
         The reprojected layer will have the same features and attributes of the input layer.
@@ -545,8 +605,8 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: polygon]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: polygon]
+            The QgsVectorLayer input for the algorithem
 
         targetEPSG : Integer
             The EPSG code og the target coordinate system.
@@ -554,12 +614,13 @@ class Worker:
 
         Returns
         -------
-        Qgsvectorlayer [vector: polygon]
+        QgsVectorLayer [vector: polygon]
             The result output from the algorithem
         """
 
         logger.info("Running reporjector V2")
-        logger.info("Processing " + str(layer.featureCount()) +" features")
+        if layerHasFeatures(layer):
+            logger.info("Processing " + str(layer.featureCount()) +" features")
         try:
             parameter = {
                 'INPUT': layer,
@@ -567,7 +628,7 @@ class Worker:
                 'OUTPUT': 'memory:Reprojected'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:reprojectlayer', parameter)['OUTPUT']
+            result = processing.run('native:reprojectlayer', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("Reproject finished")
             return result
         except Exception as error:
@@ -576,7 +637,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def simplify(layer, method, tolerance):
+    def simplify(layer: QgsVectorLayer, method: int, tolerance:int):
             """
             Simplifies the geometries in a line or polygon layer. 
             It creates a new layer with the same features as the ones in the input layer, but with geometries containing a lower number of vertices.
@@ -584,8 +645,8 @@ class Worker:
 
             Parameters
             ----------
-            layer : Qgsvectorlayer [vector: polygon]
-                The Qgsvectorlayer input for the algorithem
+            layer : QgsVectorLayer [vector: polygon]
+                The QgsVectorLayer input for the algorithem
 
             method : Integer
                 Simplification method. One of: 0 — Distance (Douglas-Peucker), 1 — Snap to grid, 2 — Area (Visvalingam)
@@ -597,20 +658,22 @@ class Worker:
 
             Returns
             -------
-            Qgsvectorlayer [vector: polygon/line]
+            QgsVectorLayer [vector: polygon/line]
                 The result output from the algorithem
             """
 
-            logger.info("Running reporjector V2")
-            logger.info("Processing " + str(layer.featureCount()) +" features")
+            logger.info("Running simplify")
+            if layerHasFeatures(layer):
+                logger.info("Processing " + str(layer.featureCount()) +" features")
             try:
                 parameter = {
+                    'INPUT': layer,
                     'METHOD':method,
                     'TOLERANCE':tolerance,
-                    'OUTPUT': 'memory:Reprojected'
+                    'OUTPUT': 'memory:simplify'
                 }
                 logger.info(f'Parameters: {str(parameter)}')
-                result = processing.run('native:simplifygeometries', parameter)['OUTPUT']
+                result = processing.run('native:simplifygeometries', parameter, feedback=Worker.progress)['OUTPUT']
                 logger.info("Simplifygeometries finished")
                 return result
             except Exception as error:
@@ -619,7 +682,7 @@ class Worker:
                 logger.critical("Program terminated" )
                 sys.exit()
 
-    def forceRHR(layer):
+    def forceRHR(layer: QgsVectorLayer):
         """
         Forces polygon geometries to respect the Right-Hand-Rule, in which the area that is bounded
         by a polygon is to the right of the boundary. 
@@ -629,24 +692,25 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: polygon]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: polygon]
+            The QgsVectorLayer input for the algorithem
 
 
         Returns
         -------
-        Qgsvectorlayer [vector: polygon]
+        QgsVectorLayer [vector: polygon]
             The result output from the algorithem
         """
 
         logger.info("Running force right-hand rule")
-        logger.info("Processing " + str(layer.featureCount()) +" features")
+        if layerHasFeatures(layer):
+            logger.info("Processing " + str(layer.featureCount()) +" features")
         try:
             parameter = {
                 'INPUT': layer,
                 'OUTPUT': 'memory:forced'
             }
-            result = processing.run('native:forcerhr', parameter)['OUTPUT']
+            result = processing.run('native:forcerhr', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("forceRHR finished")
             return result
         except Exception as error:
@@ -655,7 +719,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def join_by_attribute(layer1, layer1_field, layer2, layer2_field, fields_to_copy, method, discard, prefix):
+    def join_by_attribute(layer1: QgsVectorLayer, layer1_field:str, layer2: QgsVectorLayer, layer2_field: str, fields_to_copy: list, method:int, discard: bool, prefix:str):
         """
         Takes an input vector layer and creates a new vector layer that is an extended version of the input one, 
         with additional attributes in its attribute table.
@@ -665,14 +729,14 @@ class Worker:
 
         Parameters
         ----------
-        layer1 : Qgsvectorlayer [vector: any]
-            The 1. Qgsvectorlayer input for the algorithem
+        layer1 : QgsVectorLayer [vector: any]
+            The 1. QgsVectorLayer input for the algorithem
 
         layer1_field : String
             Field of the source layer to use for the join
 
-        layer2 : Qgsvectorlayer [vector: any]
-            The 2. Qgsvectorlayer input for the algorithem
+        layer2 : QgsVectorLayer [vector: any]
+            The 2. QgsVectorLayer input for the algorithem
 
         layer2_field : String
             Field of the source layer to use for the join
@@ -693,12 +757,13 @@ class Worker:
 
         Returns
         -------
-        Qgsvectorlayer [vector: polygon]
+        QgsVectorLayer [vector: polygon]
             The result output from the algorithem
 
         """
         logger.info("Joining features features")
-        logger.info("Processing " + str(layer1.featureCount()) +" features")
+        if layerHasFeatures(layer1):
+            logger.info("Processing " + str(layer1.featureCount()) +" features")
         try:
             parameter = {
                 'INPUT':layer1,
@@ -712,9 +777,10 @@ class Worker:
                 'OUTPUT': 'memory:joined'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:joinattributestable', parameter)['OUTPUT']
+            result = processing.run('native:joinattributestable', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("Joinattributestable finished")
-            logger.info("Returning " + str(result.featureCount()) +" features")
+            if layerHasFeatures(result):
+                logger.info("Returning " + str(result.featureCount()) +" features")
             return result
         except Exception as error:
             logger.error("An error occured in joinattributestable")
@@ -722,7 +788,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def dissolveFeatures(layer, fieldList, disjoined):
+    def dissolveFeatures(layer: QgsVectorLayer, fieldList: list, disjoined: bool):
         """
         Takes a vector layer and combines its features into new features. 
         One or more attributes can be specified to dissolve features belonging to the same class 
@@ -732,8 +798,8 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
 
         fieldList : List
             List of fields to dissolve on. Default []
@@ -744,12 +810,13 @@ class Worker:
 
         Returns
         -------
-        Qgsvectorlayer [vector: polygon]
+        QgsVectorLayer [vector: polygon]
             The result output from the algorithem
 
         """
         logger.info("Dissolving features")
-        logger.info("Processing " + str(layer.featureCount()) +" features")
+        if layerHasFeatures(layer):
+            logger.info("Processing " + str(layer.featureCount()) +" features")
         try:
             parameter = {
                 'INPUT': layer,
@@ -758,9 +825,10 @@ class Worker:
                 'OUTPUT': 'memory:dissolved'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:dissolve', parameter)['OUTPUT']
+            result = processing.run('native:dissolve', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("DissolveFeatures finished")
-            logger.info("Returning " + str(result.featureCount()) +" features")
+            if layerHasFeatures(result):
+                logger.info("Returning " + str(result.featureCount()) +" features")
             return result
         except Exception as error:
             logger.error("An error occured in dissolveFeatures")
@@ -768,7 +836,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def bufferLayer(layer, distance, segements, endcapStyle, joinStyle, miterLimit, dissolve):
+    def bufferLayer(layer: QgsVectorLayer, distance: int, segements: int, endcapStyle: int, joinStyle: int, miterLimit: int, dissolve: bool):
         """
         Computes a buffer area for all the features in an input layer, using a fixed or data defined distance.
         It is possible to use a negative distance for polygon input layers.
@@ -777,8 +845,8 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
 
         distance : Integer
             The buffer distance. Default: 10.0
@@ -804,12 +872,13 @@ class Worker:
 
         Returns
         -------
-        Qgsvectorlayer [vector: polygon]
+        QgsVectorLayer [vector: polygon]
             The result output from the algorithem
         """
 
         logger.info("Creating buffer layer")
-        logger.info("Processing " + str(layer.featureCount()) +" features")
+        if layerHasFeatures(layer):
+            logger.info("Processing " + str(layer.featureCount()) +" features")
         try:
             parameter = {
                 'INPUT': layer,
@@ -822,7 +891,7 @@ class Worker:
                 'OUTPUT': 'memory:buffer'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:buffer', parameter)['OUTPUT']
+            result = processing.run('native:buffer', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("BufferLayer finished")
             return result
         except Exception as error:
@@ -831,7 +900,7 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def fixGeometry(layer):
+    def fixGeometry(layer: QgsVectorLayer):
         """
         Attempts to create a valid representation of a given invalid geometry without losing any of the input vertices.
         Already valid geometries are returned without further intervention. Always outputs multi-geometry layer.
@@ -839,25 +908,26 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
 
 
         Returns
         -------
-        Qgsvectorlayer [vector: any]
+        QgsVectorLayer [vector: any]
             The result output from the algorithem
 
         """
         logger.info("Fixing geometries")
-        logger.info("Processing " + str(layer.featureCount()) +" features")
+        if layerHasFeatures(layer):
+            logger.info("Processing " + str(layer.featureCount()) +" features")
         try:
             parameter = {
                 'INPUT': layer,
                 'OUTPUT': 'memory:buffer'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:fixgeometries', parameter)['OUTPUT']
+            result = processing.run('native:fixgeometries', parameter, feedback=Worker.progress)['OUTPUT']
             logger.info("FixGeometry finished")
             return result
         except Exception as error:
@@ -866,7 +936,44 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
-    def randomselection(layer,method, number):
+    def createCentroids(layer: str):
+        """
+        Creates a new point layer, with points representing the centroids of the geometries of the input layer.
+        The centroid is a single point representing the barycenter (of all parts) of the feature, so it can be outside the feature borders. But can also be a point on each part of the feature.
+        The attributes of the points in the output layer are the same as for the original features.
+
+        Parameters
+        ----------
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
+
+
+        Returns
+        -------
+        QgsVectorLayer [vector: any]
+            The result output from the algorithem
+
+        """
+        logger.info("Creating centroids")
+        if layerHasFeatures(layer):
+            logger.info("Processing " + str(layer.featureCount()) +" features")
+        try:
+            parameter = {
+                'INPUT': layer,
+                'ALL_PARTS':False,
+                'OUTPUT': 'memory:buffer'
+            }
+            logger.info(f'Parameters: {str(parameter)}')
+            result = processing.run('native:centroids', parameter, feedback=Worker.progress)['OUTPUT']
+            logger.info("Centroids finished")
+            return result
+        except Exception as error:
+            logger.error("An error occured in createCentroids")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
+            script_failed()
+
+    def randomselection(layer: QgsVectorLayer, method: int, number: int):
         """
         Takes a vector layer and selects a subset of its features. No new layer is generated by this algorithm.
         The subset is defined randomly, based on feature IDs, using a percentage or count value to define the 
@@ -874,8 +981,8 @@ class Worker:
 
         Parameters
         ----------
-        layer : Qgsvectorlayer [vector: any]
-            The Qgsvectorlayer input for the algorithem
+        layer : QgsVectorLayer [vector: any]
+            The QgsVectorLayer input for the algorithem
 
         method : Integer
             Random selection method. One of: 0 — Number of selected features, 1 — Percentage of selected features
@@ -885,11 +992,12 @@ class Worker:
 
         Returns
         -------
-        _type_
-            _description_
+        QgsVectorLayer [vector: any]
+            The result output from the algorithem
         """
         logger.info("Performing random selection")
-        logger.info("Processing " + str(layer.featureCount()) +" features")
+        if layerHasFeatures(layer):
+            logger.info("Processing " + str(layer.featureCount()) +" features")
         try:
             parameter = {
                 'INPUT': layer,
@@ -898,8 +1006,9 @@ class Worker:
                 'OUTPUT': 'memory:buffer'
             }
             logger.info(f'Parameters: {str(parameter)}')
-            result = processing.run('native:randomextract', parameter)['OUTPUT']
-            logger.info("Returning " + str(result.featureCount()) +" features")
+            result = processing.run('native:randomextract', parameter, feedback=Worker.progress)['OUTPUT']
+            if layerHasFeatures(result):
+                logger.info("Returning " + str(result.featureCount()) +" features")
             logger.info("randomextract finished")
             return result
         except Exception as error:
@@ -908,3 +1017,212 @@ class Worker:
             logger.critical("Program terminated" )
             sys.exit()
 
+    def execute_sql(connection, databasetype, sql_expression, pgdb_name=None, driver=None):
+        """
+        Execute an SQL query against a database. 
+        This can be used to create tables, truncate, build indexes etc.
+        The database type must be specified in the 'database' parameter (one of 'Mssql' or 'Postgres')
+        The default Mssql driver is 'SQL Server' - if this needs to be overwritten, specify the parameter driver, else leave it empty.
+        SQL statments must be trippel double-quoted - prepare the statement in the QGIS sql executor tool for testing. 
+
+        Parameters
+        ----------
+        connection : str
+            Name of a database connection from settings.json
+        databasetype : str
+            The database type, one of 'Mssql' or 'Postgres'.
+        sql_expression : str
+            The SQL expression to be executed. Use trippel double-quotes arraound the expression
+        pgdb_name: str
+            Name of postgres database if databasetype is  Postgres. Defaults to None.
+        driver : str
+            Defaults to None. The name of the Mssql driver, if 'SQL Server' is not working.
+
+        Returns
+        -------
+        Errorcode : int
+            Returns 0 if the SQL is executed without errors.
+
+        """
+
+        config = get_config()
+        if databasetype in ('Postgres', 'Mssql'):
+            logger.info(f'Running SQL executor on {databasetype}' )
+        else :
+            logger.info(f'Unsupported database: {databasetype}, use one of "Mssql" or "Postgres"' )
+            logger.critical("Program terminated" )
+            sys.exit()
+        try:
+            dbconnection = config['DatabaseConnections'][connection]
+            if databasetype == 'Mssql':
+                import pyodbc 
+                if driver == "":
+                    mssqldriver = 'SQL Server'
+                else :
+                    mssqldriver = 'driver'
+                cnxn = pyodbc.connect('DRIVER={'+mssqldriver+'};Server='+dbconnection['host']+';Database='+dbconnection['databasename']+';User ID='+dbconnection['user']+';Password='+dbconnection['password'])
+                logger.info("Using connection :" + 'DRIVER={'+mssqldriver+'};Server='+dbconnection['host']+';Database='+dbconnection['databasename']+';User ID='+dbconnection['user']+';Password=xxxxxxxx')
+                cursor = cnxn.cursor()
+                logger.info(f'Query: {sql_expression}' )
+                cursor.execute(sql_expression) 
+                logger.info("SQL executor finished")
+                return 0
+            
+            if databasetype == 'Postgres':
+                import psycopg2
+                connection = psycopg2.connect(user=dbconnection['user'], password=dbconnection['password'], host=dbconnection['host'], port=dbconnection['port'], database=pgdb_name)
+                logger.info("Using connection : user="+ dbconnection['user']+", password=xxxxxx, host="+dbconnection['host']+", port="+dbconnection['port']+", database="+pgdb_name )
+                cursor = connection.cursor()
+                logger.info(f'Query: {sql_expression}' )
+                cursor.execute(sql_expression)
+                connection.commit()
+                cursor.close()
+                connection.close()
+                logger.info("SQL executor finished")
+                return 0
+                
+        except Exception as error:
+            logger.error("An error occured running SQL executor")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
+            sys.exit()
+
+    def fileDeleter(file: str):
+        """
+        Delete a specific file.
+
+        Parameters
+        ----------
+        file : str
+            The full path to the file to be deleted
+
+        Returns
+        -------
+        None
+        
+        """
+
+        logger.info(f'Deleting file {file}')
+        try:
+
+            if os.path.exists(file):
+                os.remove(file)
+                logger.info(f'File {file} deleted')
+            else:
+                logger.info(f'File {file} does not exist')
+            return None
+        except Exception as error:
+            logger.error("An error occured deleting file")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
+            script_failed()
+
+    def folderTruncator(folder: str):
+        """
+        Deletes all contents of a folder (files and directories), but not the folder it self.
+
+        Parameters
+        ----------
+        folder : str
+            Full path to the folder to be truncated
+
+        Returns
+        -------
+        None
+
+        """
+
+        logger.info(f'Truncating folder {folder}')
+        try:
+            for root, dirs, files in os.walk(folder):
+                for f in files:
+                    os.unlink(os.path.join(root, f))
+                for d in dirs:
+                    shutil.rmtree(os.path.join(root, d))
+            logger.info(f'Folder {folder} truncated')
+
+            return None
+        except Exception as error:
+            logger.error("An error occured truncating folder")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
+            script_failed()
+
+    def mergeVectorLayers(layers: list, crs: str ):
+        """
+        Combines multiple vector layers of the same geometry type into a single one.
+        The attribute table of the resulting layer will contain the fields from all input layers. 
+        If fields with the same name but different types are found then the exported field will be automatically 
+        converted into a string type field. New fields storing the original layer name and source are also added.
+
+        Optionally, the destination coordinate reference system (CRS) for the merged layer can be set. If it is 
+        not set, the CRS will be taken from the first input layer. All layers will be reprojected to match this CRS.
+
+        Parameters
+        ----------
+        layer : List [vector: any] [list]
+            The layers that are to be merged into a single layer. Layers should be of the same geometry type.
+
+        CRS : [crs]
+            Choose the CRS for the output layer. If not specified, the CRS of the first input layer is used.
+        
+        Returns
+        -------
+        QgsVectorLayer [vector: any]
+            The result output from the algorithem
+        
+        """
+        logger.info("Performing mergeVectorLayers")
+        logger.info(f'Processing {str(len(layers))} layers')
+        try:
+            parameter = {
+                'LAYERS': layers,
+                'CRS':crs,
+                'OUTPUT': 'memory:buffer'
+            }
+            logger.info(f'Parameters: {str(parameter)}')
+            result = processing.run('native:mergevectorlayers', parameter, feedback=Worker.progress)['OUTPUT']
+            logger.info("Returning " + str(result.featureCount()) +" features")
+            logger.info("mergeVectorLayers finished")
+            return result
+        except Exception as error:
+            logger.error("An error occured in mergeVectorLayers")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
+            script_failed()
+
+    def delete_geopacakge_layers(geopackage: str, layernames: list):
+        """
+        Deletes one or more tables from a geopackage
+
+        Parameters
+        ----------
+        geopackage : str
+            The full path for the geopackage file
+        layernames : list
+            List of layernames to be deleted
+
+        """
+        logger.info("Performing delete_geopacakge_layer")
+        logger.info(f"Deleting layers {layernames}")
+
+        if os.path.isfile(geopackage):
+            try:
+                for layer in layernames:
+                    logger.info(f"Deleting layer {layer}")
+                    parameter = {'DATABASE':'{0}|layername={1}'.format(geopackage, layer),
+                    'SQL':'drop table {0}'.format(layer)}
+                    logger.info(f'Parameters: {str(parameter)}')
+                    processing.run("native:spatialiteexecutesql", parameter )
+                    logger.info(f"Layer deleted")
+                logger.info(f"Finished deleting layers")
+
+                
+            except Exception as error:
+                logger.error("An error occured in delete_geopacakge_layer")
+                logger.error(f'{type(error).__name__}  –  {str(error)}')
+                logger.critical("Program terminated" )
+                script_failed()
+        else:    
+            pass
+        
