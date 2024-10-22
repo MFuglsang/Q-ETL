@@ -233,7 +233,7 @@ def script_failed():
     now = datetime.now()
     config = get_config()
 
-    email = config["emailConfiguration"]["emailOnError"]
+    email = bool(config["emailConfiguration"]["emailOnError"])
 
     if email == True:
         try:
