@@ -1,4 +1,5 @@
 from core.logger import *
+from core.misc import script_failed
 import sys
 import shutil
 import sqlite3
