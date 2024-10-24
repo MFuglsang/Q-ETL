@@ -54,7 +54,7 @@ class Constructor:
                 wkt_layer.commitChanges()
 
                 logger.info("layerFromWKT finished")
-                if layerHasFeatures(layer):
+                if layerHasFeatures(wkt_layer):
                     logger.info(f'Returning {str(wkt_layer.featureCount())} features')
                 return wkt_layer
 
