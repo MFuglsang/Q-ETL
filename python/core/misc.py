@@ -60,18 +60,6 @@ def validateEnvironment(settings):
     except:
         logger.info('Qgs_PrefixPath not configured')
         script_failed()
-    try:    
-        isExist = os.path.exists(settings['QGIS_Plugin_Path'])
-        if not isExist:
-            
-            logger.error('QGIS_Plugin_Path not found')
-            logger.critical('Program terminated')
-            script_failed()
-        else:
-            logger.info('QGIS_Plugin_Path found')
-    except:
-        logger.info('QGIS_Plugin_Path not configured')
-        script_failed()
 
     try:
         isExist = os.path.exists(settings['QGIS_bin_folder'])
@@ -86,7 +74,21 @@ def validateEnvironment(settings):
         logger.info('QGIS_Bin_Folder Not configured')
         script_failed()
 
+    try:
+        isExist = os.path.exists(settings['QGIS_ini_Path'])
+        if not isExist:
+            
+            logger.error('QGIS_ini_Path not found')
+            logger.critical('Program terminated')
+            script_failed()
+        else:
+            logger.info('QGIS_ini_Path found')
+    except : 
+        logger.info('QGIS_ini_Path Not configured')
+        script_failed()
+
     ## Locating the logdir
+    
     try:
         isExist = os.path.exists(settings['logdir'])
         if not isExist:
@@ -94,7 +96,7 @@ def validateEnvironment(settings):
             logger.critical('Program terminated')
             script_failed()
         else:
-            logger.info('Logdir found')
+            logger.info(f'Logdir is {settings["logdir"]}')
 
         if settings['logdir'][-1] != '/':
             settings['logdir'] = settings['logdir'] + '/'
@@ -110,7 +112,7 @@ def validateEnvironment(settings):
             logger.critical('Program terminated')
             script_failed()
         else:
-            logger.info('TempFolder found')
+            logger.info(f'TempFolder is {settings["TempFolder"]}')
         if settings['TempFolder'][-1] != '/':
             settings['TempFolder'] = settings['TempFolder'] + '/'
     except: 
@@ -179,6 +181,12 @@ def get_config():
 
     with open(settings_file, 'r') as file:
         settings = json.load(file)
+
+        ##Setting the plugin path based on Qgs_PrefixPath 
+        settings['QGIS_Plugin_Path'] = settings['Qgs_PrefixPath'] + '/python/plugins'
+
+        if not os.path.exists(settings['logdir']):
+            settings['logdir'] = path.abspath(path.join(argv[0] ,"../..")) + '/logs'
 
     return settings
 
