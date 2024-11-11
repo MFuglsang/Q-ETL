@@ -7,6 +7,7 @@ from core.misc import get_config, layerHasFeatures
 from qgis.analysis import QgsNativeAlgorithms
 from qgis.core import QgsCoordinateReferenceSystem, QgsVectorLayer, QgsProcessingFeedback
 from qgis import processing
+import requests
 
 
 class Worker:
@@ -1225,4 +1226,39 @@ class Worker:
                 script_failed()
         else:    
             pass
+
+    def download_file(url, local_filename):
+        """
+        Downloads a file from the given URL and saves it locally.
+
+        Parameters
+        ----------
+        url : str
+            The URL of the file to download
+        local_filename : str
+            The local path where the file should be saved.
+
+        Returns
+        -------
+        Boolean
+            True if download is succesful, otherwise False.
+        """
+
+        logger.info(f'Downloading file from {url}')
+        try:
+            with requests.get(url, stream=True) as response:
+                response.raise_for_status()
+                with open(local_filename, 'wb') as file:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        file.write(chunk)
+            
+            logger.info(f'Download completed: {local_filename}')
+            return True
         
+        except Exception as error:
+            logger.error('An error occurred when downloading the file')
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
+            script_failed()
+        
+        return False
