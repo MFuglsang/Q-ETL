@@ -1262,3 +1262,32 @@ class Worker:
             script_failed()
         
         return False
+
+    def assign_projection(layer: QgsVectorLayer, targetEPSG: int):
+        """
+        Assign a new projection on a layer. The returned layer is precisely the same layer but assigned a new CRS.
+
+        Parameters
+        ----------
+        layer : QgsVectorLayer
+            The layer to be assigned a new CRS.
+        
+        targetEPSG : int
+            The EPSG code og the target coordinate system.
+        """
+        logger.info(f'Assigning CRS EPSG:{targetEPSG} to {layer.name()}')
+        try:
+            parameter = {
+                'INPUT': layer,
+                'CRS': QgsCoordinateReferenceSystem(targetEPSG),
+                'OUTPUT': 'TEMPORARY_OUTPUT'
+            }
+            logger.info(f'Parameters: {str(parameter)}')
+            result = processing.run('native:assignprojection', parameter, feedback=Worker.progress)['OUTPUT']
+            logger.info('Assigning projection finished')
+            return result
+        except Exception as error:
+            logger.error("An error occured assigning a new crs to layer")
+            logger.error(f'{type(error).__name__}  –  {str(error)}')
+            logger.critical("Program terminated" )
+            sys.exit()
