@@ -1,1 +1,0 @@
-PATH_TO/python.exe PATH_TO/server.py
